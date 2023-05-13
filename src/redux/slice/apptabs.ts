@@ -1,31 +1,34 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export interface Tab {
+  title: string;
+  route: string;
+}
+
 interface Tabs {
-  tabs: any[];
-  activeTab: any;
+  tabs: Tab[];
+  prevRoute: string;
 }
 
 const initialState: Tabs = {
-  tabs: [{ id: 1, title: 'Schema', route: '/' }],
-  activeTab: { id: 1, title: 'Schema', route: '/' },
+  tabs: [{ title: 'Schema', route: '/' }],
+  prevRoute: '/',
 };
 
 const tabsSlice = createSlice({
   name: 'tabs',
   initialState,
   reducers: {
-    setNewTab: (state, { payload }: PayloadAction<object>) => {
+    setNewTab: (state, { payload }: PayloadAction<Tab>) => {
       state.tabs = [...state.tabs, payload];
     },
-    removeTab: (state, { payload }: PayloadAction<number>) => {
-      state.tabs = state.tabs.filter((tab) => tab.id !== payload);
+    removeTab: (state, { payload }: PayloadAction<string>) => {
+      state.tabs = state.tabs.filter((tab) => tab.title !== payload);
     },
-    setActiveTab: (state, { payload }: PayloadAction<object>) => {
-      state.activeTab = payload;
-    },
+    resetTabs: () => initialState,
   },
 });
 
-export const { setNewTab, removeTab, setActiveTab } = tabsSlice.actions;
+export const { setNewTab, removeTab, resetTabs } = tabsSlice.actions;
 
 export default tabsSlice.reducer;

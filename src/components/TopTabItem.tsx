@@ -1,20 +1,24 @@
 import { Box, IconButton, Typography } from '@mui/material';
-import React from 'react';
 import { tokens } from '../theme';
 import TopBarX from '../images/icons/TopBarX';
-import { useAppDispatch } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { removeTab } from '../redux/slice/apptabs';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface TopTabItemProps {
-  id: number;
   active: boolean;
   title: string;
-  data?: any;
+  index: number;
 }
 
-export default function TopTabItem({ active, title, data, id }: TopTabItemProps) {
+export default function TopTabItem({ active, title, index }: TopTabItemProps) {
   const colors = tokens();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const tabs = useAppSelector((state) => state.appTabs.tabs);
+
+  const activeTab = tabs.filter((t) => t.title === title)[0].route === pathname;
   return (
     <Box
       display={'flex'}
@@ -38,11 +42,23 @@ export default function TopTabItem({ active, title, data, id }: TopTabItemProps)
         {title}
       </Typography>
 
-      <Box justifyContent={'center'} alignItems={'center'} display={'flex'} color={colors.primary[900]}>
-        <IconButton onClick={() => dispatch(removeTab(id))}>
-          <TopBarX />
-        </IconButton>
-      </Box>
+      {tabs.length > 1 && (
+        <Box justifyContent={'center'} alignItems={'center'} display={'flex'} color={colors.primary[900]}>
+          <IconButton
+            onClick={() => {
+              const newIndex = index - 1 >= 0 ? index - 1 : 0;
+              if (activeTab) {
+                dispatch(removeTab(title));
+                navigate(tabs[newIndex].route);
+              } else {
+                dispatch(removeTab(title));
+              }
+            }}
+          >
+            <TopBarX />
+          </IconButton>
+        </Box>
+      )}
     </Box>
   );
 }

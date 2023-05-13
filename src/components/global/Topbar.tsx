@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import TopTabItem from '../../components/TopTabItem';
+import TopTabItem from '../TopTabItem';
 import { tokens } from '../../theme';
 import TopBarPlus from '../../images/icons/TopBarPlus';
 import { useLocation } from 'react-router-dom';
@@ -21,8 +21,8 @@ export default function Topbar({ items }: TopBarProps) {
       borderBottom={1}
       borderColor={colors.grey[900]}
     >
-      {items.map((i) => (
-        <TopTabItem active={i.route === pathname ? true : false} title={i.title} id={i.id} />
+      {items.map((i, index) => (
+        <TopTabItem active={i.route === pathname ? true : false} title={i.title} index={index} />
       ))}
 
       <Box
