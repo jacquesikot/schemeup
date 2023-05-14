@@ -7,6 +7,7 @@ const newAppTab = (dispatch: any, title: string, route: string, tabs: Tab[], nav
     navigate(route);
   } else {
     dispatch(setNewTab({ title, route }));
+    navigate(route);
   }
 };
 

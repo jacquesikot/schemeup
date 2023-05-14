@@ -1,7 +1,7 @@
 import 'react-pro-sidebar/dist/css/styles.css';
 import { useState } from 'react';
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
-import { Avatar, Box, Button, IconButton, Typography } from '@mui/material';
+import { Avatar, Box, IconButton, Typography } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MenuOpenRoundedIcon from '@mui/icons-material/MenuOpenRounded';
 
@@ -13,7 +13,8 @@ import SideBarDatasources from '../../images/icons/SideBarDatasources';
 import SideBarLogout from '../../images/icons/SideBarLogout';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import newAppTab from '../../utils/newAppTab';
-import { resetTabs } from '../../redux/slice/apptabs';
+import SideBarToggleClose from '../../images/icons/SideBarToggleClose';
+import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
 
 const Item = ({ title, to, icon, selected, setSelected }: any) => {
   const dispatch = useAppDispatch();
@@ -64,10 +65,7 @@ const Sidebar = () => {
   const colors = tokens();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [_, setSelected] = useState('Schema');
-  const navigate = useNavigate();
   const { pathname } = useLocation();
-  const dispatch = useAppDispatch();
-  const tabs = useAppSelector((state) => state.appTabs.tabs);
 
   return (
     <Box
@@ -97,11 +95,7 @@ const Sidebar = () => {
           {/* LOGO AND MENU ICON */}
           <Box>
             {!isCollapsed && (
-              <Box
-                onClick={() => {
-                  newAppTab(dispatch, 'Schema', '/', tabs, navigate);
-                }}
-              >
+              <Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center" pl={4} pr={3}>
                   <Box display={'flex'} alignItems={'center'}>
                     <img src={logo} alt="SchemupLogo" />
@@ -110,7 +104,7 @@ const Sidebar = () => {
                     SchemeUp
                   </Typography>
                   <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                    <MenuOpenRoundedIcon style={{ width: 30, height: 30 }} />
+                    <SideBarToggleClose />
                   </IconButton>
                 </Box>
               </Box>
@@ -118,7 +112,7 @@ const Sidebar = () => {
 
             <MenuItem
               onClick={() => setIsCollapsed(!isCollapsed)}
-              icon={isCollapsed ? <MenuOpenRoundedIcon style={{ width: 30, height: 30 }} /> : undefined}
+              icon={isCollapsed ? <SideBarToggleOpen /> : undefined}
               style={{
                 margin: '10px 0 20px 0',
                 color: colors.grey[100],
@@ -131,7 +125,7 @@ const Sidebar = () => {
               title="Schema"
               to="/"
               icon={<SideBarSchema />}
-              selected={pathname === '/' ? 'Schema' : undefined}
+              selected={pathname === '/' || pathname.includes('/schema') ? 'Schema' : undefined}
               setSelected={setSelected}
             />
 
