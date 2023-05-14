@@ -6,8 +6,15 @@ import Undo from '../images/icons/canvas-controls/Undo';
 import Link from '../images/icons/canvas-controls/Link';
 import Comment from '../images/icons/canvas-controls/Comment';
 import Table from '../images/icons/canvas-controls/Table';
+import Share from '../images/icons/canvas-controls/Share';
+import Export from '../images/icons/canvas-controls/Export';
+import Settings from '../images/icons/canvas-controls/Settings';
 
-export default function NewSchemaHeader() {
+interface NewSchemaHeaderProps {
+  toggleSettingsDrawer: (open: boolean) => void;
+}
+
+export default function NewSchemaHeader({ toggleSettingsDrawer }: NewSchemaHeaderProps) {
   const { name } = useParams<{ name: string }>();
 
   return (
@@ -84,8 +91,24 @@ export default function NewSchemaHeader() {
       </Box>
 
       {/* SHARE/EXPORT CONTROLS */}
-      <Box>
-        <h4>Share Controls</h4>
+      <Box display={'flex'} width={'13%'} justifyContent={'space-between'}>
+        <Tooltip title="Share Schema">
+          <IconButton>
+            <Share />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Export Schema">
+          <IconButton>
+            <Export />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Settings">
+          <IconButton onClick={() => toggleSettingsDrawer(true)}>
+            <Settings />
+          </IconButton>
+        </Tooltip>
       </Box>
     </Box>
   );

@@ -122,6 +122,7 @@ export default function Topbar({ items }: TopBarProps) {
           placement="bottom-start"
           transition
           disablePortal
+          style={{ zIndex: 1000 }}
         >
           {({ TransitionProps, placement }) => (
             <Grow
