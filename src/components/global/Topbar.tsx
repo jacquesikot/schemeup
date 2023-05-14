@@ -8,9 +8,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { useState } from 'react';
 import newAppTab from '../../utils/newAppTab';
+import { Tab } from '../../redux/slice/apptabs';
+import generateSchemaName from '../../utils/generateSchemaName';
 
 interface TopBarProps {
-  items: any[];
+  items: Tab[];
 }
 
 export default function Topbar({ items }: TopBarProps) {
@@ -85,6 +87,7 @@ export default function Topbar({ items }: TopBarProps) {
     >
       {items.map((i, index) => (
         <TopTabItem
+          key={index}
           active={i.route === pathname ? true : false}
           title={i.title}
           index={index}
@@ -111,6 +114,7 @@ export default function Topbar({ items }: TopBarProps) {
         >
           <TopBarPlus />
         </IconButton>
+        {/* TODO: EXTRPOLATE THIS INTO A HIGHER COMPONENT THAT CAN BE USED IN OTHER PLACES */}
         <Popper
           open={open}
           anchorEl={anchorRef.current}
@@ -136,8 +140,14 @@ export default function Topbar({ items }: TopBarProps) {
                   >
                     <MenuItem
                       onClick={(e) => {
-                        const newSchemaId = Math.random().toFixed(5);
-                        newAppTab(dispatch, `Schema - ${newSchemaId}`, `/schema/${newSchemaId}`, tabs, navigate);
+                        const newSchemaName = generateSchemaName();
+                        newAppTab(
+                          dispatch,
+                          `Schema - ${newSchemaName}`,
+                          `/schema/new/${newSchemaName}`,
+                          tabs,
+                          navigate
+                        );
                         handleClose(e);
                       }}
                     >

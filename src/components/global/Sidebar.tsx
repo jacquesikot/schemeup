@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Avatar, Box, IconButton, Typography } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import MenuOpenRoundedIcon from '@mui/icons-material/MenuOpenRounded';
 
 import { tokens } from '../../theme';
 import logo from '../../images/schemup_logo.png';
@@ -16,7 +15,15 @@ import newAppTab from '../../utils/newAppTab';
 import SideBarToggleClose from '../../images/icons/SideBarToggleClose';
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
 
-const Item = ({ title, to, icon, selected, setSelected }: any) => {
+interface ItemProps {
+  title: string;
+  to: string;
+  icon: any;
+  selected: string;
+  setSelected: any;
+}
+
+const Item = ({ title, to, icon, selected, setSelected }: ItemProps) => {
   const dispatch = useAppDispatch();
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const navigate = useNavigate();
@@ -120,12 +127,13 @@ const Sidebar = () => {
             ></MenuItem>
           </Box>
 
+          {/* NAV ITEMS */}
           <Box mt={5} alignItems={'center'} justifyContent={'center'} display={'flex'} flexDirection={'column'}>
             <Item
               title="Schema"
               to="/"
               icon={<SideBarSchema />}
-              selected={pathname === '/' || pathname.includes('/schema') ? 'Schema' : undefined}
+              selected={pathname === '/' || pathname.includes('/schema') ? 'Schema' : ''}
               setSelected={setSelected}
             />
 
@@ -133,7 +141,7 @@ const Sidebar = () => {
               title="Mock Data"
               to="/mock-data"
               icon={<SideBarMockData />}
-              selected={pathname.includes('/mock-data') ? 'Mock Data' : undefined}
+              selected={pathname.includes('/mock-data') ? 'Mock Data' : ''}
               setSelected={setSelected}
             />
 
@@ -141,7 +149,7 @@ const Sidebar = () => {
               title="DataSources"
               to="/datasources"
               icon={<SideBarDatasources />}
-              selected={pathname.includes('/datasources') ? 'DataSources' : undefined}
+              selected={pathname.includes('/datasources') ? 'DataSources' : ''}
               setSelected={setSelected}
             />
           </Box>
