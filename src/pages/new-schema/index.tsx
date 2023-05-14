@@ -1,9 +1,7 @@
 import 'reactflow/dist/style.css';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, Button, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import { tokens } from '../../theme';
-import { useParams } from 'react-router-dom';
-import ReactFlow, { MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from 'reactflow';
+import { Box } from '@mui/material';
+import ReactFlow, { MiniMap, Controls, useNodesState, useEdgesState, addEdge } from 'reactflow';
 
 import NewSchemaHeader from '../../components/NewSchemaHeader';
 
@@ -15,17 +13,6 @@ const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
 const NewSchema = () => {
   const containerRef = useRef<any>(null);
-  const initialNodes = [
-    { id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
-    { id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
-  ];
-
-  const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
-
-  const theme = useTheme();
-  const colors = tokens();
-
-  const { name } = useParams<{ name: string }>();
 
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
