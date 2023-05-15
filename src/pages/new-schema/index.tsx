@@ -1,12 +1,12 @@
 import 'reactflow/dist/style.css';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, Button, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import React, { useCallback, useRef, useState } from 'react';
+import { Box, useTheme } from '@mui/material';
 import { tokens } from '../../theme';
-import { useParams } from 'react-router-dom';
 import ReactFlow, { MiniMap, Controls, useNodesState, useEdgesState, addEdge } from 'reactflow';
 
 import NewSchemaHeader from '../../components/NewSchemaHeader';
-import CanvasDrawer from '../../components/CanvasDrawer';
+import CanvasDrawer from '../../components/canvas/CanvasDrawer';
+import SchemaProperties from '../../components/canvas/SchemaProperties';
 
 const initialNodes = [
   { id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
@@ -26,7 +26,8 @@ const NewSchema = () => {
   const theme = useTheme();
   const colors = tokens();
 
-  const [drawerState, setDrawerState] = useState<boolean>(true);
+  const [drawerState, setDrawerState] = useState<boolean>(false);
+  const [tableActive, setTableActive] = useState<boolean>(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -34,13 +35,11 @@ const NewSchema = () => {
   const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   return (
-    <Box ref={containerRef} style={{ width: '100%', height: '85%', position: 'relative' }}>
-      <NewSchemaHeader toggleSettingsDrawer={setDrawerState} />
+    <Box ref={containerRef} style={{ width: '100%', height: '91%', position: 'relative' }}>
+      <NewSchemaHeader toggleSettingsDrawer={setDrawerState} drawerState={drawerState} />
 
-      <CanvasDrawer open={drawerState} toggleDrawer={setDrawerState}>
-        <Box width={300}>
-          <p>Hello</p>
-        </Box>
+      <CanvasDrawer toggleOpen={setDrawerState} open={drawerState}>
+        <SchemaProperties toggleOpen={setDrawerState} />
       </CanvasDrawer>
 
       <Box style={{ width: '100%', height: '100%', position: 'absolute' }}>

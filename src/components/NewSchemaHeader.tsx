@@ -12,9 +12,10 @@ import Settings from '../images/icons/canvas-controls/Settings';
 
 interface NewSchemaHeaderProps {
   toggleSettingsDrawer: (open: boolean) => void;
+  drawerState: boolean;
 }
 
-export default function NewSchemaHeader({ toggleSettingsDrawer }: NewSchemaHeaderProps) {
+export default function NewSchemaHeader({ toggleSettingsDrawer, drawerState }: NewSchemaHeaderProps) {
   const { name } = useParams<{ name: string }>();
 
   return (
@@ -105,7 +106,7 @@ export default function NewSchemaHeader({ toggleSettingsDrawer }: NewSchemaHeade
         </Tooltip>
 
         <Tooltip title="Settings">
-          <IconButton onClick={() => toggleSettingsDrawer(true)}>
+          <IconButton onClick={() => toggleSettingsDrawer(!drawerState)}>
             <Settings />
           </IconButton>
         </Tooltip>
