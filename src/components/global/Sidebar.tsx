@@ -169,7 +169,7 @@ const Sidebar = () => {
                   Jacques Ikot
                 </Typography>
                 <Typography fontSize={14} fontWeight={400} color={'#344054'}>
-                  jacquesikot@gmail.com
+                  osstephen70@gmail.com
                 </Typography>
               </Box>
 
