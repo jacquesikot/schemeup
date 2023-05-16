@@ -9,7 +9,7 @@ const SchemaHeader = () => {
       display={'flex'}
       justifyContent={'space-between'}
       alignItems={'center'}
-      height={'75px'}
+      height={'96px'}
       width={'100%'}
       borderBottom={1}
       borderColor={'#EAECF0'}
