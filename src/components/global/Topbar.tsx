@@ -3,7 +3,7 @@ import { Box, ClickAwayListener, Grow, IconButton, MenuItem, MenuList, Paper, Po
 
 import TopTabItem from '../TopTabItem';
 import { tokens } from '../../theme';
-import TopBarPlus from '../../images/icons/TopBarPlus';
+import TopBarPlus from '../../images/icons/Plus';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { useState } from 'react';
