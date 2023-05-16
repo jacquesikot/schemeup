@@ -11,6 +11,7 @@ import Dashboard from './pages/schema';
 import MockData from './pages/mock-data';
 import Datasources from './pages/datasources';
 import NewSchema from './pages/new-schema';
+import InventoryManager from './components/global/InventoryManager';
 
 function App() {
   const [theme] = useMode();
@@ -22,6 +23,10 @@ function App() {
         <Sidebar />
         <main className="content">
           <Topbar items={tabs} />
+          <div className="inventory-manager-wrapper">
+            <InventoryManager />
+          </div>
+          
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/mock-data" element={<MockData />} />
