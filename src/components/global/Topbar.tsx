@@ -1,19 +1,24 @@
 import { useEffect, useRef } from 'react';
-import { Box, ClickAwayListener, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
+import { Box, IconButton, MenuItem, Typography } from '@mui/material';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import TopTabItem from '../TopTabItem';
 import { tokens } from '../../theme';
 import TopBarPlus from '../../images/icons/Plus';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { useState } from 'react';
 import newAppTab from '../../utils/newAppTab';
 import { Tab } from '../../redux/slice/apptabs';
 import generateSchemaName from '../../utils/generateSchemaName';
+import MenuPopper from './MenuPopper';
 
 interface TopBarProps {
   items: Tab[];
 }
+
+const menuItemStyle = {
+  height: '55px',
+};
 
 export default function Topbar({ items }: TopBarProps) {
   const colors = tokens();
@@ -39,15 +44,6 @@ export default function Topbar({ items }: TopBarProps) {
 
     setOpen(false);
   };
-
-  function handleListKeyDown(event: React.KeyboardEvent) {
-    if (event.key === 'Tab') {
-      event.preventDefault();
-      setOpen(false);
-    } else if (event.key === 'Escape') {
-      setOpen(false);
-    }
-  }
 
   useEffect(() => {
     const resizeBoxes = () => {
@@ -114,64 +110,40 @@ export default function Topbar({ items }: TopBarProps) {
         >
           <TopBarPlus />
         </IconButton>
-        {/* TODO: EXTRPOLATE THIS INTO A HIGHER COMPONENT THAT CAN BE USED IN OTHER PLACES */}
-        <Popper
+
+        <MenuPopper
           open={open}
-          anchorEl={anchorRef.current}
-          role={undefined}
-          placement="bottom-start"
-          transition
-          disablePortal
-          style={{ zIndex: 1000 }}
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              style={{
-                transformOrigin: placement === 'bottom-start' ? 'left top' : 'left bottom',
-              }}
-            >
-              <Paper>
-                <ClickAwayListener onClickAway={handleClose}>
-                  <MenuList
-                    autoFocusItem={open}
-                    id="composition-menu"
-                    aria-labelledby="composition-button"
-                    onKeyDown={handleListKeyDown}
-                  >
-                    <MenuItem
-                      onClick={(e) => {
-                        const newSchemaName = generateSchemaName();
-                        newAppTab(
-                          dispatch,
-                          `Schema - ${newSchemaName}`,
-                          `/schema/new/${newSchemaName}`,
-                          tabs,
-                          navigate
-                        );
-                        handleClose(e);
-                      }}
-                    >
-                      <Typography color={'#101828'} fontSize={16} fontWeight={500}>
-                        Schema
-                      </Typography>
-                    </MenuItem>
-                    <MenuItem onClick={handleClose}>
-                      <Typography color={'#101828'} fontSize={16} fontWeight={500}>
-                        Mock Dataset
-                      </Typography>
-                    </MenuItem>
-                    <MenuItem onClick={handleClose}>
-                      <Typography color={'#101828'} fontSize={16} fontWeight={500}>
-                        Database
-                      </Typography>
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
+          setOpen={setOpen}
+          anchorRef={anchorRef}
+          handleClose={handleClose}
+          containerStyle={{ border: '1px solid #EAECF0', width: '200px', borderRadius: '6px' }}
+          menuItems={
+            <>
+              <MenuItem
+                style={menuItemStyle}
+                onClick={(e) => {
+                  const newSchemaName = generateSchemaName();
+                  newAppTab(dispatch, `Schema - ${newSchemaName}`, `/schema/new/${newSchemaName}`, tabs, navigate);
+                  handleClose(e);
+                }}
+              >
+                <Typography color={'#344054'} fontSize={14} fontWeight={600}>
+                  New Schema
+                </Typography>
+              </MenuItem>
+              <MenuItem style={menuItemStyle} onClick={handleClose}>
+                <Typography color={'#344054'} fontSize={14} fontWeight={500}>
+                  New Mock Dataset
+                </Typography>
+              </MenuItem>
+              <MenuItem style={menuItemStyle} onClick={handleClose}>
+                <Typography color={'#344054'} fontSize={14} fontWeight={500}>
+                  New Database
+                </Typography>
+              </MenuItem>
+            </>
+          }
+        />
       </Box>
     </Box>
   );

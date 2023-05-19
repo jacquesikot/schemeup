@@ -13,10 +13,12 @@ body,
 .app {
   display: flex;
   position: relative;
+  min-width: 1200px;
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
+  height: 5px;
 }
 
 /* Track */
@@ -26,7 +28,7 @@ body,
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #b692f6;
 }
 
 /* Handle on hover */

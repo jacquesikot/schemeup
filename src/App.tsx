@@ -11,6 +11,7 @@ import Dashboard from './pages/schema';
 import MockData from './pages/mock-data';
 import Datasources from './pages/datasources';
 import NewSchema from './pages/new-schema';
+import BottomBar from './components/global/BottomBar';
 
 function App() {
   const [theme] = useMode();
@@ -29,6 +30,7 @@ function App() {
             <Route path="/schema/new/:name" element={<NewSchema />} />
           </Routes>
         </main>
+        <BottomBar />
       </div>
     </ThemeProvider>
   );

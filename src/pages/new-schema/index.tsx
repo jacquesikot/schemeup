@@ -35,7 +35,7 @@ const NewSchema = () => {
   const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   return (
-    <Box ref={containerRef} style={{ width: '100%', height: '91%', position: 'relative' }}>
+    <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 180, position: 'relative' }}>
       <NewSchemaHeader toggleSettingsDrawer={setDrawerState} drawerState={drawerState} />
 
       <CanvasDrawer toggleOpen={setDrawerState} open={drawerState}>

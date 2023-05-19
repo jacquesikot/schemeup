@@ -7,12 +7,16 @@ interface ButtonProps {
   height?: number | string;
   type: 'primary' | 'secondary';
   icon?: ReactNode;
+  style?: React.CSSProperties;
+  onClick?: (e: any) => void;
 }
 
-const Button = ({ label, width, height = 40, type, icon }: ButtonProps) => {
+const Button = ({ label, width, height = 40, type, icon, style, onClick }: ButtonProps) => {
   return (
     <MuiButton
       startIcon={icon}
+      onClick={onClick}
+      style={style}
       sx={{
         width,
         height,
@@ -26,11 +30,12 @@ const Button = ({ label, width, height = 40, type, icon }: ButtonProps) => {
         textTransform: 'none',
         paddingLeft: 2,
         paddingRight: 2,
+        transition: 'background-color 0.3s',
         '&:hover': {
-          bgcolor: type === 'primary' ? '#6941C6' : '#FFF',
+          bgcolor: type === 'primary' ? '#512DA8' : '#F7F7F7',
         },
         '&:active': {
-          bgcolor: type === 'primary' ? '#6941C6' : '#FFF',
+          bgcolor: type === 'primary' ? '#371F7E' : '#F2F2F2',
         },
       }}
     >

@@ -95,30 +95,30 @@ const data = [
     description: 'Report Generator',
     noOfTables: 13,
   },
-  {
-    id: 17,
-    title: 'task_scheduler',
-    description: 'Task Scheduler',
-    noOfTables: 11,
-  },
-  {
-    id: 18,
-    title: 'customer_relationship',
-    description: 'Customer Relationship',
-    noOfTables: 19,
-  },
-  {
-    id: 19,
-    title: 'attendance_management',
-    description: 'Attendance Management',
-    noOfTables: 7,
-  },
-  {
-    id: 20,
-    title: 'survey_tool',
-    description: 'Survey Tool',
-    noOfTables: 21,
-  },
+  // {
+  //   id: 17,
+  //   title: 'task_scheduler',
+  //   description: 'Task Scheduler',
+  //   noOfTables: 11,
+  // },
+  // {
+  //   id: 18,
+  //   title: 'customer_relationship',
+  //   description: 'Customer Relationship',
+  //   noOfTables: 19,
+  // },
+  // {
+  //   id: 19,
+  //   title: 'attendance_management',
+  //   description: 'Attendance Management',
+  //   noOfTables: 7,
+  // },
+  // {
+  //   id: 20,
+  //   title: 'survey_tool',
+  //   description: 'Survey Tool',
+  //   noOfTables: 21,
+  // },
 ];
 
 export default data;

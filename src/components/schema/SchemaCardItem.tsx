@@ -1,14 +1,39 @@
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, MenuItem, Typography } from '@mui/material';
 import SchemaCardIcon from '../../images/icons/schema/SchemaCardIcon';
 import ThreeDotsV from '../../images/icons/ThreeDotsV';
+import MenuPopper from '../global/MenuPopper';
+import { useRef, useState } from 'react';
+import EditIcon from '../../images/icons/EditIcon';
+import SchemaButtonUpload from '../../images/icons/schema/SchemaButtonUpload';
+import TrashIconPlain from '../../images/icons/TrashIconPlain';
 
 interface SchemaCardItemProps {
   title: string;
   description: string;
   noOfTables: string;
+  handleDelete: () => void;
 }
 
-const SchemaCardItem = ({ title, description, noOfTables }: SchemaCardItemProps) => {
+const SchemaCardItem = ({ title, description, noOfTables, handleDelete }: SchemaCardItemProps) => {
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLButtonElement>(null);
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event: Event | React.SyntheticEvent) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const menuItemStyle = {
+    display: 'flex',
+    alignItems: 'center',
+  };
   return (
     <Box width={343} height={174} border={1} borderRadius={'12px'} borderColor={'#EAECF0'}>
       <Box
@@ -27,9 +52,53 @@ const SchemaCardItem = ({ title, description, noOfTables }: SchemaCardItemProps)
           </Typography>
         </Box>
 
-        <IconButton>
-          <ThreeDotsV />
-        </IconButton>
+        <Box>
+          <IconButton
+            ref={anchorRef}
+            id="composition-button"
+            aria-controls={open ? 'composition-menu' : undefined}
+            aria-expanded={open ? 'true' : undefined}
+            aria-haspopup="true"
+            onClick={handleToggle}
+          >
+            <ThreeDotsV />
+          </IconButton>
+
+          <MenuPopper
+            open={open}
+            setOpen={setOpen}
+            anchorRef={anchorRef}
+            handleClose={handleClose}
+            containerStyle={{ border: '1px solid #EAECF0', width: '115px', borderRadius: '6px' }}
+            menuItems={
+              <>
+                <MenuItem style={menuItemStyle} onClick={handleClose}>
+                  <EditIcon />
+                  <Typography color={'#344054'} fontSize={14} fontWeight={600} ml={1}>
+                    Edit
+                  </Typography>
+                </MenuItem>
+                <MenuItem style={menuItemStyle} onClick={handleClose}>
+                  <SchemaButtonUpload />
+                  <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
+                    Export
+                  </Typography>
+                </MenuItem>
+                <MenuItem
+                  style={menuItemStyle}
+                  onClick={() => {
+                    handleDelete();
+                  }}
+                >
+                  <TrashIconPlain />
+                  <Typography color={'#F04438'} fontSize={14} fontWeight={500} ml={1}>
+                    Delete
+                  </Typography>
+                </MenuItem>
+              </>
+            }
+          />
+        </Box>
       </Box>
 
       <Box pl={'14px'} pr={'14px'} pb={'14px'} pt={'5px'}>
