@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Grid, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 import SchemaCardItem from '../../components/schema/SchemaCardItem';
-import data from './data';
+// import data from './data';
 import MainSeachInput from '../../components/MainSeachInput';
 import DashboardHeader from '../../components/global/DashboardHeader';
 import Button from '../../components/global/Button';
@@ -13,6 +14,8 @@ import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import DeleteModal from '../../components/global/DeleteModal';
+import { clearSchemas, newSchema } from '../../redux/slice/schemas';
+import routes from '../../routes';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -21,8 +24,14 @@ const Dashboard = () => {
   const [prevScrollTop, setPrevScrollTop] = useState<number>(0);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const tabs = useAppSelector((state) => state.appTabs.tabs);
+  const schemas = useAppSelector((state) => state.schemas.schemas);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  // for dev only
+  // useEffect(() => {
+  //   dispatch(clearSchemas());
+  // }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,6 +74,15 @@ const Dashboard = () => {
     itemsPerRow = 4;
   }
 
+  const data = schemas.map((s) => {
+    return {
+      id: s.id,
+      title: s.title,
+      description: s.description,
+      noOfTables: s.tables?.length || 0,
+    };
+  });
+
   // Calculate the number of placeholder items needed in the last row
   const remainingItems = data.length % itemsPerRow;
   const placeholderItemsCount = remainingItems === 0 ? 0 : itemsPerRow - remainingItems;
@@ -96,8 +114,10 @@ const Dashboard = () => {
               type={'primary'}
               icon={<TopBarPlus color="#FFF" />}
               onClick={(e: any) => {
+                const id = uuidv4();
                 const newSchemaName = generateSchemaName();
-                newAppTab(dispatch, `Schema - ${newSchemaName}`, `/schema/new/${newSchemaName}`, tabs, navigate);
+                dispatch(newSchema({ id, title: newSchemaName, tables: [] }));
+                newAppTab(dispatch, `Schema - ${newSchemaName}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate);
               }}
             />
           </>
@@ -114,8 +134,8 @@ const Dashboard = () => {
       <Grid
         ref={gridRef}
         container
-        maxHeight={isHeaderVisible ? '70vh' : '100vh'}
-        // maxHeight={'70vh'}
+        // maxHeight={isHeaderVisible ? '75vh' : '100vh'}
+        maxHeight={'75vh'}
         pt={5}
         pb={5}
         justifyContent={'center'}
@@ -154,6 +174,7 @@ const Dashboard = () => {
             {item.title !== '' ? (
               <Box display="flex" justifyContent="center" alignItems="center" maxWidth="343px" height="174px" p={1}>
                 <SchemaCardItem
+                  id={item.id}
                   title={item.title}
                   description={item.description}
                   noOfTables={item.noOfTables.toString()}

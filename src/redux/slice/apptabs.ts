@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import routes from '../../routes';
 
 export interface Tab {
   title: string;
@@ -11,8 +12,8 @@ interface Tabs {
 }
 
 const initialState: Tabs = {
-  tabs: [{ title: 'Schema', route: '/' }],
-  prevRoute: '/',
+  tabs: [{ title: 'Schema', route: routes.HOME }],
+  prevRoute: routes.HOME,
 };
 
 const tabsSlice = createSlice({

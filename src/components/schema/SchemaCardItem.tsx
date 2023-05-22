@@ -6,15 +6,23 @@ import { useRef, useState } from 'react';
 import EditIcon from '../../images/icons/EditIcon';
 import SchemaButtonUpload from '../../images/icons/schema/SchemaButtonUpload';
 import TrashIconPlain from '../../images/icons/TrashIconPlain';
+import newAppTab from '../../utils/newAppTab';
+import routes from '../../routes';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { useNavigate } from 'react-router-dom';
 
 interface SchemaCardItemProps {
+  id: string;
   title: string;
   description: string;
   noOfTables: string;
   handleDelete: () => void;
 }
 
-const SchemaCardItem = ({ title, description, noOfTables, handleDelete }: SchemaCardItemProps) => {
+const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: SchemaCardItemProps) => {
+  const tabs = useAppSelector((state) => state.appTabs.tabs);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
 
@@ -72,7 +80,12 @@ const SchemaCardItem = ({ title, description, noOfTables, handleDelete }: Schema
             containerStyle={{ border: '1px solid #EAECF0', width: '115px', borderRadius: '6px' }}
             menuItems={
               <>
-                <MenuItem style={menuItemStyle} onClick={handleClose}>
+                <MenuItem
+                  style={menuItemStyle}
+                  onClick={() => {
+                    newAppTab(dispatch, `Schema - ${title}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate);
+                  }}
+                >
                   <EditIcon />
                   <Typography color={'#344054'} fontSize={14} fontWeight={600} ml={1}>
                     Edit

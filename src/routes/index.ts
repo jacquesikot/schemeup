@@ -1,7 +1,7 @@
 const routes = {
   HOME: '/',
-  SCHEMA: '/dashboard',
-  NEW_SCHEMA: '/schema/new',
+  SCHEMA: '/schema',
+  EDIT_SCHEMA: '/schema/edit',
   MOCK_DATA: '/mock-data',
   DATASOURCES: '/datasources',
 };

@@ -9,6 +9,7 @@ import Table from '../images/icons/canvas-controls/Table';
 import Share from '../images/icons/canvas-controls/Share';
 import Export from '../images/icons/canvas-controls/Export';
 import Settings from '../images/icons/canvas-controls/Settings';
+import { useAppSelector } from '../redux/hooks';
 
 interface NewSchemaHeaderProps {
   toggleSettingsDrawer: (open: boolean) => void;
@@ -16,7 +17,8 @@ interface NewSchemaHeaderProps {
 }
 
 export default function NewSchemaHeader({ toggleSettingsDrawer, drawerState }: NewSchemaHeaderProps) {
-  const { name } = useParams<{ name: string }>();
+  const { id } = useParams<{ id: string }>();
+  const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === id))[0];
 
   return (
     <Box
@@ -34,7 +36,7 @@ export default function NewSchemaHeader({ toggleSettingsDrawer, drawerState }: N
       {/* SCHEMA TITLE */}
       <Box display={'flex'} alignItems={'center'}>
         <Typography fontSize={18} color={'#101828'} fontWeight={500}>
-          {name}
+          {schema.title}
         </Typography>
         <Box
           height={'22px'}
@@ -47,7 +49,7 @@ export default function NewSchemaHeader({ toggleSettingsDrawer, drawerState }: N
           ml={2}
         >
           <Typography fontSize={12} color={'#6941C6'} fontWeight={500}>
-            No Tables
+            {schema.tables && schema.tables.length > 0 ? `${schema.tables.length} Tables` : 'No Tables'}
           </Typography>
         </Box>
       </Box>

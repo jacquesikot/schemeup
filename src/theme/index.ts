@@ -109,6 +109,12 @@ export const themeSettings = () => {
         fontFamily: ['Inter', 'sans-serif'].join(','),
         fontSize: 14,
       },
+      tableTitle: {
+        fontFamily: ['Work Sans', 'sans serif'].join(','),
+      },
+      tableColumns: {
+        fontFamily: ['IBM Plex Mono', 'monospace'].join(','),
+      },
     },
   };
 };

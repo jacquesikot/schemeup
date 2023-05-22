@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Box, IconButton, MenuItem, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 import TopTabItem from '../TopTabItem';
 import { tokens } from '../../theme';
@@ -12,6 +13,7 @@ import { Tab } from '../../redux/slice/apptabs';
 import generateSchemaName from '../../utils/generateSchemaName';
 import MenuPopper from './MenuPopper';
 import routes from '../../routes';
+import { newSchema } from '../../redux/slice/schemas';
 
 interface TopBarProps {
   items: Tab[];
@@ -68,6 +70,8 @@ export default function Topbar({ items }: TopBarProps) {
     };
   }, [tabs.length, topBarRef]);
 
+  console.log(items);
+
   return (
     <Box
       ref={topBarRef}
@@ -123,14 +127,10 @@ export default function Topbar({ items }: TopBarProps) {
               <MenuItem
                 style={menuItemStyle}
                 onClick={(e) => {
+                  const id = uuidv4();
                   const newSchemaName = generateSchemaName();
-                  newAppTab(
-                    dispatch,
-                    `Schema - ${newSchemaName}`,
-                    `${routes.NEW_SCHEMA}/${newSchemaName}`,
-                    tabs,
-                    navigate
-                  );
+                  newAppTab(dispatch, `Schema - ${newSchemaName}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate);
+                  dispatch(newSchema({ id, title: newSchemaName, tables: [] }));
                   handleClose(e);
                 }}
               >

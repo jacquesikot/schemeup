@@ -10,7 +10,7 @@ import Sidebar from './components/global/Sidebar';
 import Dashboard from './pages/schema';
 import MockData from './pages/mock-data';
 import Datasources from './pages/datasources';
-import NewSchema from './pages/new-schema';
+import EditSchema from './pages/edit-schema';
 import BottomBar from './components/global/BottomBar';
 import routes from './routes';
 
@@ -28,7 +28,7 @@ function App() {
             <Route path={routes.HOME} element={<Dashboard />} />
             <Route path={routes.MOCK_DATA} element={<MockData />} />
             <Route path={routes.DATASOURCES} element={<Datasources />} />
-            <Route path={routes.NEW_SCHEMA + '/:name'} element={<NewSchema />} />
+            <Route path={routes.EDIT_SCHEMA + '/:id'} element={<EditSchema />} />
           </Routes>
         </main>
         <BottomBar />
