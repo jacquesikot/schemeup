@@ -12,6 +12,7 @@ import MockData from './pages/mock-data';
 import Datasources from './pages/datasources';
 import NewSchema from './pages/new-schema';
 import BottomBar from './components/global/BottomBar';
+import routes from './routes';
 
 function App() {
   const [theme] = useMode();
@@ -24,10 +25,10 @@ function App() {
         <main className="content">
           <Topbar items={tabs} />
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/mock-data" element={<MockData />} />
-            <Route path="/datasources" element={<Datasources />} />
-            <Route path="/schema/new/:name" element={<NewSchema />} />
+            <Route path={routes.HOME} element={<Dashboard />} />
+            <Route path={routes.MOCK_DATA} element={<MockData />} />
+            <Route path={routes.DATASOURCES} element={<Datasources />} />
+            <Route path={routes.NEW_SCHEMA + '/:name'} element={<NewSchema />} />
           </Routes>
         </main>
         <BottomBar />

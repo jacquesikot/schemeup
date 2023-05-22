@@ -8,7 +8,7 @@ const BottomBar = () => {
       bottom={0}
       bgcolor={'white'}
       height={'44px'}
-      zIndex={3000}
+      zIndex={1100}
       width={'100%'}
       borderTop={1}
       borderColor={'divider'}

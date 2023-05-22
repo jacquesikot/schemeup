@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import newAppTab from '../../utils/newAppTab';
 import SideBarToggleClose from '../../images/icons/SideBarToggleClose';
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
+import routes from '../../routes';
 
 interface ItemProps {
   title: string;
@@ -131,25 +132,25 @@ const Sidebar = () => {
           <Box mt={5} alignItems={'center'} justifyContent={'center'} display={'flex'} flexDirection={'column'}>
             <Item
               title="Schema"
-              to="/"
+              to={routes.HOME}
               icon={<SideBarSchema />}
-              selected={pathname === '/' || pathname.includes('/schema') ? 'Schema' : ''}
+              selected={pathname === '/' || pathname.includes(routes.SCHEMA) ? 'Schema' : ''}
               setSelected={setSelected}
             />
 
             <Item
               title="Mock Data"
-              to="/mock-data"
+              to={routes.MOCK_DATA}
               icon={<SideBarMockData />}
-              selected={pathname.includes('/mock-data') ? 'Mock Data' : ''}
+              selected={pathname.includes(routes.MOCK_DATA) ? 'Mock Data' : ''}
               setSelected={setSelected}
             />
 
             <Item
               title="DataSources"
-              to="/datasources"
+              to={routes.DATASOURCES}
               icon={<SideBarDatasources />}
-              selected={pathname.includes('/datasources') ? 'DataSources' : ''}
+              selected={pathname.includes(routes.DATASOURCES) ? 'DataSources' : ''}
               setSelected={setSelected}
             />
           </Box>
@@ -160,7 +161,7 @@ const Sidebar = () => {
         {/* PROFILE SECTION */}
         <Box width={'90%'} height={1.1} bgcolor={'#EAECF0'} alignSelf={'center'} />
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} pl={2} pr={2} pb={8} pt={2}>
-          <Avatar />
+          <Avatar style={{ width: 30, height: 30, borderRadius: 15 }} />
 
           {isCollapsed ? undefined : (
             <>

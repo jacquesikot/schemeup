@@ -11,6 +11,7 @@ import newAppTab from '../../utils/newAppTab';
 import { Tab } from '../../redux/slice/apptabs';
 import generateSchemaName from '../../utils/generateSchemaName';
 import MenuPopper from './MenuPopper';
+import routes from '../../routes';
 
 interface TopBarProps {
   items: Tab[];
@@ -123,7 +124,13 @@ export default function Topbar({ items }: TopBarProps) {
                 style={menuItemStyle}
                 onClick={(e) => {
                   const newSchemaName = generateSchemaName();
-                  newAppTab(dispatch, `Schema - ${newSchemaName}`, `/schema/new/${newSchemaName}`, tabs, navigate);
+                  newAppTab(
+                    dispatch,
+                    `Schema - ${newSchemaName}`,
+                    `${routes.NEW_SCHEMA}/${newSchemaName}`,
+                    tabs,
+                    navigate
+                  );
                   handleClose(e);
                 }}
               >

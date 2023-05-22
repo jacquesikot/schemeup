@@ -83,31 +83,31 @@ const Dashboard = () => {
     >
       {/* HEADER-START */}
 
-      <Box className={`header ${isHeaderVisible ? 'visible' : ''}`}>
-        <DashboardHeader
-          title="Schemas"
-          dataCount={data.length}
-          subtitle="Manage and export your schemas"
-          actionButtons={
-            <>
-              <Button label={'Upload'} type={'secondary'} icon={<SchemaButtonUpload />} style={{ marginRight: 10 }} />
-              <Button
-                label={'New Schema'}
-                type={'primary'}
-                icon={<TopBarPlus color="#FFF" />}
-                onClick={(e: any) => {
-                  const newSchemaName = generateSchemaName();
-                  newAppTab(dispatch, `Schema - ${newSchemaName}`, `/schema/new/${newSchemaName}`, tabs, navigate);
-                }}
-              />
-            </>
-          }
-        />
+      {/* <Box className={`header ${isHeaderVisible ? 'visible' : ''}`}> */}
+      <DashboardHeader
+        title="Schemas"
+        dataCount={data.length}
+        subtitle="Manage and export your schemas"
+        actionButtons={
+          <>
+            <Button label={'Upload'} type={'secondary'} icon={<SchemaButtonUpload />} style={{ marginRight: 10 }} />
+            <Button
+              label={'New Schema'}
+              type={'primary'}
+              icon={<TopBarPlus color="#FFF" />}
+              onClick={(e: any) => {
+                const newSchemaName = generateSchemaName();
+                newAppTab(dispatch, `Schema - ${newSchemaName}`, `/schema/new/${newSchemaName}`, tabs, navigate);
+              }}
+            />
+          </>
+        }
+      />
 
-        <Box display={'flex'} height={80} borderBottom={1} borderColor={'#EAECF0'} alignItems={'center'} pl={2}>
-          <MainSeachInput placeholder="Search Schemas" />
-        </Box>
+      <Box display={'flex'} height={80} borderBottom={1} borderColor={'#EAECF0'} alignItems={'center'} pl={2}>
+        <MainSeachInput placeholder="Search Schemas" />
       </Box>
+      {/* </Box> */}
 
       {/* HEADER-END */}
 
