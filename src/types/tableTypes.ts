@@ -89,7 +89,7 @@ export type PostgresIndexSorting =
   | 'DESC NULLS LAST';
 
 export const typeColors: Record<PostgresColumnType, string> = {
-  int: '#FF6666',
+  int: '#363F72',
   integer: '#66CC66',
   bigint: '#6666FF',
   smallint: '#FFCC66',

@@ -24,12 +24,12 @@ export const TABLE_WIDTH = 360;
 const CanvasTableColumn = ({ name, type, notNull, foreignKey, primaryKey }: CanvasTableColumnProps) => {
   return (
     <Box display={'flex'} height={40} paddingLeft={'10px'} borderTop={1} borderColor={'#EAECF0'} alignItems={'center'}>
-      {foreignKey && (
+      {/* {foreignKey && (
         <>
           <Handle type="target" position={Position.Left} />
           <Handle type="source" position={Position.Right} />
         </>
-      )}
+      )} */}
       <Typography fontFamily={'IBM Plex Mono'} fontSize={14} color={'#344054'} width={'40%'}>
         {name}
       </Typography>

@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import SchemaCardItem from '../../components/schema/SchemaCardItem';
 // import data from './data';
-import MainSeachInput from '../../components/MainSeachInput';
+import MainSeachInput from '../../components/MainSearchInput';
 import DashboardHeader from '../../components/global/DashboardHeader';
 import Button from '../../components/global/Button';
 import SchemaButtonUpload from '../../images/icons/schema/SchemaButtonUpload';

@@ -9,15 +9,19 @@ import Table from '../images/icons/canvas-controls/Table';
 import Share from '../images/icons/canvas-controls/Share';
 import Export from '../images/icons/canvas-controls/Export';
 import Settings from '../images/icons/canvas-controls/Settings';
-import { useAppSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import EditableText from './global/EditableText';
+import { updateSchema } from '../redux/slice/schemas';
 
 interface NewSchemaHeaderProps {
   toggleSettingsDrawer: (open: boolean) => void;
   drawerState: boolean;
+  handleNewTable: () => void;
 }
 
-export default function NewSchemaHeader({ toggleSettingsDrawer, drawerState }: NewSchemaHeaderProps) {
+export default function NewSchemaHeader({ toggleSettingsDrawer, drawerState, handleNewTable }: NewSchemaHeaderProps) {
   const { id } = useParams<{ id: string }>();
+  const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === id))[0];
 
   return (
@@ -35,9 +39,16 @@ export default function NewSchemaHeader({ toggleSettingsDrawer, drawerState }: N
     >
       {/* SCHEMA TITLE */}
       <Box display={'flex'} alignItems={'center'}>
-        <Typography fontSize={18} color={'#101828'} fontWeight={500}>
-          {schema.title}
-        </Typography>
+        <EditableText
+          fontSize={18}
+          fontColor={'#101828'}
+          fontWeight={500}
+          value={schema.title}
+          onSave={(e) => {
+            const updatedSchema = { ...schema, title: e };
+            dispatch(updateSchema(updatedSchema));
+          }}
+        />
         <Box
           height={'22px'}
           width={'77px'}
@@ -75,7 +86,7 @@ export default function NewSchemaHeader({ toggleSettingsDrawer, drawerState }: N
         </Tooltip>
 
         <Tooltip title="New Table">
-          <IconButton>
+          <IconButton onClick={handleNewTable}>
             <Table />
           </IconButton>
         </Tooltip>

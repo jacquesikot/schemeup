@@ -94,6 +94,21 @@ const schemasSlice = createSlice({
     deleteSchema: (state, action: PayloadAction<string>) => {
       state.schemas = state.schemas.filter((schema) => schema.id !== action.payload);
     },
+    newTable: (state, action: PayloadAction<{ schemaId: string; table: Table }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      state.schemas[index].tables?.push(action.payload.table);
+    },
+    deleteTable: (state, action: PayloadAction<{ schemaId: string; tableId: string }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      state.schemas[index].tables = state.schemas[index].tables?.filter((table) => table.id !== action.payload.tableId);
+    },
+    editTable: (state, action: PayloadAction<{ schemaId: string; table: Table }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      const tableIndex = state.schemas[index].tables?.findIndex((table) => table.id === action.payload.table.id);
+      if (tableIndex !== undefined && tableIndex !== -1) {
+        state.schemas[index].tables![tableIndex] = action.payload.table;
+      }
+    },
     // dev only
     clearSchemas: (state) => {
       state.schemas = [];
@@ -101,6 +116,7 @@ const schemasSlice = createSlice({
   },
 });
 
-export const { newSchema, updateSchema, deleteSchema, clearSchemas } = schemasSlice.actions;
+export const { newSchema, updateSchema, deleteSchema, clearSchemas, newTable, deleteTable, editTable } =
+  schemasSlice.actions;
 
 export default schemasSlice.reducer;

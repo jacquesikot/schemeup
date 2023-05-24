@@ -70,8 +70,6 @@ export default function Topbar({ items }: TopBarProps) {
     };
   }, [tabs.length, topBarRef]);
 
-  console.log(items);
-
   return (
     <Box
       ref={topBarRef}

@@ -29,9 +29,11 @@ interface MainSeachInputProps {
   placeholder?: string;
   width?: number | string;
   height?: number | string;
+  value?: string;
+  setValue?: (value: string) => void;
 }
 
-const MainSeachInput = ({ placeholder, width = 400, height = 44 }: MainSeachInputProps) => {
+const MainSeachInput = ({ placeholder, width = 400, height = 44, value, setValue }: MainSeachInputProps) => {
   return (
     <StyledTextField
       InputProps={{
@@ -41,6 +43,8 @@ const MainSeachInput = ({ placeholder, width = 400, height = 44 }: MainSeachInpu
           </InputAdornment>
         ),
       }}
+      value={value}
+      onChange={(e) => setValue && setValue(e.target.value)}
       id="custom-css-outlined-input"
       placeholder={placeholder}
       style={{ width, borderRadius: 20 }}

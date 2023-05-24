@@ -1,78 +1,79 @@
 import { TABLE_WIDTH } from '../components/canvas/CanvasTable';
 import { Table } from '../redux/slice/schemas';
 
-interface Coordinate {
+interface TableCoordinates {
+  id: string;
   x: number;
   y: number;
 }
 
-interface TableLayout {
-  [tableId: string]: Coordinate;
-}
+const generateTableLayout = (tables: Table[]): TableCoordinates[] => {
+  const coordinates: TableCoordinates[] = [];
+  const tableMap: Map<string, Table> = new Map();
 
-const generateTableLayout = (schema: Table[]): TableLayout => {
-  const tableLayout: TableLayout = {};
-  const tableWidth = TABLE_WIDTH; // Adjust the width of each table square
-  const padding = 50; // Adjust the spacing between tables
-
-  let currentX = padding;
-  let currentY = padding;
-
-  const referencedTableLayout: TableLayout = {};
-
-  // Calculate x and y coordinates for each table
-  for (const table of schema) {
-    const tableHeight = 40 * table.columns.length;
-
-    tableLayout[table.id] = { x: currentX, y: currentY };
-
-    currentX += tableWidth + padding;
-
-    // If the currentX exceeds the available width, move to the next row
-    if (currentX + tableWidth + padding > window.innerWidth) {
-      currentX = padding;
-      currentY += tableHeight + padding;
-    }
+  // Create a map of tables using their IDs for easy lookup
+  for (const table of tables) {
+    tableMap.set(table.id, table);
   }
 
-  // Generate coordinates for foreign key connections
-  for (const table of schema) {
-    for (const foreignKey of table.foreignKeys) {
-      const { x: startX, y: startY } = tableLayout[table.id];
-      const referencedTable = tableLayout[foreignKey.referenceTable];
+  // Calculate the initial coordinates for each table
+  let x = 50;
+  let y = 50;
 
-      if (referencedTable) {
-        const { x: endX, y: endY } = referencedTable;
+  for (const table of tables) {
+    const { id } = table;
+    const foreignKeys = table.foreignKeys ? table.foreignKeys.map((fk) => fk.referenceTable) : [];
+    const targetTable = tableMap.get(id);
 
-        // Adjust the coordinates for the foreign key connection
-        const offsetX = tableWidth; // Adjust the horizontal offset between tables
-        const offsetY = (endY + startY) / 2; // Use the average of the start and end Y coordinates
+    if (!targetTable) {
+      continue;
+    }
 
-        // Store the adjusted coordinates for the foreign key connection
-        tableLayout[`${table.id}_${foreignKey.referenceTable}`] = { x: startX + offsetX, y: offsetY };
+    // Adjust the x-coordinate based on the number of foreign keys
+    const numForeignKeys = foreignKeys.length;
+    const xOffset = numForeignKeys * -100; // Adjust the spacing between tables with foreign keys
+    const tableWidth = TABLE_WIDTH; // Fixed width for each table
+    const tableHeight = 40 * targetTable.columns.length;
 
-        // Store the referenced table's layout for swapping later
-        referencedTableLayout[foreignKey.referenceTable] = referencedTable;
+    coordinates.push({ id, x, y });
+
+    x += tableWidth + xOffset;
+    y += tableHeight + 100; // Adjust the vertical spacing between tables
+  }
+
+  // Adjust the y-coordinate for tables with foreign keys to place them on the left
+  for (const table of tables) {
+    const { id } = table;
+    const foreignKeys = table.foreignKeys ? table.foreignKeys.map((fk) => fk.referenceTable) : [];
+
+    for (const fk of foreignKeys) {
+      const sourceTable = tableMap.get(fk);
+
+      if (!sourceTable) {
+        continue;
+      }
+
+      const sourceCoord = coordinates.find((coord) => coord.id === fk);
+      const targetCoord = coordinates.find((coord) => coord.id === id);
+
+      if (sourceCoord && targetCoord) {
+        const sourceY = sourceCoord.y;
+        const targetY = targetCoord.y;
+        const xOffset = -300; // Adjust the horizontal spacing between tables with foreign keys
+
+        if (sourceY === targetY && sourceCoord.x > targetCoord.x) {
+          // Adjust the x-coordinate for tables on the same row
+          targetCoord.x = sourceCoord.x + xOffset;
+        } else if (sourceY > targetY) {
+          // Adjust the y-coordinate for tables on different rows
+          targetCoord.y = sourceY;
+          targetCoord.x = sourceCoord.x + xOffset;
+        }
       }
     }
   }
 
-  // Swap the X coordinates of tables with foreign keys
-  for (const table of schema) {
-    if (table.foreignKeys.length > 0) {
-      const referencedTableId = table.foreignKeys[0].referenceTable;
-
-      if (tableLayout[table.id] && referencedTableLayout[table.id]) {
-        const startX = tableLayout[table.id].x;
-        const endX = referencedTableLayout[table.id].x;
-
-        tableLayout[table.id].x = endX;
-        tableLayout[referencedTableId].x = startX;
-      }
-    }
-  }
-
-  return tableLayout;
+  return coordinates;
 };
 
 export default generateTableLayout;

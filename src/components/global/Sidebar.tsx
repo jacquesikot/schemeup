@@ -105,9 +105,9 @@ const Sidebar = () => {
             {!isCollapsed && (
               <Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center" pl={4} pr={3}>
-                  <Box display={'flex'} alignItems={'center'}>
+                  {/* <Box display={'flex'} alignItems={'center'}>
                     <img src={logo} alt="SchemupLogo" />
-                  </Box>
+                  </Box> */}
                   <Typography variant="h4" color={colors.grey[100]} fontWeight="medium">
                     SchemeUp
                   </Typography>
