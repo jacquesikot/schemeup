@@ -13,9 +13,16 @@ import TopBarPlus from '../../images/icons/Plus';
 import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import DeleteModal from '../../components/global/DeleteModal';
+import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
 import { clearSchemas, newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
+import DownloadSchemaModal from '../../components/modals/DownloadSchemaModal';
+import ImportSchemaModal from '../../components/modals/ImportSchemaModal';
+
+interface ModalActions {
+  open: boolean;
+  itemId?: string;
+}
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -23,6 +30,8 @@ const Dashboard = () => {
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [prevScrollTop, setPrevScrollTop] = useState<number>(0);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [downloadModal, toggleDownloadModal] = useState<ModalActions>({open: false});
+  const [importModal, toggleImportModal] = useState<boolean>(false);
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const schemas = useAppSelector((state) => state.schemas.schemas);
   const dispatch = useAppDispatch();
@@ -108,7 +117,9 @@ const Dashboard = () => {
         subtitle="Manage and export your schemas"
         actionButtons={
           <>
-            <Button label={'Upload'} type={'secondary'} icon={<SchemaButtonUpload />} style={{ marginRight: 10 }} />
+            <Button label={'Upload'} type={'secondary'} icon={<SchemaButtonUpload />} style={{ marginRight: 10 }} onClick={
+              () => {toggleImportModal(true)}
+            } />
             <Button
               label={'New Schema'}
               type={'primary'}
@@ -178,6 +189,9 @@ const Dashboard = () => {
                   title={item.title}
                   description={item.description}
                   noOfTables={item.noOfTables.toString()}
+                  handleExport={() => {
+                    toggleDownloadModal({open: true, itemId: item.id});
+                  }}
                   handleDelete={() => {
                     setOpenDeleteModal(true);
                   }}
@@ -190,12 +204,36 @@ const Dashboard = () => {
         ))}
       </Grid>
 
-      <DeleteModal
+      {/* Exporting schema triggers Download Schema Modal */}
+      <DownloadSchemaModal
+        open={downloadModal.open}
+        handleClose={() => toggleDownloadModal({open: false})}
+        itemId={downloadModal.itemId}
+        containerStyle={{
+          width: '370px',
+          height: '470px',
+          backgroundColor: '#FFFFFF',
+        }}
+      />
+
+      {/* Delete Schema Modal */}
+      <DeleteSchemaModal
         open={openDeleteModal}
         handleClose={() => setOpenDeleteModal(false)}
         containerStyle={{
           width: '400px',
           height: '260px',
+          backgroundColor: '#FFFFFF',
+        }}
+      />
+
+      {/* Upload Button triggers Import Schema Modal */}
+       <ImportSchemaModal
+        open={importModal}
+        handleClose={() => toggleImportModal(false)}
+        containerStyle={{
+          width: '380px',
+          height: '650px',
           backgroundColor: '#FFFFFF',
         }}
       />

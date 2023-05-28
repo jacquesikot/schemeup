@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 
 import appTabsReducer from './slice/apptabs';
 import schemasReducer from './slice/schemas';
+import settingsReducer from './slice/settings';
 
 const persistConfig = {
   key: 'root',
@@ -15,6 +16,7 @@ const persistedReducer = persistReducer(
   combineReducers({
     appTabs: appTabsReducer,
     schemas: schemasReducer,
+    settings: settingsReducer,
   })
 );
 

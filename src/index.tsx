@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
 import App from './App';
+import { ProSidebarProvider } from "react-pro-sidebar";
 import { persistor, store } from './redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
 
@@ -13,7 +14,9 @@ root.render(
     <BrowserRouter>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <App />
+          <ProSidebarProvider>
+            <App />
+          </ProSidebarProvider>
         </PersistGate>
       </Provider>
     </BrowserRouter>

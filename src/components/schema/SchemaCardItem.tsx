@@ -16,10 +16,11 @@ interface SchemaCardItemProps {
   title: string;
   description: string;
   noOfTables: string;
+  handleExport: () => void;
   handleDelete: () => void;
 }
 
-const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: SchemaCardItemProps) => {
+const SchemaCardItem = ({ id, title, description, noOfTables, handleExport, handleDelete }: SchemaCardItemProps) => {
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -91,7 +92,9 @@ const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: Sc
                     Edit
                   </Typography>
                 </MenuItem>
-                <MenuItem style={menuItemStyle} onClick={handleClose}>
+                <MenuItem style={menuItemStyle} onClick={() => {
+                    handleExport();
+                  }}>
                   <SchemaButtonUpload />
                   <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
                     Export
