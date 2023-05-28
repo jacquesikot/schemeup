@@ -39,7 +39,7 @@ interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
 }
 
-const ImportSchemaModalForm = () => {
+const UploadSchemaModalForm = () => {
   const [dbType, setDbType] = useState("postgres");
   const [file, setFile] = useState<File | null>();
   const fileTypes = ["SQL", "JSON"];
@@ -104,4 +104,4 @@ const ImportSchemaModalForm = () => {
   );
 }
 
-export default ImportSchemaModalForm;
+export default UploadSchemaModalForm;

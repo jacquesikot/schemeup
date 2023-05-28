@@ -13,16 +13,16 @@ import TopBarPlus from '../../images/icons/Plus';
 import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import DeleteModal from '../../components/global/DeleteModal';
 import { clearSchemas, newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
+import UploadSchemaModal from '../../components/modals/UploadSchemaModal';
 
 const Dashboard = () => {
   const theme = useTheme();
   const gridRef = useRef<any>(null);
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [prevScrollTop, setPrevScrollTop] = useState<number>(0);
-  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [uploadModal, toggleUploadModal] = useState<boolean>(false);
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const schemas = useAppSelector((state) => state.schemas.schemas);
   const dispatch = useAppDispatch();
@@ -108,7 +108,9 @@ const Dashboard = () => {
         subtitle="Manage and export your schemas"
         actionButtons={
           <>
-            <Button label={'Upload'} type={'secondary'} icon={<SchemaButtonUpload />} style={{ marginRight: 10 }} />
+            <Button label={'Upload'} type={'secondary'} icon={<SchemaButtonUpload />} style={{ marginRight: 10 }} onClick={() => {
+              toggleUploadModal(true);
+            }} />
             <Button
               label={'New Schema'}
               type={'primary'}
@@ -178,9 +180,7 @@ const Dashboard = () => {
                   title={item.title}
                   description={item.description}
                   noOfTables={item.noOfTables.toString()}
-                  handleDelete={() => {
-                    setOpenDeleteModal(true);
-                  }}
+                  handleDelete={() => {}}
                 />
               </Box>
             ) : (
@@ -190,12 +190,12 @@ const Dashboard = () => {
         ))}
       </Grid>
 
-      <DeleteModal
-        open={openDeleteModal}
-        handleClose={() => setOpenDeleteModal(false)}
+      <UploadSchemaModal
+        open={uploadModal}
+        handleClose={() => toggleUploadModal(false)}
         containerStyle={{
-          width: '400px',
-          height: '260px',
+          width: '390px',
+          height: '645px',
           backgroundColor: '#FFFFFF',
         }}
       />

@@ -1,6 +1,6 @@
-import 'react-pro-sidebar/dist/css/styles.css';
+// import 'react-pro-sidebar/dist/css/styles.css';
 import { useState } from 'react';
-import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
+import { Sidebar as ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Avatar, Box, IconButton, Typography } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -98,8 +98,8 @@ const Sidebar = () => {
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed} width={280}>
-        <Menu iconShape="square">
+      <ProSidebar defaultCollapsed={isCollapsed} width={"280"}>
+        <Menu>
           {/* LOGO AND MENU ICON */}
           <Box>
             {!isCollapsed && (

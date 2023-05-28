@@ -3,10 +3,10 @@ import BaseModal, { ModalProps } from './BaseModal';
 import { Button, Box, Typography, Grid, IconButton, Avatar } from '@mui/material';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 import CodeBoxIcon from '../../images/icons/CodeBoxIcon';
-import ImportSchemaModalForm from './ImportSchemaModalForm';
+import UploadSchemaModalForm from './UploadSchemaModalForm';
 
-const ImportSchemaModal = ({ open, handleClose, containerStyle }: ModalProps) => {
-  const ImportSchemaHandler = (e: any) => {
+const UploadSchemaModal = ({ open, handleClose, containerStyle }: ModalProps) => {
+  const uploadSchemaHandler = (e: any) => {
     console.log(e);
   }
 
@@ -32,14 +32,14 @@ const ImportSchemaModal = ({ open, handleClose, containerStyle }: ModalProps) =>
           Select your schema type and upload file or paste data
         </Typography>
 
-        <ImportSchemaModalForm />
+        <UploadSchemaModalForm />
 
         <Grid container spacing={2} direction="row" justifyContent="flex-end" sx={{ mt: 0.8, padding: "0 2px" }}>
           <Grid item xs={4}>
             <Button variant={"outlined"} fullWidth={true} size={"large"} style={{ color: "#344054", borderColor: "#D0D5DD", borderRadius: "10px", textTransform: "capitalize", fontSize: "13.5px", fontWeight: 600, padding: "11px 0" }} onClick={handleClose}>Cancel</Button>
           </Grid>
           <Grid item xs={5}>
-            <Button variant={"contained"} color={"primary"} fullWidth={true} size={"large"} style={{ borderRadius: "10px", textTransform: "capitalize", fontSize: "13.5px", padding: "11px 0" }} onClick={ImportSchemaHandler}>import schema</Button>
+            <Button variant={"contained"} color={"primary"} fullWidth={true} size={"large"} style={{ borderRadius: "10px", textTransform: "capitalize", fontSize: "13.5px", padding: "11px 0" }} onClick={uploadSchemaHandler}>import schema</Button>
           </Grid>
         </Grid>
       </Box>
@@ -47,4 +47,4 @@ const ImportSchemaModal = ({ open, handleClose, containerStyle }: ModalProps) =>
   );
 };
 
-export default ImportSchemaModal;
+export default UploadSchemaModal;
