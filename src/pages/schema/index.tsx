@@ -13,9 +13,14 @@ import TopBarPlus from '../../images/icons/Plus';
 import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import DeleteModal from '../../components/global/DeleteModal';
+import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
 import { clearSchemas, newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
+
+interface ModalActions {
+  open: boolean;
+  itemId?: string;
+}
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -190,7 +195,8 @@ const Dashboard = () => {
         ))}
       </Grid>
 
-      <DeleteModal
+      {/* Delete Schema Modal */}
+      <DeleteSchemaModal
         open={openDeleteModal}
         handleClose={() => setOpenDeleteModal(false)}
         containerStyle={{
