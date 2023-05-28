@@ -13,11 +13,9 @@ import TopBarPlus from '../../images/icons/Plus';
 import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
 import { clearSchemas, newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
 import DownloadSchemaModal from '../../components/modals/DownloadSchemaModal';
-import ImportSchemaModal from '../../components/modals/ImportSchemaModal';
 
 interface ModalActions {
   open: boolean;
@@ -29,9 +27,7 @@ const Dashboard = () => {
   const gridRef = useRef<any>(null);
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [prevScrollTop, setPrevScrollTop] = useState<number>(0);
-  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const [downloadModal, toggleDownloadModal] = useState<ModalActions>({open: false});
-  const [importModal, toggleImportModal] = useState<boolean>(false);
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const schemas = useAppSelector((state) => state.schemas.schemas);
   const dispatch = useAppDispatch();
@@ -117,9 +113,7 @@ const Dashboard = () => {
         subtitle="Manage and export your schemas"
         actionButtons={
           <>
-            <Button label={'Upload'} type={'secondary'} icon={<SchemaButtonUpload />} style={{ marginRight: 10 }} onClick={
-              () => {toggleImportModal(true)}
-            } />
+            <Button label={'Upload'} type={'secondary'} icon={<SchemaButtonUpload />} style={{ marginRight: 10 }} />
             <Button
               label={'New Schema'}
               type={'primary'}
@@ -192,9 +186,7 @@ const Dashboard = () => {
                   handleExport={() => {
                     toggleDownloadModal({open: true, itemId: item.id});
                   }}
-                  handleDelete={() => {
-                    setOpenDeleteModal(true);
-                  }}
+                  handleDelete={() => {}}
                 />
               </Box>
             ) : (
@@ -212,28 +204,6 @@ const Dashboard = () => {
         containerStyle={{
           width: '370px',
           height: '470px',
-          backgroundColor: '#FFFFFF',
-        }}
-      />
-
-      {/* Delete Schema Modal */}
-      <DeleteSchemaModal
-        open={openDeleteModal}
-        handleClose={() => setOpenDeleteModal(false)}
-        containerStyle={{
-          width: '400px',
-          height: '260px',
-          backgroundColor: '#FFFFFF',
-        }}
-      />
-
-      {/* Upload Button triggers Import Schema Modal */}
-       <ImportSchemaModal
-        open={importModal}
-        handleClose={() => toggleImportModal(false)}
-        containerStyle={{
-          width: '380px',
-          height: '650px',
           backgroundColor: '#FFFFFF',
         }}
       />
