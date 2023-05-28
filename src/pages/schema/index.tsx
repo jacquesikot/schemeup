@@ -27,7 +27,7 @@ const Dashboard = () => {
   const gridRef = useRef<any>(null);
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [prevScrollTop, setPrevScrollTop] = useState<number>(0);
-  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [deleteModal, toggleDeleteModal] = useState<ModalActions>({open: false});
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const schemas = useAppSelector((state) => state.schemas.schemas);
   const dispatch = useAppDispatch();
@@ -184,7 +184,7 @@ const Dashboard = () => {
                   description={item.description}
                   noOfTables={item.noOfTables.toString()}
                   handleDelete={() => {
-                    setOpenDeleteModal(true);
+                    toggleDeleteModal({open: true, itemId: item.id});
                   }}
                 />
               </Box>
@@ -197,8 +197,9 @@ const Dashboard = () => {
 
       {/* Delete Schema Modal */}
       <DeleteSchemaModal
-        open={openDeleteModal}
-        handleClose={() => setOpenDeleteModal(false)}
+        open={deleteModal.open}
+        handleClose={() => toggleDeleteModal({open: false})}
+        itemId={deleteModal.itemId}
         containerStyle={{
           width: '400px',
           height: '260px',
