@@ -1,0 +1,21 @@
+{
+  "name": "schemeup-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node12 --outfile=dist/index.js",
+    "deploy": "sls deploy",
+    "offline": "sls offline start"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.19",
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-esbuild": "^1.45.0",
+    "serverless-offline": "^12.0.4",
+    "serverless-plugin-typescript": "^2.1.4"
+  },
+  "dependencies": {
+    "serverless": "^3.31.0"
+  }
+}

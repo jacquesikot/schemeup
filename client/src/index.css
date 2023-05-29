@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Work+Sans:wght@400;500;600;700&display=swap');
+
+html,
+body,
+#root,
+.app,
+.content {
+  height: 100%;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+.app {
+  display: flex;
+  position: relative;
+  min-width: 1200px;
+}
+
+::-webkit-scrollbar {
+  /* 
+  Hidden becasue the entire page is not meant to scroll so no need for the scrollbar
+  width: 5px;
+  height: 5px; */
+  width: 0;
+  height: 0;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #b692f6;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Handle hide on scroll on schema header */
+.header {
+  /* Your header styles */
+  transition: transform 0.3s ease-out, height 0.3s ease-out;
+  transform: translateY(-100%);
+  height: 0;
+  overflow: hidden;
+}
+
+@keyframes showHeader {
+  from {
+    transform: translateY(-100%);
+    height: 0;
+  }
+  to {
+    transform: translateY(0);
+    height: auto;
+  }
+}
+
+.header.visible {
+  animation: showHeader 0.5s ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes hideHeader {
+  from {
+    transform: translateY(0);
+    height: auto;
+  }
+  to {
+    transform: translateY(-100%);
+    height: 0;
+  }
+}
+
+.header:not(.visible) {
+  animation: hideHeader 0.5s ease-out;
+  animation-fill-mode: forwards;
+}
