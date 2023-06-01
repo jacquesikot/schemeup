@@ -1,30 +1,21 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add -D @types/sql-parser
+  /home/sangodzi/.nvm/versions/node/v18.16.0/bin/node /home/sangodzi/.nvm/versions/node/v18.16.0/bin/yarn install
 
 PATH: 
-  /Library/Frameworks/Python.framework/Versions/3.11/bin:/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin
+  /home/sangodzi/.vscode-server/bin/b3e4e68a0bc097f0ae7907b217c1119af9e03435/bin/remote-cli:/home/sangodzi/.nvm/versions/node/v18.16.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Python311/Scripts/:/mnt/c/Python311/:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files/nodejs/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/godwi/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/godwi/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/godwi/AppData/Roaming/npm:/snap/bin
 
 Yarn version: 
   1.22.19
 
 Node version: 
-  18.15.0
+  18.16.0
 
 Platform: 
-  darwin arm64
+  linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fsql-parser: Not found
-      at params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66145:18)
-      at self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140890:22)
-      at Request.emit (node:events:513:28)
-      at Request.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141862:10)
-      at Request.emit (node:events:513:28)
-      at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141784:12)
-      at Object.onceWrapper (node:events:627:28)
-      at IncomingMessage.emit (node:events:525:35)
-      at endReadableNT (node:internal/streams/readable:1359:12)
-      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+  Error: read ECONNRESET
+      at TLSWrap.onStreamRead (node:internal/stream_base_commons:217:20)
 
 npm manifest: 
   {
@@ -32,8 +23,8 @@ npm manifest:
     "version": "0.1.0",
     "private": true,
     "dependencies": {
-      "@emotion/react": "^11.10.4",
-      "@emotion/styled": "^11.10.4",
+      "@emotion/react": "^11.11.0",
+      "@emotion/styled": "^11.11.0",
       "@fullcalendar/core": "^5.11.3",
       "@fullcalendar/daygrid": "^5.11.3",
       "@fullcalendar/interaction": "^5.11.3",
@@ -42,7 +33,7 @@ npm manifest:
       "@fullcalendar/timegrid": "^5.11.3",
       "@mui/icons-material": "^5.3.0",
       "@mui/material": "^5.3.0",
-      "@mui/styles": "^5.3.0",
+      "@mui/styles": "^5.4.0",
       "@mui/x-data-grid": "^5.17.2",
       "@nivo/bar": "^0.80.0",
       "@nivo/core": "^0.79.0",
@@ -70,7 +61,6 @@ npm manifest:
       "react-syntax-highlighter": "^15.5.0",
       "reactflow": "^11.7.0",
       "redux-persist": "^6.0.0",
-      "sql-parser": "^0.5.0",
       "uuid": "^9.0.0",
       "web-vitals": "^2.1.4",
       "yup": "^0.32.11"
@@ -102,6 +92,7 @@ npm manifest:
     "devDependencies": {
       "@types/react-beautiful-dnd": "^13.1.4",
       "@types/react-syntax-highlighter": "^15.5.7",
+      "@types/sql.js": "^1.4.4",
       "@types/uuid": "^9.0.1",
       "typescript": "^5.0.4"
     }
@@ -2847,6 +2838,11 @@ Lockfile:
       "@types/d3-transition" "*"
       "@types/d3-zoom" "*"
   
+  "@types/emscripten@*":
+    version "1.39.6"
+    resolved "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-1.39.6.tgz#698b90fe60d44acf93c31064218fbea93fbfd85a"
+    integrity sha512-H90aoynNhhkQP6DRweEjJp5vfUVdIj7tdPLsu7pq89vODD/lcugKfZOsfgwpvM6XUewEp2N5dCg1Uf3Qe55Dcg==
+  
   "@types/eslint-scope@^3.7.3":
     version "3.7.4"
     resolved "https://registry.npmjs.org/@types/eslint-scope/-/eslint-scope-3.7.4.tgz"
@@ -3127,6 +3123,14 @@ Lockfile:
     resolved "https://registry.npmjs.org/@types/sockjs/-/sockjs-0.3.33.tgz"
     integrity sha512-f0KEEe05NvUnat+boPTZ0dgaLZ4SfSouXUgv5noUiefG2ajgKjmETo9ZJyuqsl7dfl2aHlLJUiki6B4ZYldiiw==
     dependencies:
+      "@types/node" "*"
+  
+  "@types/sql.js@^1.4.4":
+    version "1.4.4"
+    resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.4.tgz#1c4df5045f08a518d48cda6bbb4f5dacc44c503c"
+    integrity sha512-6EWU2wfiBtzgTy18WQoXZAGTreBjhZcBCfD8CDvyI1Nj0a4KNDDt41IYeAZ40cRUdfqWHb7VGx7t6nK0yBOI5A==
+    dependencies:
+      "@types/emscripten" "*"
       "@types/node" "*"
   
   "@types/stack-utils@^2.0.0":
@@ -9771,11 +9775,6 @@ Lockfile:
     version "1.0.3"
     resolved "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz"
     integrity sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==
-  
-  sql-parser@^0.5.0:
-    version "0.5.0"
-    resolved "https://registry.yarnpkg.com/sql-parser/-/sql-parser-0.5.0.tgz#a79b6e66452f3d615b211989f006f34033bc436a"
-    integrity sha512-0Lw6wAUF4MGJ5pRKY6W8emkhWB7WmQ/5bioEzVVk0oI7kIvACJxJCdHD/K8EKQb+kniRPOuxhSnmd/kU+gn/9Q==
   
   stable@^0.1.8:
     version "0.1.8"
