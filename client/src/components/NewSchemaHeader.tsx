@@ -17,6 +17,7 @@ interface NewSchemaHeaderProps {
   toggleSettingsDrawer: (open: boolean) => void;
   drawerState: boolean;
   handleNewTable: () => void;
+  handleShare: () => void;
   handleImport: () => void;
 }
 
@@ -24,6 +25,7 @@ export default function NewSchemaHeader({
   toggleSettingsDrawer,
   drawerState,
   handleNewTable,
+  handleShare,
   handleImport,
 }: NewSchemaHeaderProps) {
   const { id } = useParams<{ id: string }>();
@@ -113,7 +115,7 @@ export default function NewSchemaHeader({
       {/* SHARE/EXPORT CONTROLS */}
       <Box display={'flex'} width={'13%'} justifyContent={'space-between'}>
         <Tooltip title="Share Schema">
-          <IconButton>
+          <IconButton onClick={handleShare}>
             <Share />
           </IconButton>
         </Tooltip>
