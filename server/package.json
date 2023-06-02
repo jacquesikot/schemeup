@@ -7,7 +7,7 @@
     "build": "esbuild src/index.ts --bundle --platform=node --target=node12 --outfile=dist/index.js",
     "deploy": "sls deploy",
     "offline": "sls offline start",
-    "offline-dev": "nodemon --exec serverless offline start"
+    "offline-dev": "nodemon --exec serverless offline start --httpPort 5001"
   },
   "devDependencies": {
     "esbuild": "^0.17.19",

@@ -29,6 +29,7 @@ import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
 import { toggleRightPanel } from '../../redux/slice/app';
 import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
 import ImportModal from '../../components/canvas/ImportModal';
+import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 
 const EditSchema = () => {
   const params = useParams();
@@ -49,6 +50,7 @@ const EditSchema = () => {
   const containerRef = useRef<any>(null);
 
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [showShareModal, toggleShowShareModal] = useState<boolean>(false);
   const [showRelations, setShowRelations] = useState<boolean>(true);
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
@@ -208,6 +210,7 @@ const EditSchema = () => {
             })
           )
         }
+        handleShare={() => toggleShowShareModal(true)}
         handleImport={() => setShowImportModal(true)}
       />
 
@@ -268,6 +271,17 @@ const EditSchema = () => {
         handleDelete={() => {
           dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }));
           setOpenDeleteModal(false);
+        }}
+      />
+
+      {/* Modal UI - share schema with people */}
+      <ShareSchemaModal
+        open={showShareModal}
+        handleClose={() => { toggleShowShareModal(false) }}
+        containerStyle={{
+          width: '400px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '8px',
         }}
       />
     </Box>
