@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import DeleteModal from '../../components/global/DeleteModal';
 import { deleteSchema, newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
+import { removeBottomBar } from '../../redux/slice/app';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -48,6 +49,11 @@ const Dashboard = () => {
       gridElement.removeEventListener('scroll', handleScroll);
     };
   }, [isHeaderVisible, prevScrollTop]);
+
+  // Do not allow codeEditor show up when user is in dashboard
+  useEffect(() => {
+    dispatch(removeBottomBar());
+  }, [dispatch]);
 
   const xsScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const smScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));
