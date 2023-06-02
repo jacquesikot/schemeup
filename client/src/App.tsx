@@ -17,6 +17,7 @@ import routes from './routes';
 function App() {
   const [theme] = useMode();
   const tabs = useAppSelector((state) => state.appTabs.tabs);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

@@ -23,7 +23,7 @@ const CanvasDrawer = ({ open, children }: CanvasDrawerProps) => {
           height={'100%'}
           position={'absolute'}
           right={0}
-          zIndex={1000}
+          zIndex={900}
         >
           {children}
         </Box>
