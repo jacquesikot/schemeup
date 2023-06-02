@@ -6,16 +6,20 @@
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node12 --outfile=dist/index.js",
     "deploy": "sls deploy",
-    "offline": "sls offline start"
+    "offline": "sls offline start",
+    "offline-dev": "nodemon --exec serverless offline start"
   },
   "devDependencies": {
     "esbuild": "^0.17.19",
+    "nodemon": "^2.0.22",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-esbuild": "^1.45.0",
     "serverless-offline": "^12.0.4",
     "serverless-plugin-typescript": "^2.1.4"
   },
   "dependencies": {
+    "node-sql-parser": "^4.7.0",
+    "pg-query-parser": "^0.3.0",
     "serverless": "^3.31.0"
   }
 }

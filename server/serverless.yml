@@ -65,6 +65,12 @@ functions:
       - httpApi:
           path: /api/schema/parse-dump
           method: post
+  parsePgDump:
+    handler: src/functions/parsePgSqlDump.handler
+    events:
+      - httpApi:
+          path: /api/schema/parse-pg-dump
+          method: post
 
   # hello:
   #   handler: handler.hello
