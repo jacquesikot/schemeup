@@ -40,7 +40,6 @@ const EditSchema = () => {
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
   const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
   const tableLayout = generateTableLayout(schema.tables || []);
-  console.log('tableLayout', tableLayout);
   const tablesWithForeignKeys = schema?.tables?.filter((table) => table.foreignKeys.length > 0);
 
   const activeTableId = useAppSelector(

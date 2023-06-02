@@ -1,0 +1,12 @@
+{
+  "name": "schemeup",
+  "version": "1.0.0",
+  "scripts": {
+    "client": "cd client && yarn start",
+    "server": "cd server && yarn run offline-dev",
+    "dev": "concurrently --kill-others-on-fail \"yarn client\" \"yarn server\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.1.0"
+  }
+}
