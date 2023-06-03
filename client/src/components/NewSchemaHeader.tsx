@@ -5,6 +5,7 @@ import Pointer from '../images/icons/canvas-controls/Pointer';
 import Undo from '../images/icons/canvas-controls/Undo';
 import Link from '../images/icons/canvas-controls/Link';
 import Comment from '../images/icons/canvas-controls/Comment';
+import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
 import Table from '../images/icons/canvas-controls/Table';
 import Share from '../images/icons/canvas-controls/Share';
 import Export from '../images/icons/canvas-controls/Export';
@@ -19,6 +20,7 @@ interface NewSchemaHeaderProps {
   handleNewTable: () => void;
   handleShare: () => void;
   handleImport: () => void;
+  showPreview: () => void;
 }
 
 export default function NewSchemaHeader({
@@ -27,6 +29,7 @@ export default function NewSchemaHeader({
   handleNewTable,
   handleShare,
   handleImport,
+  showPreview,
 }: NewSchemaHeaderProps) {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
@@ -108,6 +111,12 @@ export default function NewSchemaHeader({
         <Tooltip title="Comment">
           <IconButton>
             <Comment />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Preview">
+          <IconButton onClick={showPreview}>
+            <VisibilityIcon />
           </IconButton>
         </Tooltip>
       </Box>
