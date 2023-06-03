@@ -3,13 +3,15 @@ import emptysetimg from "../../images/emptyset_img.png";
 import { Box, Typography } from "@mui/material";
 import SchemaButtonUpload from "../../images/icons/schema/SchemaButtonUpload";
 import TopBarPlus from "../../images/icons/Plus";
+import { ReactNode } from "react";
 
 interface EmptyStateProps {
   title: string;
   message: string;
+  actionButtons: ReactNode;
 }
 
-const EmptyState = ({ title, message }: EmptyStateProps) => {
+const EmptyState = ({ title, message, actionButtons }: EmptyStateProps) => {
   return (
     <Box
       display={"flex"}
@@ -37,21 +39,7 @@ const EmptyState = ({ title, message }: EmptyStateProps) => {
           {message}
         </Typography>
       </Box>
-      <Box mt={4}>
-        <Button
-          style={{ marginRight: 10 }}
-          label="Import Schema"
-          type={"secondary"}
-          icon={<SchemaButtonUpload />}
-          onClick={() => true}
-        />
-        <Button
-          label="New Schema"
-          type={"primary"}
-          icon={<TopBarPlus color="#FFF" />}
-          onClick={() => true}
-        />
-      </Box>
+      <Box mt={4}>{actionButtons}</Box>
     </Box>
   );
 };

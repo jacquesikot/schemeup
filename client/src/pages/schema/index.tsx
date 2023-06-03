@@ -160,6 +160,23 @@ const Dashboard = () => {
         <EmptyState
           title="No schemas found"
           message="Your search “Landing page schema” did not match any projects. Please try again."
+          actionButtons={
+            <>
+              <Button
+                style={{ marginRight: 10 }}
+                label="Import Schema"
+                type={"secondary"}
+                icon={<SchemaButtonUpload />}
+                onClick={() => true}
+              />
+              <Button
+                label="New Schema"
+                type={"primary"}
+                icon={<TopBarPlus color="#FFF" />}
+                onClick={() => true}
+              />
+            </>
+          }
         />
       ) : (
         <Grid
