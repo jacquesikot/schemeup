@@ -142,6 +142,10 @@ const schemasSlice = createSlice({
         state.schemas[index].tables![tableIndex] = action.payload.table;
       }
     },
+    importTables: (state, action: PayloadAction<{ schemaId: string; tables: Table[] }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      state.schemas[index].tables = action.payload.tables;
+    },
     setActiveTable: (state, action: PayloadAction<{ schemaId: string; tableId: string }>) => {
       if (action.payload.tableId.length < 1) {
         const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
@@ -158,7 +162,16 @@ const schemasSlice = createSlice({
   },
 });
 
-export const { newSchema, updateSchema, deleteSchema, clearSchemas, newTable, deleteTable, editTable, setActiveTable } =
-  schemasSlice.actions;
+export const {
+  newSchema,
+  updateSchema,
+  deleteSchema,
+  clearSchemas,
+  newTable,
+  deleteTable,
+  editTable,
+  setActiveTable,
+  importTables,
+} = schemasSlice.actions;
 
 export default schemasSlice.reducer;

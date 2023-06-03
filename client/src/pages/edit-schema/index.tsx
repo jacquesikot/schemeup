@@ -26,14 +26,16 @@ import DeleteModal from '../../components/global/DeleteModal';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
 import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
-import { toggleRightPanel } from '../../redux/slice/app';
+import { removeBottomBar, toggleRightPanel } from '../../redux/slice/app';
 import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
 import ImportModal from '../../components/canvas/ImportModal';
+import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 
 const EditSchema = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
+  // console.log('schema', schema);
   const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
   const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
@@ -49,6 +51,7 @@ const EditSchema = () => {
   const containerRef = useRef<any>(null);
 
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [showShareModal, toggleShowShareModal] = useState<boolean>(false);
   const [showRelations, setShowRelations] = useState<boolean>(true);
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
@@ -148,33 +151,31 @@ const EditSchema = () => {
     dispatch(setNodeState({ node: initialNodes || [], edge: initialEdges || [], schemaId: schema.id }));
   }, [dispatch, schema.tables, openDeleteModal]);
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        const schemaSql = generateSchemaTablesSql(schema.tables || []);
-        const res = await getSchemaSuggestions(schemaSql);
-        if (res) {
-          const data = res.replace(/^'|'$/g, '');
-          if (data) {
-            const dataRes = JSON.parse(data);
-            if (dataRes) {
-              const finalSuggestions = dataRes.suggestions.map((d: any) => {
-                return {
-                  title: d.severity,
-                  body: d.suggestion,
-                };
-              });
-              setAiSuggestions(finalSuggestions);
-            }
-          }
-        }
-      } catch (error) {
-        // console.log('error in ai', error);
-      }
-    };
+  // useEffect(() => {
+  //   const run = async () => {
+  //     try {
+  //       const schemaSql = generateSchemaTablesSql(schema.tables || []);
+  //       const res = await getSchemaSuggestions(schemaSql);
+  //       if (res) {
+  //         const data = res.replace(/^'|'$/g, '');
+  //         if (data) {
+  //           const dataRes = JSON.parse(data);
+  //           if (dataRes) {
+  //             const finalSuggestions = dataRes.suggestions.map((d: any) => {
+  //               return {
+  //                 title: d.severity,
+  //                 body: d.suggestion,
+  //               };
+  //             });
+  //             setAiSuggestions(finalSuggestions);
+  //           }
+  //         }
+  //       }
+  //     } catch (error) {}
+  //   };
 
-    run();
-  }, [schema.tables, schema.description, schema.title]);
+  //   run();
+  // }, [schema.tables, schema.description, schema.title]);
 
   return (
     <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 150, position: 'relative' }}>
@@ -208,6 +209,7 @@ const EditSchema = () => {
             })
           )
         }
+        handleShare={() => toggleShowShareModal(true)}
         handleImport={() => setShowImportModal(true)}
       />
 
@@ -242,7 +244,7 @@ const EditSchema = () => {
             setOpenDeleteModal(true);
           }}
           fitView
-          style={{ width: '100%', height: '100%' }}
+          // style={{ width: '100%', height: '100%' }}
         >
           <Background />
           <Controls />
@@ -250,7 +252,7 @@ const EditSchema = () => {
         </ReactFlow>
       </Box>
 
-      <ImportModal open={showImportModal} handleClose={() => setShowImportModal(false)} />
+      <ImportModal open={showImportModal} handleClose={() => setShowImportModal(false)} schemaId={schema.id} />
 
       <DeleteModal
         open={openDeleteModal}
@@ -268,6 +270,19 @@ const EditSchema = () => {
         handleDelete={() => {
           dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }));
           setOpenDeleteModal(false);
+        }}
+      />
+
+      {/* Modal UI - share schema with people */}
+      <ShareSchemaModal
+        open={showShareModal}
+        handleClose={() => {
+          toggleShowShareModal(false);
+        }}
+        containerStyle={{
+          width: '400px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '8px',
         }}
       />
     </Box>

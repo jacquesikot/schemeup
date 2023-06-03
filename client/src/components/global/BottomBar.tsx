@@ -100,6 +100,7 @@ const BottomBar = () => {
           left={sideBarOpen ? SIDEBAR_WIDTH : 80}
           sx={{
             transition: 'width 0.3s ease, left 0.3s ease',
+            overflow: 'auto',
           }}
         >
           <div

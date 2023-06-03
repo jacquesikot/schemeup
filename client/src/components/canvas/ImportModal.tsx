@@ -1,14 +1,19 @@
 import { Modal, Box, Typography, IconButton, styled, TextField } from '@mui/material';
+import { v4 as uuidv4 } from 'uuid';
 
 import { CancelIcon } from '../../images/icons/CancelIcon';
 import Button from '../global/Button';
 import { ImportSchemaIcon } from '../../images/icons/canvas-controls/ImportSchemaIcon';
 import { useState } from 'react';
+import { parsePgDump } from '../../api/parse';
+import { useDispatch } from 'react-redux/es/hooks/useDispatch';
+import { importTables } from '../../redux/slice/schemas';
 // import parseDumpToTables from '../../utils/parseDumpToTable';
 
 interface DeleteModalProps {
   open: boolean;
   handleClose: (event: Event | React.SyntheticEvent) => void;
+  schemaId: string;
 }
 
 const StyledTextField = styled(TextField)({
@@ -21,9 +26,10 @@ const StyledTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
     color: '#667085',
     fontSize: 14,
-    // height: 200,
-    maxHeight: 600,
+    maxHeight: 300,
+    height: 200,
     fontFamily: 'IBM Plex Mono',
+    overflow: 'auto',
 
     '& fieldset': {
       borderColor: '#E0E3E7',
@@ -38,12 +44,34 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const ImportModal = ({ open, handleClose }: DeleteModalProps) => {
+const ImportModal = ({ open, handleClose, schemaId }: DeleteModalProps) => {
   const [sql, setSql] = useState<string>('');
+  const dispatch = useDispatch();
 
-  const handleImport = () => {
-    // const schema = parseDumpToTables(sql);
-    // console.log('schema', schema);
+  const handleImport = async () => {
+    const schema = await parsePgDump(sql);
+    dispatch(
+      importTables({
+        schemaId,
+        tables: schema.data.data.map((d: any) => {
+          return {
+            id: uuidv4(),
+            name: d.name,
+            meta: {
+              type: 'table',
+              isEdit: false,
+            },
+            columns: d.columns.map((c: any) => {
+              return {
+                ...c,
+              };
+            }),
+            foreignKeys: [],
+            indexes: [],
+          };
+        }),
+      })
+    );
   };
 
   return (
@@ -82,7 +110,7 @@ const ImportModal = ({ open, handleClose }: DeleteModalProps) => {
         </Box>
 
         <StyledTextField
-          style={{ width: '100%', overflow: 'hidden' }}
+          style={{ width: '100%' }}
           multiline
           placeholder="Paste SQL DDL here.."
           value={sql}

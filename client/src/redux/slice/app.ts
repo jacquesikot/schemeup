@@ -25,9 +25,12 @@ const appSlice = createSlice({
     toggleRightPanel: (state) => {
       state.rightPanelOpen = !state.rightPanelOpen;
     },
+    removeBottomBar: (state) => {
+      state.codeEditorOpen = false;
+    },
   },
 });
 
-export const { toggleCodeEditor, toggleRightPanel, toggleSideBar } = appSlice.actions;
+export const { toggleCodeEditor, toggleRightPanel, toggleSideBar, removeBottomBar } = appSlice.actions;
 
 export default appSlice.reducer;
