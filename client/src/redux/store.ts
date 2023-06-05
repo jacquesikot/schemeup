@@ -7,6 +7,7 @@ import schemasReducer from './slice/schemas';
 import canvasReducer from './slice/canvas';
 import appReducer from './slice/app';
 
+
 const persistConfig = {
   key: 'root',
   storage,

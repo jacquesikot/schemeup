@@ -30,6 +30,8 @@ const BottomBar = () => {
 
   const schema = schemaArr && schemaArr.length > 0 ? schemaArr[0] : { tables: [] };
 
+  console.log(schema);
+
   const dispatch = useAppDispatch();
 
   const [boxHeight, setBoxHeight] = useState(500);
@@ -40,6 +42,9 @@ const BottomBar = () => {
     setBoxHeight((prevHeight) => prevHeight - deltaY);
     setBoxBottom((prevBottom) => prevBottom + deltaY);
   };
+
+  const sqlAccessRoutes = location.pathname.includes(routes.EDIT_SCHEMA) || location.pathname.includes(routes.SHARE_SCHEMA);
+
 
   useEffect(() => {
     if (!location.pathname.includes(routes.EDIT_SCHEMA)) {
@@ -69,6 +74,8 @@ const BottomBar = () => {
   };
 
   const BOX_WIDTH = returnBoxWidth();
+
+  console.log(codeEditorOpen);
 
   return (
     <Box
@@ -146,7 +153,7 @@ const BottomBar = () => {
       </Typography>
 
       <Box display="flex">
-        {location.pathname.includes(routes.EDIT_SCHEMA) && (
+        {sqlAccessRoutes && (
           <IconButton onClick={() => dispatch(toggleCodeEditor())}>
             <Typography color={'#101828'}>SQL</Typography>
           </IconButton>

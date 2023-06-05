@@ -17,19 +17,19 @@ import generateTableLayout from '../../utils/generateTableLayout';
 import {
   Schema,
   Table as TableProps,
-  deleteTable,
   editTable,
   newTable,
   setActiveTable,
 } from '../../redux/slice/schemas';
-import DeleteModal from '../../components/global/DeleteModal';
+import DeleteModal from '../../components/modals/DeleteModal';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
 import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
 import { removeBottomBar, toggleRightPanel } from '../../redux/slice/app';
 import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
-import ImportModal from '../../components/canvas/ImportModal';
+import ImportModal from '../../components/modals/ImportModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
+import routes from '../../routes';
 
 const EditSchema = () => {
   const params = useParams();
@@ -177,6 +177,11 @@ const EditSchema = () => {
   //   run();
   // }, [schema.tables, schema.description, schema.title]);
 
+  const showPreview = () => {
+    const url = `${routes.SHARE_SCHEMA}/${schema.id}`;
+    window.open(url, '_blank', 'noreferrer');
+  }
+
   return (
     <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 150, position: 'relative' }}>
       <NewSchemaHeader
@@ -211,6 +216,7 @@ const EditSchema = () => {
         }
         handleShare={() => toggleShowShareModal(true)}
         handleImport={() => setShowImportModal(true)}
+        showPreview={showPreview}
       />
 
       <CanvasDrawer open={drawerOpen}>
@@ -252,24 +258,26 @@ const EditSchema = () => {
         </ReactFlow>
       </Box>
 
-      <ImportModal open={showImportModal} handleClose={() => setShowImportModal(false)} schemaId={schema.id} />
+      <ImportModal 
+      open={showImportModal} 
+      handleClose={() => setShowImportModal(false)}
+      containerStyle={{
+        backgroundColor: '#FFFFFF',
+        width: 480,
+        borderRadius: 8,
+        padding: '14px',
+      }} 
+      />
 
       <DeleteModal
         open={openDeleteModal}
-        handleClose={() => {
-          setOpenDeleteModal(false);
-        }}
+        handleClose={() => { setOpenDeleteModal(false) }}
+        itemId={schema.id}
         containerStyle={{
           width: '400px',
           backgroundColor: '#FFFFFF',
           borderRadius: '8px',
           padding: '20px',
-        }}
-        title={`Delete Table`}
-        body={`Are you sure you want to delete this table? This action cannot be undone.`}
-        handleDelete={() => {
-          dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }));
-          setOpenDeleteModal(false);
         }}
       />
 

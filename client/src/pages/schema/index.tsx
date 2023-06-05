@@ -12,8 +12,8 @@ import TopBarPlus from '../../images/icons/Plus';
 import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import DeleteModal from '../../components/global/DeleteModal';
-import { deleteSchema, newSchema } from '../../redux/slice/schemas';
+import DeleteModal from '../../components/modals/DeleteModal';
+import { newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
 import { removeBottomBar } from '../../redux/slice/app';
 
@@ -25,9 +25,10 @@ const Dashboard = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const schemas = useAppSelector((state) => state.schemas.schemas);
-  const [activeSchema, setActiveSchema] = useState<any>(null);
+  const [activeSchema, setActiveSchema] = useState<any>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -195,17 +196,12 @@ const Dashboard = () => {
       <DeleteModal
         open={openDeleteModal}
         handleClose={() => setOpenDeleteModal(false)}
+        itemId={activeSchema?.id}
         containerStyle={{
           width: '400px',
           backgroundColor: '#FFFFFF',
           borderRadius: '8px',
           padding: '20px',
-        }}
-        title={`Delete Schema`}
-        body={`Are you sure you want to delete this schema? This action cannot be undone.`}
-        handleDelete={() => {
-          dispatch(deleteSchema(activeSchema.id));
-          setOpenDeleteModal(false);
         }}
       />
     </Box>
