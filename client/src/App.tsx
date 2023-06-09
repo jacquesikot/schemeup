@@ -10,7 +10,7 @@ import Datasources from './pages/datasources';
 import EditSchema from './pages/edit-schema';
 import routes from './routes';
 import ShareSchema from './pages/share-schema';
-import AuthenticateUser from './pages/authenticate-user';
+import AuthenticateUser from './pages/auth';
 import Layout from './components/global/Layout';
 
 function App() {
