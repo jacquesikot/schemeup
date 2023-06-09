@@ -5,6 +5,7 @@ const routes = {
   SHARE_SCHEMA: '/schema/share',
   MOCK_DATA: '/mock-data',
   DATASOURCES: '/datasources',
+  AUTH: '/authenticate-user',
 };
 
 export default routes;

@@ -16,6 +16,8 @@ import SideBarToggleClose from '../../images/icons/SideBarToggleClose';
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
 import routes from '../../routes';
 import { toggleSideBar } from '../../redux/slice/app';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase.config';
 
 export const SIDEBAR_WIDTH = 280;
 
@@ -31,6 +33,7 @@ const Item = ({ title, to, icon, selected, setSelected }: ItemProps) => {
   const dispatch = useAppDispatch();
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const navigate = useNavigate();
+
   return (
     <MenuItem
       active={selected === title}
@@ -75,9 +78,20 @@ const Item = ({ title, to, icon, selected, setSelected }: ItemProps) => {
 const Sidebar = () => {
   const colors = tokens();
   const sideBarOpen = useAppSelector((state: any) => state.app.sideBarOpen);
+  const { activeUser } = useAppSelector((state) => state.activeUser);
   const dispatch = useAppDispatch();
   const [_, setSelected] = useState('Schema');
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const logOutHandler = () => {
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      return navigate(routes.AUTH);
+    }).catch((error) => {
+      // An error happened.
+    });
+  }
 
   return (
     <Box
@@ -171,14 +185,14 @@ const Sidebar = () => {
             <>
               <Box>
                 <Typography fontSize={14} fontWeight={500} color={'#344054'}>
-                  Jacques Ikot
+                  {activeUser.name}
                 </Typography>
                 <Typography fontSize={14} fontWeight={400} color={'#344054'}>
-                  osstephen70@gmail.com
+                  {activeUser.email}
                 </Typography>
               </Box>
 
-              <IconButton>
+              <IconButton onClick={logOutHandler}>
                 <SideBarLogout />
               </IconButton>
             </>

@@ -30,7 +30,7 @@ const BottomBar = () => {
 
   const schema = schemaArr && schemaArr.length > 0 ? schemaArr[0] : { tables: [] };
 
-  console.log(schema);
+  // console.log(schema);
 
   const dispatch = useAppDispatch();
 
@@ -75,7 +75,7 @@ const BottomBar = () => {
 
   const BOX_WIDTH = returnBoxWidth();
 
-  console.log(codeEditorOpen);
+  // console.log(codeEditorOpen);
 
   return (
     <Box
