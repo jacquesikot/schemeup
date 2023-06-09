@@ -6,6 +6,7 @@ import appTabsReducer from './slice/apptabs';
 import schemasReducer from './slice/schemas';
 import canvasReducer from './slice/canvas';
 import appReducer from './slice/app';
+import userReducer from './slice/user';
 
 
 const persistConfig = {
@@ -20,6 +21,7 @@ const persistedReducer = persistReducer(
     schemas: schemasReducer,
     canvas: canvasReducer,
     app: appReducer,
+    activeUser: userReducer,
   })
 );
 
