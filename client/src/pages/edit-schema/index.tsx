@@ -14,18 +14,12 @@ import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import generateForeignKeyName from '../../utils/generateFkName';
 import generateTableLayout from '../../utils/generateTableLayout';
-import {
-  Schema,
-  Table as TableProps,
-  editTable,
-  newTable,
-  setActiveTable,
-} from '../../redux/slice/schemas';
+import { Schema, Table as TableProps, editTable, newTable, setActiveTable } from '../../redux/slice/schemas';
 import DeleteModal from '../../components/modals/DeleteModal';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
 import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
-import { removeBottomBar, toggleRightPanel } from '../../redux/slice/app';
+import { toggleRightPanel } from '../../redux/slice/app';
 import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
 import ImportModal from '../../components/modals/ImportModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
@@ -180,7 +174,7 @@ const EditSchema = () => {
   const showPreview = () => {
     const url = `${routes.SHARE_SCHEMA}/${schema.id}`;
     window.open(url, '_blank', 'noreferrer');
-  }
+  };
 
   return (
     <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 150, position: 'relative' }}>
@@ -258,20 +252,22 @@ const EditSchema = () => {
         </ReactFlow>
       </Box>
 
-      <ImportModal 
-      open={showImportModal} 
-      handleClose={() => setShowImportModal(false)}
-      containerStyle={{
-        backgroundColor: '#FFFFFF',
-        width: 480,
-        borderRadius: 8,
-        padding: '14px',
-      }} 
+      <ImportModal
+        open={showImportModal}
+        handleClose={() => setShowImportModal(false)}
+        containerStyle={{
+          backgroundColor: '#FFFFFF',
+          width: 480,
+          borderRadius: 8,
+          padding: '14px',
+        }}
       />
 
       <DeleteModal
         open={openDeleteModal}
-        handleClose={() => { setOpenDeleteModal(false) }}
+        handleClose={() => {
+          setOpenDeleteModal(false);
+        }}
         itemId={schema.id}
         containerStyle={{
           width: '400px',

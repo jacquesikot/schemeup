@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import DeleteModal from '../../components/modals/DeleteModal';
 import { newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
-import { removeBottomBar } from '../../redux/slice/app';
+import { hideCodeEditor } from '../../redux/slice/app';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -28,7 +28,6 @@ const Dashboard = () => {
   const [activeSchema, setActiveSchema] = useState<any>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,8 +52,9 @@ const Dashboard = () => {
 
   // Do not allow codeEditor show up when user is in dashboard
   useEffect(() => {
-    dispatch(removeBottomBar());
-  }, [dispatch]);
+    dispatch(hideCodeEditor());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const xsScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const smScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));

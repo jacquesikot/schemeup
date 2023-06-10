@@ -3,7 +3,6 @@ import { ThemeProvider } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 
-import { useMode } from './theme';
 import Dashboard from './pages/schema';
 import MockData from './pages/mock-data';
 import Datasources from './pages/datasources';
@@ -12,9 +11,10 @@ import routes from './routes';
 import ShareSchema from './pages/share-schema';
 import AuthenticateUser from './pages/auth';
 import Layout from './components/global/Layout';
+import { createTheme } from './theme';
 
 function App() {
-  const [theme] = useMode();
+  const theme = createTheme();
 
   return (
     <ThemeProvider theme={theme}>

@@ -1,10 +1,6 @@
-import { Box, Button, IconButton, Typography, useTheme } from '@mui/material';
-import { tokens } from '../../theme';
+import { Box } from '@mui/material';
 
 const Datasources = () => {
-  const theme = useTheme();
-  const colors = tokens();
-
   return (
     <Box m="20px">
       {/* HEADER */}
