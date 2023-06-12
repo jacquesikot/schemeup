@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, IconButton, Typography } from '@mui/material';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { a11yLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -156,8 +156,9 @@ const BottomBar = () => {
         <Box
           display={'flex'}
           alignItems={'center'}
-          bgcolor={'#ECFDF3'}
           borderRadius={12}
+          height={30}
+          alignSelf={'center'}
           paddingX={1}
           paddingY={0.5}
           marginLeft={5}

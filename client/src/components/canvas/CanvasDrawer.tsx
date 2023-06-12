@@ -2,7 +2,7 @@ import { Box, Fade } from '@mui/material';
 import { useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 
-export const CANVAS_DRAWER_WIDTH = 365;
+export const CANVAS_DRAWER_WIDTH = 450;
 
 interface CanvasDrawerProps {
   open?: boolean;

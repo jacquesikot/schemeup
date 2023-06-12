@@ -13,7 +13,7 @@ import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import DeleteModal from '../../components/modals/DeleteModal';
-import { newSchema } from '../../redux/slice/schemas';
+import { clearSchemas, newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
 import { hideCodeEditor } from '../../redux/slice/app';
 
@@ -53,6 +53,7 @@ const Dashboard = () => {
   // Do not allow codeEditor show up when user is in dashboard
   useEffect(() => {
     dispatch(hideCodeEditor());
+    // dispatch(clearSchemas()); dev only
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

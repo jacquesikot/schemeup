@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { TickIcon } from '../../images/icons/TickIcon';
@@ -9,8 +9,9 @@ import { NewRowPlus } from '../../images/icons/canvas-controls/NewRowPlus';
 import TableRowV2, { TableRowProps } from './TableRowV2';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { deleteTable } from '../../redux/slice/schemas';
 
-function TableV2(data: any) {
+function TableV2({ data }: any) {
   const theme = useTheme();
   const colors = theme.palette;
   const editMode = data.isEdit;
@@ -62,13 +63,16 @@ function TableV2(data: any) {
           },
         ]
   );
+
+  console.log('data', data);
+
   return (
     <Box
       display={'flex'}
       border={1}
       borderColor={colors.divider}
       bgcolor={'#FFFF'}
-      width={400}
+      width={420}
       flexDirection={'column'}
       borderRadius={'8px'}
     >
@@ -94,7 +98,12 @@ function TableV2(data: any) {
         </Box>
 
         <Box display={'flex'} alignItems={'center'}>
-          <IconButton onClick={() => true} style={{ marginRight: 15, marginLeft: 10 }}>
+          <IconButton
+            onClick={() => {
+              dispatch(deleteTable({ schemaId: schema.id, tableId: data.data.id }));
+            }}
+            style={{ marginRight: 15, marginLeft: 10 }}
+          >
             <CancelIcon />
           </IconButton>
           <IconButton onClick={() => true}>

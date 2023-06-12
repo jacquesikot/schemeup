@@ -8,7 +8,8 @@ import {
   IconButton,
   Tooltip,
   MenuItem,
-  TextField,
+  FormHelperText,
+  Checkbox,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
@@ -22,8 +23,8 @@ import { KeyIcon } from '../../images/icons/KeyIcon';
 import { UniqueIndexIcon } from '../../images/icons/UniqueIndexIcon';
 import { IndexPinIcon } from '../../images/icons/IndexPinIcon';
 import { SmallTickIcon } from '../../images/icons/SmallTickIcon';
-import { useAppDispatch } from '../../redux/hooks';
-import BootstrapInput from '../global/BootstrapInput';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { useParams } from 'react-router-dom';
 
 export interface TableRowProps {
   name: string;
@@ -42,6 +43,7 @@ export interface TableRowProps {
   index: boolean;
   canDelete?: boolean;
   isEdit?: boolean;
+  comment?: string;
   handleDelete?: () => void;
   handleUpdate?: (row: TableRowProps) => void;
 }
@@ -66,14 +68,14 @@ function TableRowV2(row: TableRowProps) {
   const colors = theme.palette;
   const indexAnchorRef = useRef<HTMLButtonElement>(null);
   const moreOptionsAnchorRef = useRef<HTMLButtonElement>(null);
+  const params = useParams();
   const dispatch = useAppDispatch();
+  const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
   const [nameEditMode, setNameEditMode] = useState<boolean>(false);
   const [typeEditMode, setTypeEditMode] = useState<boolean>(false);
   const [openIndex, setOpenIndex] = useState<boolean>(false);
   const [openMoreOptions, setOpenMoreOptions] = useState<boolean>(false);
   const [rowData, setRowData] = useState<TableRowProps>(row);
-
-  //   console.log(schema);
 
   const handleInputBlur = (field: keyof TableRowProps, value: any) => {
     const updatedRow = {
@@ -130,8 +132,10 @@ function TableRowV2(row: TableRowProps) {
                 }}
               />
             </IconButton>
-          ) : (
+          ) : rowData.primaryKey ? (
             <KeyIcon />
+          ) : (
+            <Box width={'16px'} />
           )}
         </Box>
 
@@ -263,16 +267,26 @@ function TableRowV2(row: TableRowProps) {
                 width: '40px',
                 height: '40px',
                 borderRadius: '6px',
+                paddingLeft: '10px',
+                paddingRight: '10px',
               }}
             >
-              <Box
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '10px',
-                  border: `1.5px solid ${colors.grey[700]}`,
-                }}
-              />
+              <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+                {rowData.primaryKey && <KeyIcon style={{ marginRight: 3 }} />}
+                {rowData.unique && <UniqueIndexIcon style={{ marginRight: 3 }} />}
+                {rowData.index && <IndexPinIcon style={{ marginRight: 3 }} />}
+                {!rowData.index && !rowData.unique && !rowData.primaryKey && (
+                  <Box
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      marginRight: 1,
+                      borderRadius: '10px',
+                      border: `1.5px solid ${colors.grey[900]}`,
+                    }}
+                  />
+                )}
+              </Box>
             </IconButton>
           </Tooltip>
           <MenuPopper
@@ -396,10 +410,143 @@ function TableRowV2(row: TableRowProps) {
             containerStyle={{ border: `1px solid ${theme.palette.divider}`, width: '200px', borderRadius: '6px' }}
             menuItems={
               <Box p={1}>
-                <Typography variant="caption" mb={1}>
-                  Default
-                </Typography>
-                <TextField size="small" placeholder="Default Value" />
+                <FormHelperText>Default Value</FormHelperText>
+                <StyledInput
+                  style={{
+                    border: '1px solid #EAECF0',
+                    marginTop: 1,
+                    height: 25,
+                    paddingLeft: '10px',
+                    borderRadius: 4,
+                    textAlign: 'left',
+                  }}
+                  type="text"
+                  onBlur={(e) => handleInputBlur('defaultValue', e.target.value)}
+                />
+
+                <FormHelperText>Comment</FormHelperText>
+                <StyledInput
+                  style={{
+                    border: '1px solid #EAECF0',
+                    marginTop: 1,
+                    height: 25,
+                    paddingLeft: '10px',
+                    borderRadius: 4,
+                    textAlign: 'left',
+                  }}
+                  type="text"
+                  onBlur={(e) => handleInputBlur('comment', e.target.value)}
+                />
+
+                <Box ml={-1} mt={1} display={'flex'} alignItems={'center'}>
+                  <Checkbox
+                    size="small"
+                    checked={rowData.foreignKey}
+                    onChange={() => handleInputBlur('foreignKey', !rowData.foreignKey)}
+                  />
+                  <FormHelperText style={{ marginBottom: '2px' }}>Foreign Key</FormHelperText>
+                </Box>
+
+                {rowData.foreignKey && (
+                  <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-end'} alignItems={'center'}>
+                    <Autocomplete
+                      openOnFocus
+                      value={row.isEdit ? row.referenceTable : rowData.referenceTable}
+                      options={schema.tables && schema.tables.length > 0 && (schema.tables.map((t) => t.name) as any)}
+                      renderInput={(params) => (
+                        <div ref={params.InputProps.ref}>
+                          <FormHelperText>Referenced Table</FormHelperText>
+                          <StyledInput
+                            style={{
+                              border: '1px solid #EAECF0',
+                              height: 25,
+                              borderRadius: 4,
+                              paddingLeft: '10px',
+                              textAlign: 'left',
+                            }}
+                            type="text"
+                            {...params.inputProps}
+                            onBlur={(e) => handleInputBlur('referenceTable', e.target.value)}
+                          />
+                        </div>
+                      )}
+                    />
+
+                    <Autocomplete
+                      openOnFocus
+                      value={row.isEdit ? row.referenceColumn : rowData.referenceColumn}
+                      options={
+                        schema.tables && schema.tables.length > 0
+                          ? schema.tables.find((t) => t.name === rowData.referenceTable)?.columns.map((c) => c.name) ||
+                            []
+                          : []
+                      }
+                      renderInput={(params) => (
+                        <div ref={params.InputProps.ref}>
+                          <FormHelperText>Referenced Column</FormHelperText>
+                          <StyledInput
+                            style={{
+                              border: '1px solid #EAECF0',
+                              height: 25,
+                              borderRadius: 4,
+                              paddingLeft: '10px',
+                              textAlign: 'left',
+                            }}
+                            type="text"
+                            {...params.inputProps}
+                            onBlur={(e) => handleInputBlur('referenceColumn', e.target.value)}
+                          />
+                        </div>
+                      )}
+                    />
+
+                    <Autocomplete
+                      openOnFocus
+                      value={row.isEdit ? row.onUpdate : rowData.onUpdate}
+                      options={['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION', 'SET DEFAULT']}
+                      renderInput={(params) => (
+                        <div ref={params.InputProps.ref}>
+                          <FormHelperText>On Update</FormHelperText>
+                          <StyledInput
+                            style={{
+                              border: '1px solid #EAECF0',
+                              height: 25,
+                              borderRadius: 4,
+                              paddingLeft: '10px',
+                              textAlign: 'left',
+                            }}
+                            type="text"
+                            {...params.inputProps}
+                            onBlur={(e) => handleInputBlur('onUpdate', e.target.value)}
+                          />
+                        </div>
+                      )}
+                    />
+
+                    <Autocomplete
+                      openOnFocus
+                      value={row.isEdit ? row.onDelete : rowData.onDelete}
+                      options={['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION', 'SET DEFAULT']}
+                      renderInput={(params) => (
+                        <div ref={params.InputProps.ref}>
+                          <FormHelperText>On Delete</FormHelperText>
+                          <StyledInput
+                            style={{
+                              border: '1px solid #EAECF0',
+                              height: 25,
+                              borderRadius: 4,
+                              paddingLeft: '10px',
+                              textAlign: 'left',
+                            }}
+                            type="text"
+                            {...params.inputProps}
+                            onBlur={(e) => handleInputBlur('onDelete', e.target.value)}
+                          />
+                        </div>
+                      )}
+                    />
+                  </Box>
+                )}
               </Box>
             }
           />
