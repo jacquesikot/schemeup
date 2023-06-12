@@ -35,14 +35,38 @@ const StyledTextField = styled(TextField)({
 });
 
 const ImportModal = ({ open, handleClose, containerStyle }: BaseModalProps) => {
+  const [sql, setSql] = useState<string>('');
+  // const dispatch = useDispatch();
   const theme = useTheme();
   const colors = theme.palette;
-  const [sql, setSql] = useState<string>('');
 
-  const handleImport = () => {
-    // const schema = parseDumpToTables(sql);
-    // console.log('schema', schema);
-  };
+  // const handleImport = async () => {
+  //   const schema = await parsePgDump(sql);
+  //   dispatch(
+  //     importTables({
+  //       schemaId,
+  //       tables: schema.data.data.map((d: any) => {
+  //         return {
+  //           id: uuidv4(),
+  //           name: d.name,
+  //           meta: {
+  //             type: 'table',
+  //             isEdit: false,
+  //           },
+  //           columns: d.columns.map((c: any) => {
+  //             return {
+  //               ...c,
+  //             };
+  //           }),
+  //           foreignKeys: [],
+  //           indexes: [],
+  //         };
+  //       }),
+  //     })
+  //   );
+  // };
+
+  const handleImport = () => {};
 
   return (
     <BaseModal open={open} handleClose={handleClose} containerStyle={containerStyle}>

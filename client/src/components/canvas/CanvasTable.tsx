@@ -1,6 +1,7 @@
 import { useLocation, useParams } from 'react-router-dom';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { Handle, Position } from 'reactflow';
+import EditIcon from '../../images/icons/EditIcon';
 
 import getTypeColorCode from '../../utils/getTypeColor';
 import { PostgresColumnType } from '../../types/tableTypes';
@@ -123,6 +124,12 @@ const CanvasTable = ({ data }: any) => {
         <Typography typography="tableTitle" fontWeight={600} fontSize={16} color={'#344054'}>
           {data.title}
         </Typography>
+
+        {!location.pathname.includes(routes.SHARE_SCHEMA) && (
+          <IconButton>
+            <EditIcon onClick={() => data.handleUpdate()} />
+          </IconButton>
+        )}
       </Box>
       {schema.meta.showColumns &&
         data.columns &&
