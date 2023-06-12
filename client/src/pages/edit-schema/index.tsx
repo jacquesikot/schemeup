@@ -246,6 +246,7 @@ const EditSchema = () => {
       <ImportModal
         open={showImportModal}
         handleClose={() => setShowImportModal(false)}
+        schemaId={schema.id}
         containerStyle={{
           backgroundColor: '#FFFFFF',
           width: 480,

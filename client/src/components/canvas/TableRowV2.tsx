@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { useParams } from 'react-router-dom';
 
 import { PostgresColumnType, PostgresOnDeleteOption, PostgresOnUpdateOption } from '../../types/tableTypes';
 import typesArray from './tableTypes';
@@ -23,8 +24,7 @@ import { KeyIcon } from '../../images/icons/KeyIcon';
 import { UniqueIndexIcon } from '../../images/icons/UniqueIndexIcon';
 import { IndexPinIcon } from '../../images/icons/IndexPinIcon';
 import { SmallTickIcon } from '../../images/icons/SmallTickIcon';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { useParams } from 'react-router-dom';
+import { useAppSelector } from '../../redux/hooks';
 
 export interface TableRowProps {
   name: string;
@@ -68,7 +68,6 @@ function TableRowV2(row: TableRowProps) {
   const indexAnchorRef = useRef<HTMLButtonElement>(null);
   const moreOptionsAnchorRef = useRef<HTMLButtonElement>(null);
   const params = useParams();
-  const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
   const [nameEditMode, setNameEditMode] = useState<boolean>(false);
   const [typeEditMode, setTypeEditMode] = useState<boolean>(false);
@@ -107,6 +106,13 @@ function TableRowV2(row: TableRowProps) {
 
   const handleMoreOptionsToggle = () => {
     setOpenMoreOptions((prevOpen) => !prevOpen);
+  };
+
+  const isValidType = (type: PostgresColumnType) => {
+    return typesArray.some((validType) => {
+      const regex = new RegExp(`^${validType}(\\(\\d+\\))?$`, 'i');
+      return regex.test(type);
+    });
   };
 
   return (
@@ -171,6 +177,7 @@ function TableRowV2(row: TableRowProps) {
                 style={{
                   cursor: 'pointer',
                   width: '100%',
+                  overflow: 'hidden',
                   display: 'flex',
                   justifyContent: 'flex-start',
                 }}
@@ -187,7 +194,7 @@ function TableRowV2(row: TableRowProps) {
         <Box
           width={'35%'}
           borderRadius={'6px'}
-          border={typesArray.includes(rowData.type) ? 'none' : `1px solid ${colors.error.main}`}
+          border={isValidType(rowData.type) ? 'none' : `1px solid ${colors.error.main}`}
         >
           <Tooltip title={typeEditMode ? '' : rowData.type}>
             {typeEditMode ? (
