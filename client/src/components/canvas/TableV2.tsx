@@ -9,7 +9,6 @@ import { NewRowPlus } from '../../images/icons/canvas-controls/NewRowPlus';
 import TableRowV2, { TableRowProps } from './TableRowV2';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { deleteTable } from '../../redux/slice/schemas';
 
 function TableV2({ data }: any) {
   const theme = useTheme();

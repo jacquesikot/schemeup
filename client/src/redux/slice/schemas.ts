@@ -85,10 +85,7 @@ const schemasSlice = createSlice({
             ],
             foreignKeys: [],
             indexes: [{ column: 'name', unique: false, sorting: 'ASC' }],
-            meta: {
-              type: 'table',
-              isEdit: false,
-            },
+            meta: {},
           },
           {
             id: '2',
@@ -109,10 +106,7 @@ const schemasSlice = createSlice({
               },
             ],
             indexes: [{ column: 'title', unique: false, sorting: 'ASC' }],
-            meta: {
-              type: 'table',
-              isEdit: false,
-            },
+            meta: {},
           },
         ],
         meta: {

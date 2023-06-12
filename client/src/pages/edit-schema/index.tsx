@@ -89,20 +89,6 @@ const EditSchema = () => {
       data: {
         id: table.id,
         title: table.name,
-        isEdit: table.meta.isEdit,
-        handleEdit: () =>
-          dispatch(
-            editTable({
-              schemaId: schema.id,
-              table: {
-                ...table,
-                meta: {
-                  type: 'editTable',
-                  isEdit: true,
-                },
-              },
-            })
-          ),
         columns: table.columns.map((c) => {
           return {
             name: c.name,

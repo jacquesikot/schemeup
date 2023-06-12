@@ -105,10 +105,6 @@ const Table = ({ data }: any) => {
                         schemaId: schema.id,
                         table: {
                           ...table,
-                          meta: {
-                            type: 'table',
-                            isEdit: false,
-                          },
                         },
                       })
                     )
