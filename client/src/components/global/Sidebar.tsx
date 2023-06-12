@@ -138,6 +138,15 @@ const Sidebar = () => {
                 </Box>
               </Box>
             )}
+
+            <MenuItem
+              onClick={() => dispatch(toggleSideBar())}
+              icon={!sideBarOpen ? <SideBarToggleOpen /> : undefined}
+              style={{
+                margin: '10px 0 20px 0',
+                color: theme.palette.grey[100],
+              }}
+            ></MenuItem>
           </Box>
 
           {/* NAV ITEMS */}

@@ -14,22 +14,29 @@ import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import generateForeignKeyName from '../../utils/generateFkName';
 import generateTableLayout from '../../utils/generateTableLayout';
-import { Schema, Table as TableProps, editTable, newTable, setActiveTable } from '../../redux/slice/schemas';
-import DeleteModal from '../../components/modals/DeleteModal';
+import {
+  Schema,
+  Table as TableProps,
+  deleteTable,
+  editTable,
+  newTable,
+  setActiveTable,
+} from '../../redux/slice/schemas';
+import DeleteModal from '../../components/modals/DeleteTableModal';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
 import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
 import { toggleRightPanel } from '../../redux/slice/app';
-import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
 import ImportModal from '../../components/modals/ImportModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 import routes from '../../routes';
+import TableV2 from '../../components/canvas/TableV2';
+import DeleteTableModal from '../../components/modals/DeleteTableModal';
 
 const EditSchema = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
-  // console.log('schema', schema);
   const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
   const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
@@ -40,7 +47,7 @@ const EditSchema = () => {
     (state) => state.schemas.schemas.filter((s) => s.id === params.id)[0].activeTable
   );
 
-  const nodeTypes = useMemo(() => ({ table: CanvasTable, editTable: Table }), []);
+  const nodeTypes = useMemo(() => ({ table: CanvasTable, editTable: TableV2 }), []);
 
   const containerRef = useRef<any>(null);
 
@@ -82,20 +89,6 @@ const EditSchema = () => {
       data: {
         id: table.id,
         title: table.name,
-        isEdit: table.meta.isEdit,
-        handleEdit: () =>
-          dispatch(
-            editTable({
-              schemaId: schema.id,
-              table: {
-                ...table,
-                meta: {
-                  type: 'editTable',
-                  isEdit: true,
-                },
-              },
-            })
-          ),
         columns: table.columns.map((c) => {
           return {
             name: c.name,
@@ -219,6 +212,7 @@ const EditSchema = () => {
           toggleOpen={() => dispatch(toggleRightPanel())}
           showRelations={showRelations}
           toggleRelations={setShowRelations}
+          handleTableDelete={() => setOpenDeleteModal(true)}
         />
       </CanvasDrawer>
 
@@ -244,6 +238,8 @@ const EditSchema = () => {
             setOpenDeleteModal(true);
           }}
           fitView
+          panOnScroll
+          selectionOnDrag
           // style={{ width: '100%', height: '100%' }}
         >
           <Background />
@@ -263,11 +259,14 @@ const EditSchema = () => {
         }}
       />
 
-      <DeleteModal
+      <DeleteTableModal
         open={openDeleteModal}
         handleClose={() => {
           setOpenDeleteModal(false);
         }}
+        handleTableDelete={() =>
+          dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }))
+        }
         itemId={schema.id}
         containerStyle={{
           width: '400px',

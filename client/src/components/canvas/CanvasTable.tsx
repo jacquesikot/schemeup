@@ -5,7 +5,6 @@ import { Handle, Position } from 'reactflow';
 import getTypeColorCode from '../../utils/getTypeColor';
 import { PostgresColumnType } from '../../types/tableTypes';
 import { useAppSelector } from '../../redux/hooks';
-import EditIcon from '../../images/icons/EditIcon';
 import routes from '../../routes';
 
 interface CanvasTableColumnProps {
@@ -124,10 +123,6 @@ const CanvasTable = ({ data }: any) => {
         <Typography typography="tableTitle" fontWeight={600} fontSize={16} color={'#344054'}>
           {data.title}
         </Typography>
-
-        <IconButton onClick={data.handleEdit} disabled={location.pathname.includes(routes.SHARE_SCHEMA)}>
-          <EditIcon />
-        </IconButton>
       </Box>
       {schema.meta.showColumns &&
         data.columns &&

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import BaseModal, { ModalProps } from './BaseModal';
+import BaseModal, { BaseModalProps } from './BaseModal';
 import { Box, Typography, IconButton, styled, TextField } from '@mui/material';
 import { CancelIcon } from '../../images/icons/CancelIcon';
 import Button from '../global/Button';
 import { ImportSchemaIcon } from '../../images/icons/canvas-controls/ImportSchemaIcon';
+import { useTheme } from '@mui/material/styles';
 // import parseDumpToTables from '../../utils/parseDumpToTable';
-
 
 const StyledTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -17,7 +17,7 @@ const StyledTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
     color: '#667085',
     fontSize: 14,
-    // height: 200,
+    height: 200,
     maxHeight: 600,
     fontFamily: 'IBM Plex Mono',
 
@@ -34,7 +34,9 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const ImportModal = ({ open, handleClose, containerStyle }: ModalProps) => {
+const ImportModal = ({ open, handleClose, containerStyle }: BaseModalProps) => {
+  const theme = useTheme();
+  const colors = theme.palette;
   const [sql, setSql] = useState<string>('');
 
   const handleImport = () => {
@@ -47,14 +49,14 @@ const ImportModal = ({ open, handleClose, containerStyle }: ModalProps) => {
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
         <ImportSchemaIcon />
         <IconButton onClick={handleClose}>
-          <CancelIcon color={'#667085'} />
+          <CancelIcon color={colors.grey[500]} />
         </IconButton>
       </Box>
       <Box marginTop={1} marginBottom={2.5}>
-        <Typography fontSize={18} fontWeight={600} color={'#101828'}>
+        <Typography fontSize={18} fontWeight={600} color={colors.grey[800]}>
           Import Schema
         </Typography>
-        <Typography fontSize={14} fontWeight={400} color={'#475467'} lineHeight={'25px'} mt={.7}>
+        <Typography fontSize={14} fontWeight={400} color={colors.grey[600]} lineHeight={'25px'} mt={0.7}>
           Select your schema and update the file or paste data
         </Typography>
       </Box>

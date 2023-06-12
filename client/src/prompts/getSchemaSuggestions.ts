@@ -34,7 +34,7 @@ async function getSchemaSuggestions(schema: string) {
 
   try {
     const response = await openai.createCompletion({
-      model: 'text-davinci-003',
+      model: 'gpt-4',
       max_tokens: 800,
       prompt,
       temperature: 0.0,

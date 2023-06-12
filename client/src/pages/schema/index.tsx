@@ -12,10 +12,11 @@ import TopBarPlus from '../../images/icons/Plus';
 import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import DeleteModal from '../../components/modals/DeleteModal';
-import { newSchema } from '../../redux/slice/schemas';
+import DeleteModal from '../../components/modals/DeleteTableModal';
+import { clearSchemas, deleteSchema, newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
 import { hideCodeEditor } from '../../redux/slice/app';
+import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -53,6 +54,7 @@ const Dashboard = () => {
   // Do not allow codeEditor show up when user is in dashboard
   useEffect(() => {
     dispatch(hideCodeEditor());
+    // dispatch(clearSchemas()); dev only
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -193,9 +195,10 @@ const Dashboard = () => {
         ))}
       </Grid>
 
-      <DeleteModal
+      <DeleteSchemaModal
         open={openDeleteModal}
         handleClose={() => setOpenDeleteModal(false)}
+        handleSchemaDelete={() => dispatch(deleteSchema(activeSchema.id))}
         itemId={activeSchema?.id}
         containerStyle={{
           width: '400px',
