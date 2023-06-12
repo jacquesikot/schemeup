@@ -163,14 +163,14 @@ const SchemaProperties = ({
                     )
                   }
                 />
-                <Typography fontWeight={500} fontSize={14} color={colors.grey[700]}>
+                <Typography variant="body2" fontWeight={500} fontSize={14} color={colors.grey[600]}>
                   Hide Table Columns
                 </Typography>
               </Box>
 
               <Box display={'flex'} alignItems={'center'}>
                 <Checkbox checked={!showRelations} onChange={(e) => toggleRelations(!showRelations)} />
-                <Typography fontWeight={500} fontSize={14} color={colors.grey[700]}>
+                <Typography variant="body2" fontWeight={500} fontSize={14} color={colors.grey[600]}>
                   Hide Relations
                 </Typography>
               </Box>
