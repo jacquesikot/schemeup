@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import Button from '../global/Button';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { editTable, updateSchema } from '../../redux/slice/schemas';
+import { updateSchema } from '../../redux/slice/schemas';
 import AiSuggestCard from './AiSuggestCard';
 import TableV2 from './TableV2';
 
@@ -95,30 +95,56 @@ const SchemaProperties = ({
 
       {value === 'Settings' ? (
         schema.activeTable && activeTable ? (
-          <Box mt={3}>
-            <TableV2
-              data={{
-                id: activeTable.id,
-                title: activeTable.name,
-                handleTableDelete,
-                columns: activeTable.columns.map((c) => {
-                  return {
-                    name: c.name,
-                    type: c.type,
-                    primaryKey: c.primaryKey,
-                    foreignKey: activeTable.foreignKeys.filter((fk: any) => fk.column === c.name).length > 0,
-                    nullable: c.nullable,
-                    index: c.index,
-                    autoInc: c.autoInc,
-                    autoUpdateTime: c.autoUpdateTime,
-                    comment: '',
-                    unique: c.unique,
-                    default: '',
-                  };
-                }),
-              }}
-            />
-          </Box>
+          <Grid
+            container
+            maxHeight={'75vh'}
+            pb={2}
+            display={'flex'}
+            justifyContent={'center'}
+            sx={{
+              overflowY: 'auto' /* To allow main grid scroll vertically but not entire screen */,
+              scrollbarWidth: 'none' /* Firefox */,
+              '-ms-overflow-style': 'none' /* IE 10+ */,
+              '&::-webkit-scrollbar': {
+                width: 0,
+                height: 0,
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'transparent',
+              },
+              '-webkit-overflow-scrolling': 'touch' /* For hide on scroll */,
+            }}
+          >
+            <Grid>
+              <Box mt={3}>
+                <TableV2
+                  data={{
+                    id: activeTable.id,
+                    title: activeTable.name,
+                    handleTableDelete,
+                    columns: activeTable.columns.map((c) => {
+                      return {
+                        name: c.name,
+                        type: c.type,
+                        primaryKey: c.primaryKey,
+                        foreignKey: activeTable.foreignKeys.filter((fk: any) => fk.column === c.name).length > 0,
+                        nullable: c.nullable,
+                        index: c.index,
+                        autoInc: c.autoInc,
+                        autoUpdateTime: c.autoUpdateTime,
+                        comment: '',
+                        unique: c.unique,
+                        default: '',
+                      };
+                    }),
+                  }}
+                />
+              </Box>
+            </Grid>
+          </Grid>
         ) : (
           <>
             <Box>
@@ -163,14 +189,14 @@ const SchemaProperties = ({
                     )
                   }
                 />
-                <Typography fontWeight={500} fontSize={14} color={colors.grey[700]}>
+                <Typography variant="body2" fontWeight={500} fontSize={14} color={colors.grey[600]}>
                   Hide Table Columns
                 </Typography>
               </Box>
 
               <Box display={'flex'} alignItems={'center'}>
                 <Checkbox checked={!showRelations} onChange={(e) => toggleRelations(!showRelations)} />
-                <Typography fontWeight={500} fontSize={14} color={colors.grey[700]}>
+                <Typography variant="body2" fontWeight={500} fontSize={14} color={colors.grey[600]}>
                   Hide Relations
                 </Typography>
               </Box>

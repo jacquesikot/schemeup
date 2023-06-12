@@ -2,17 +2,18 @@ import * as React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertColor, AlertProps } from '@mui/material/Alert';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { setShowSnack, setSnackPack } from '../../redux/slice/app';
+import { setShowSnack, unloadSnacks } from '../../redux/slice/app';
 
 export interface SnackbarMessage {
   message: string;
   severity: AlertColor;
+  hideDuration: number;
   key: number;
 }
 
 export interface State {
   open: boolean;
-  snackPack: readonly SnackbarMessage[];
+  snackPack: SnackbarMessage[];
   messageInfo?: SnackbarMessage;
 }
 
@@ -29,7 +30,7 @@ const SnackNotification = () => {
   };
 
   const handleExited = () => {
-    dispatch(setSnackPack([]));
+    dispatch(unloadSnacks());
   };
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
@@ -41,7 +42,7 @@ const SnackNotification = () => {
       <Snackbar
         key={snackPack && snackPack.length > 0 ? snackPack[0].key : undefined}
         open={showSnack}
-        autoHideDuration={6000}
+        autoHideDuration={snackPack && snackPack.length > 0 ? snackPack[0].hideDuration : 4000}
         onClose={handleClose}
         TransitionProps={{ onExited: handleExited }}
       >

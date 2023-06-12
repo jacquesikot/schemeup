@@ -1,11 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { SnackbarMessage } from '../../components/global/SnackNotification';
+import { AlertColor } from '@mui/material';
 
 interface AppState {
   sideBarOpen: boolean;
   codeEditorOpen: boolean;
   rightPanelOpen: boolean;
-  snackPack: readonly SnackbarMessage[];
+  snackPack: SnackbarMessage[];
   showSnack: boolean;
 }
 
@@ -30,12 +31,25 @@ const appSlice = createSlice({
     toggleRightPanel: (state) => {
       state.rightPanelOpen = !state.rightPanelOpen;
     },
+    openRightPanel: (state) => {
+      state.rightPanelOpen = true;
+    },
     hideCodeEditor: (state) => {
       state.codeEditorOpen = false;
     },
-    setSnackPack: (state, action) => {
-      state.snackPack = action.payload;
+    triggerSnack: (state, action: PayloadAction<{ message: string; severity: AlertColor; hideDuration: number }>) => {
+      state.snackPack = [
+        {
+          message: action.payload.message,
+          severity: action.payload.severity,
+          hideDuration: action.payload.hideDuration,
+          key: new Date().getTime() + Math.random(),
+        },
+      ];
       state.showSnack = true;
+    },
+    unloadSnacks: (state) => {
+      state.snackPack = [];
     },
     setShowSnack: (state, action) => {
       state.showSnack = action.payload;
@@ -43,7 +57,15 @@ const appSlice = createSlice({
   },
 });
 
-export const { toggleCodeEditor, toggleRightPanel, toggleSideBar, hideCodeEditor, setSnackPack, setShowSnack } =
-  appSlice.actions;
+export const {
+  toggleCodeEditor,
+  toggleRightPanel,
+  toggleSideBar,
+  hideCodeEditor,
+  triggerSnack,
+  setShowSnack,
+  openRightPanel,
+  unloadSnacks,
+} = appSlice.actions;
 
 export default appSlice.reducer;

@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import BaseModal, { BaseModalProps } from './BaseModal';
+import { useTheme } from '@mui/material/styles';
 import { Box, Typography, IconButton, styled, TextField } from '@mui/material';
+import { v4 as uuidv4 } from 'uuid';
+
+import BaseModal, { BaseModalProps } from './BaseModal';
 import { CancelIcon } from '../../images/icons/CancelIcon';
 import Button from '../global/Button';
 import { ImportSchemaIcon } from '../../images/icons/canvas-controls/ImportSchemaIcon';
-import { useTheme } from '@mui/material/styles';
-// import parseDumpToTables from '../../utils/parseDumpToTable';
+import parsePgDump from '../../utils/parsers/parsePgDump';
+import { importTables } from '../../redux/slice/schemas';
+import { useAppDispatch } from '../../redux/hooks';
+import { triggerSnack } from '../../redux/slice/app';
 
 const StyledTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -17,9 +22,9 @@ const StyledTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
     color: '#667085',
     fontSize: 14,
-    height: 200,
-    maxHeight: 600,
     fontFamily: 'IBM Plex Mono',
+    overflow: 'hidden',
+    height: 300,
 
     '& fieldset': {
       borderColor: '#E0E3E7',
@@ -34,14 +39,38 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const ImportModal = ({ open, handleClose, containerStyle }: BaseModalProps) => {
+interface ImportModalProps extends BaseModalProps {
+  schemaId: string;
+}
+
+const ImportModal = ({ open, handleClose, containerStyle, schemaId }: ImportModalProps) => {
+  const [sql, setSql] = useState<string>('');
+  const dispatch = useAppDispatch();
   const theme = useTheme();
   const colors = theme.palette;
-  const [sql, setSql] = useState<string>('');
 
-  const handleImport = () => {
-    // const schema = parseDumpToTables(sql);
-    // console.log('schema', schema);
+  const handleImport = async () => {
+    const schemaData = await parsePgDump(sql);
+    const schema = JSON.parse(schemaData.body);
+    dispatch(
+      importTables({
+        schemaId,
+        tables: schema.data.map((d: any) => {
+          return {
+            id: uuidv4(),
+            name: d.name,
+            columns: d.columns.map((c: any) => {
+              return {
+                ...c,
+              };
+            }),
+            foreignKeys: [],
+            indexes: [],
+          };
+        }),
+      })
+    );
+    dispatch(triggerSnack({ message: 'DB Schema Imported Successfully', severity: 'success', hideDuration: 2000 }));
   };
 
   return (
@@ -62,7 +91,7 @@ const ImportModal = ({ open, handleClose, containerStyle }: BaseModalProps) => {
       </Box>
 
       <StyledTextField
-        style={{ width: '100%', overflow: 'hidden' }}
+        style={{ width: '100%' }}
         multiline
         placeholder="Paste SQL DDL here.."
         value={sql}
@@ -78,7 +107,16 @@ const ImportModal = ({ open, handleClose, containerStyle }: BaseModalProps) => {
           height={44}
           style={{ marginRight: 10 }}
         />
-        <Button type="primary" onClick={handleImport} label="Import Schema" width={'40%'} height={44} />
+        <Button
+          type="primary"
+          onClick={(e) => {
+            handleImport();
+            handleClose(e);
+          }}
+          label="Import Schema"
+          width={'40%'}
+          height={44}
+        />
       </Box>
     </BaseModal>
   );

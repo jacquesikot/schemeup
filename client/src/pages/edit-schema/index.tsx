@@ -9,28 +9,18 @@ import { v4 as uuidv4 } from 'uuid';
 import NewSchemaHeader from '../../components/NewSchemaHeader';
 import CanvasDrawer from '../../components/canvas/CanvasDrawer';
 import SchemaProperties from '../../components/canvas/SchemaProperties';
-import Table from '../../components/canvas/Table';
 import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import generateForeignKeyName from '../../utils/generateFkName';
 import generateTableLayout from '../../utils/generateTableLayout';
-import {
-  Schema,
-  Table as TableProps,
-  deleteTable,
-  editTable,
-  newTable,
-  setActiveTable,
-} from '../../redux/slice/schemas';
-import DeleteModal from '../../components/modals/DeleteTableModal';
+import { Schema, Table as TableProps, deleteTable, newTable, setActiveTable } from '../../redux/slice/schemas';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
-import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
-import { toggleRightPanel } from '../../redux/slice/app';
+// import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
+import { openRightPanel, toggleRightPanel } from '../../redux/slice/app';
 import ImportModal from '../../components/modals/ImportModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 import routes from '../../routes';
-import TableV2 from '../../components/canvas/TableV2';
 import DeleteTableModal from '../../components/modals/DeleteTableModal';
 
 const EditSchema = () => {
@@ -47,7 +37,7 @@ const EditSchema = () => {
     (state) => state.schemas.schemas.filter((s) => s.id === params.id)[0].activeTable
   );
 
-  const nodeTypes = useMemo(() => ({ table: CanvasTable, editTable: TableV2 }), []);
+  const nodeTypes = useMemo(() => ({ table: CanvasTable }), []);
 
   const containerRef = useRef<any>(null);
 
@@ -81,7 +71,7 @@ const EditSchema = () => {
   const initialNodes: Node<Schema>[] = nodeSchemaTables.map((table: TableProps) => {
     return {
       id: table.name,
-      type: table.meta.type,
+      type: 'table',
       position: {
         x: tableLayout.filter((t) => t.id === table.id)[0].x,
         y: tableLayout.filter((t) => t.id === table.id)[0].y,
@@ -89,6 +79,10 @@ const EditSchema = () => {
       data: {
         id: table.id,
         title: table.name,
+        handleUpdate: () => {
+          dispatch(setActiveTable({ schemaId: schema.id, tableId: '' }));
+          dispatch(openRightPanel());
+        },
         columns: table.columns.map((c) => {
           return {
             name: c.name,
@@ -174,12 +168,13 @@ const EditSchema = () => {
       <NewSchemaHeader
         toggleSettingsDrawer={() => dispatch(toggleRightPanel())}
         drawerState={drawerOpen}
-        handleNewTable={() =>
+        handleNewTable={() => {
+          const newTableId = uuidv4();
           dispatch(
             newTable({
               schemaId: schema.id,
               table: {
-                id: uuidv4(),
+                id: newTableId,
                 name: generateSchemaName(),
                 columns: [
                   {
@@ -194,13 +189,12 @@ const EditSchema = () => {
                 ],
                 foreignKeys: [],
                 indexes: [],
-                meta: {
-                  type: 'editTable',
-                },
               },
             })
-          )
-        }
+          );
+          dispatch(setActiveTable({ schemaId: schema.id, tableId: newTableId }));
+          dispatch(openRightPanel());
+        }}
         handleShare={() => toggleShowShareModal(true)}
         handleImport={() => setShowImportModal(true)}
         showPreview={showPreview}
@@ -226,8 +220,10 @@ const EditSchema = () => {
           onConnect={onConnect}
           onNodeClick={(_event, node) => {
             dispatch(setActiveTable({ schemaId: schema.id, tableId: node.data.id }));
+            dispatch(openRightPanel());
           }}
           onClick={(e) => {
+            console.log('target', e.currentTarget);
             if (activeTableId) {
               dispatch(setActiveTable({ schemaId: schema.id, tableId: '' }));
             } else {
@@ -240,7 +236,6 @@ const EditSchema = () => {
           fitView
           panOnScroll
           selectionOnDrag
-          // style={{ width: '100%', height: '100%' }}
         >
           <Background />
           <Controls />
@@ -251,6 +246,7 @@ const EditSchema = () => {
       <ImportModal
         open={showImportModal}
         handleClose={() => setShowImportModal(false)}
+        schemaId={schema.id}
         containerStyle={{
           backgroundColor: '#FFFFFF',
           width: 480,

@@ -1,11 +1,11 @@
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import Forward from '../images/icons/canvas-controls/Forward';
+import { useTheme } from '@mui/material/styles';
+import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
+
 import Pointer from '../images/icons/canvas-controls/Pointer';
-import Undo from '../images/icons/canvas-controls/Undo';
 import Link from '../images/icons/canvas-controls/Link';
 import Comment from '../images/icons/canvas-controls/Comment';
-import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
 import Table from '../images/icons/canvas-controls/Table';
 import Share from '../images/icons/canvas-controls/Share';
 import Export from '../images/icons/canvas-controls/Export';
@@ -31,9 +31,12 @@ export default function NewSchemaHeader({
   handleImport,
   showPreview,
 }: NewSchemaHeaderProps) {
+  const theme = useTheme();
+  const colors = theme.palette;
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === id))[0];
+  const rightPanelOpen = useAppSelector((state) => state.app.rightPanelOpen);
 
   return (
     <Box
@@ -45,14 +48,14 @@ export default function NewSchemaHeader({
       pl={'24px'}
       pr={'24px'}
       borderBottom={1}
-      borderColor={'#EAECF0'}
+      borderColor={colors.divider}
       width={'100%'}
     >
       {/* SCHEMA TITLE */}
       <Box display={'flex'} alignItems={'center'}>
         <EditableText
           fontSize={18}
-          fontColor={'#101828'}
+          fontColor={colors.grey[900]}
           fontWeight={500}
           value={schema.title}
           onSave={(e) => {
@@ -66,18 +69,18 @@ export default function NewSchemaHeader({
           display={'flex'}
           justifyContent={'center'}
           alignItems={'center'}
-          bgcolor={'#F9F5FF'}
+          bgcolor={colors.background.paper}
           borderRadius={16}
           ml={2}
         >
-          <Typography fontSize={12} color={'#6941C6'} fontWeight={500}>
+          <Typography fontSize={12} color={colors.primary.main} fontWeight={500}>
             {schema.tables && schema.tables.length > 0 ? `${schema.tables.length} Tables` : 'No Tables'}
           </Typography>
         </Box>
       </Box>
 
       {/* CANVAS CONTROLS */}
-      <Box display={'flex'} width={300} justifyContent={'space-between'}>
+      <Box display={'flex'} width={350} justifyContent={'space-between'}>
         {/* <Tooltip title="Undo">
           <IconButton>
             <Undo />
@@ -122,7 +125,7 @@ export default function NewSchemaHeader({
       </Box>
 
       {/* SHARE/EXPORT CONTROLS */}
-      <Box display={'flex'} width={200} justifyContent={'space-between'}>
+      <Box display={'flex'} width={180} justifyContent={'space-between'}>
         <Tooltip title="Share Schema">
           <IconButton onClick={handleShare}>
             <Share />
@@ -137,7 +140,7 @@ export default function NewSchemaHeader({
 
         <Tooltip title="Settings">
           <IconButton onClick={() => toggleSettingsDrawer(!drawerState)}>
-            <Settings />
+            <Settings color={rightPanelOpen ? colors.primary.main : colors.grey[700]} />
           </IconButton>
         </Tooltip>
       </Box>

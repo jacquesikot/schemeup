@@ -2,6 +2,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { Handle, Position } from 'reactflow';
 
+import EditIcon from '../../images/icons/EditIcon';
 import getTypeColorCode from '../../utils/getTypeColor';
 import { PostgresColumnType } from '../../types/tableTypes';
 import { useAppSelector } from '../../redux/hooks';
@@ -24,12 +25,12 @@ export interface CanvasTableProps {
   handleEdit: () => void;
 }
 
-export const TABLE_WIDTH = 380;
+export const TABLE_WIDTH = 450;
 
 const CanvasTableColumn = ({ name, type, nullable, foreignKey, primaryKey }: CanvasTableColumnProps) => {
   return (
     <Box display={'flex'} height={40} paddingLeft={'10px'} borderTop={1} borderColor={'#EAECF0'} alignItems={'center'}>
-      <Typography fontFamily={'IBM Plex Mono'} fontSize={14} color={'#344054'} width={'40%'}>
+      <Typography fontFamily={'IBM Plex Mono'} fontSize={14} color={'#344054'} width={'35%'} mr={1}>
         {name}
       </Typography>
 
@@ -123,6 +124,12 @@ const CanvasTable = ({ data }: any) => {
         <Typography typography="tableTitle" fontWeight={600} fontSize={16} color={'#344054'}>
           {data.title}
         </Typography>
+
+        {!location.pathname.includes(routes.SHARE_SCHEMA) && (
+          <IconButton>
+            <EditIcon onClick={() => data.handleUpdate()} />
+          </IconButton>
+        )}
       </Box>
       {schema.meta.showColumns &&
         data.columns &&

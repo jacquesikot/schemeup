@@ -16,16 +16,6 @@ const DeleteSchemaModal = ({
   itemId,
   handleSchemaDelete,
 }: DeleteSchemaModalProps) => {
-  // const handleDelete = (e: Event) => {
-  //   if (deleteType === 'schema') {
-  //     dispatch(deleteSchema(schema.id));
-  //   } else {
-  //     dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }));
-  //   }
-
-  //   handleClose(e);
-  // };
-
   return (
     <BaseModal open={open} handleClose={handleClose} containerStyle={containerStyle}>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
