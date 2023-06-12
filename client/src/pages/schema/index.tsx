@@ -12,10 +12,11 @@ import TopBarPlus from '../../images/icons/Plus';
 import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import DeleteModal from '../../components/modals/DeleteModal';
-import { clearSchemas, newSchema } from '../../redux/slice/schemas';
+import DeleteModal from '../../components/modals/DeleteTableModal';
+import { clearSchemas, deleteSchema, newSchema } from '../../redux/slice/schemas';
 import routes from '../../routes';
 import { hideCodeEditor } from '../../redux/slice/app';
+import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -194,9 +195,10 @@ const Dashboard = () => {
         ))}
       </Grid>
 
-      <DeleteModal
+      <DeleteSchemaModal
         open={openDeleteModal}
         handleClose={() => setOpenDeleteModal(false)}
+        handleSchemaDelete={() => dispatch(deleteSchema(activeSchema.id))}
         itemId={activeSchema?.id}
         containerStyle={{
           width: '400px',

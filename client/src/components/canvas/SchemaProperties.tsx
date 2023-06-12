@@ -16,6 +16,7 @@ interface SchemaPropertiesProps {
   showRelations: boolean;
   toggleRelations: (showRelations: boolean) => void;
   suggestions: { title: string; body: string }[];
+  handleTableDelete: () => void;
 }
 
 const StyledTextField = styled(TextField)({
@@ -43,7 +44,13 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const SchemaProperties = ({ toggleOpen, showRelations, toggleRelations, suggestions }: SchemaPropertiesProps) => {
+const SchemaProperties = ({
+  toggleOpen,
+  showRelations,
+  toggleRelations,
+  suggestions,
+  handleTableDelete,
+}: SchemaPropertiesProps) => {
   const theme = useTheme();
   const colors = theme.palette;
   const params = useParams();
@@ -89,14 +96,11 @@ const SchemaProperties = ({ toggleOpen, showRelations, toggleRelations, suggesti
       {value === 'Settings' ? (
         schema.activeTable && activeTable ? (
           <Box mt={3}>
-            <Typography variant="body1" fontSize={18} mb={2} fontWeight={600}>
-              {activeTable.name + ' table'}
-            </Typography>
             <TableV2
               data={{
                 id: activeTable.id,
                 title: activeTable.name,
-                isEdit: true,
+                handleTableDelete,
                 columns: activeTable.columns.map((c) => {
                   return {
                     name: c.name,

@@ -14,8 +14,15 @@ import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import generateForeignKeyName from '../../utils/generateFkName';
 import generateTableLayout from '../../utils/generateTableLayout';
-import { Schema, Table as TableProps, editTable, newTable, setActiveTable } from '../../redux/slice/schemas';
-import DeleteModal from '../../components/modals/DeleteModal';
+import {
+  Schema,
+  Table as TableProps,
+  deleteTable,
+  editTable,
+  newTable,
+  setActiveTable,
+} from '../../redux/slice/schemas';
+import DeleteModal from '../../components/modals/DeleteTableModal';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
 import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
@@ -24,6 +31,7 @@ import ImportModal from '../../components/modals/ImportModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 import routes from '../../routes';
 import TableV2 from '../../components/canvas/TableV2';
+import DeleteTableModal from '../../components/modals/DeleteTableModal';
 
 const EditSchema = () => {
   const params = useParams();
@@ -218,6 +226,7 @@ const EditSchema = () => {
           toggleOpen={() => dispatch(toggleRightPanel())}
           showRelations={showRelations}
           toggleRelations={setShowRelations}
+          handleTableDelete={() => setOpenDeleteModal(true)}
         />
       </CanvasDrawer>
 
@@ -264,11 +273,14 @@ const EditSchema = () => {
         }}
       />
 
-      <DeleteModal
+      <DeleteTableModal
         open={openDeleteModal}
         handleClose={() => {
           setOpenDeleteModal(false);
         }}
+        handleTableDelete={() =>
+          dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }))
+        }
         itemId={schema.id}
         containerStyle={{
           width: '400px',

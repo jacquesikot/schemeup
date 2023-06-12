@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import BaseModal, { ModalProps } from './BaseModal';
+import BaseModal, { BaseModalProps } from './BaseModal';
 import { Box, Typography, IconButton, styled, TextField } from '@mui/material';
 import { CancelIcon } from '../../images/icons/CancelIcon';
 import Button from '../global/Button';
@@ -34,7 +34,7 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const ImportModal = ({ open, handleClose, containerStyle }: ModalProps) => {
+const ImportModal = ({ open, handleClose, containerStyle }: BaseModalProps) => {
   const theme = useTheme();
   const colors = theme.palette;
   const [sql, setSql] = useState<string>('');

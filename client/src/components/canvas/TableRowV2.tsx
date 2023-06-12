@@ -42,7 +42,6 @@ export interface TableRowProps {
   onUpdate?: PostgresOnUpdateOption;
   index: boolean;
   canDelete?: boolean;
-  isEdit?: boolean;
   comment?: string;
   handleDelete?: () => void;
   handleUpdate?: (row: TableRowProps) => void;
@@ -205,7 +204,7 @@ function TableRowV2(row: TableRowProps) {
                     <StyledInput
                       autoFocus
                       type="text"
-                      width={'35%'}
+                      width={'100%'}
                       color={getTypeColorCode(rowData.type)}
                       {...params.inputProps}
                       onBlur={(e) => handleInputBlur('type', e.target.value)}
@@ -220,8 +219,11 @@ function TableRowV2(row: TableRowProps) {
                 }}
                 style={{
                   cursor: 'pointer',
-                  width: '15%',
+                  width: '100%',
                   display: 'flex',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                   justifyContent: 'flex-start',
                 }}
               >
@@ -420,6 +422,7 @@ function TableRowV2(row: TableRowProps) {
                     borderRadius: 4,
                     textAlign: 'left',
                   }}
+                  value={rowData.defaultValue}
                   type="text"
                   onBlur={(e) => handleInputBlur('defaultValue', e.target.value)}
                 />
@@ -451,7 +454,7 @@ function TableRowV2(row: TableRowProps) {
                   <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-end'} alignItems={'center'}>
                     <Autocomplete
                       openOnFocus
-                      value={row.isEdit ? row.referenceTable : rowData.referenceTable}
+                      value={row.referenceTable ? row.referenceTable : rowData.referenceTable}
                       options={schema.tables && schema.tables.length > 0 && (schema.tables.map((t) => t.name) as any)}
                       renderInput={(params) => (
                         <div ref={params.InputProps.ref}>
@@ -474,7 +477,7 @@ function TableRowV2(row: TableRowProps) {
 
                     <Autocomplete
                       openOnFocus
-                      value={row.isEdit ? row.referenceColumn : rowData.referenceColumn}
+                      value={row.referenceColumn ? row.referenceColumn : rowData.referenceColumn}
                       options={
                         schema.tables && schema.tables.length > 0
                           ? schema.tables.find((t) => t.name === rowData.referenceTable)?.columns.map((c) => c.name) ||
@@ -502,7 +505,7 @@ function TableRowV2(row: TableRowProps) {
 
                     <Autocomplete
                       openOnFocus
-                      value={row.isEdit ? row.onUpdate : rowData.onUpdate}
+                      value={row.onUpdate ? row.onUpdate : rowData.onUpdate}
                       options={['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION', 'SET DEFAULT']}
                       renderInput={(params) => (
                         <div ref={params.InputProps.ref}>
@@ -525,7 +528,7 @@ function TableRowV2(row: TableRowProps) {
 
                     <Autocomplete
                       openOnFocus
-                      value={row.isEdit ? row.onDelete : rowData.onDelete}
+                      value={row.onDelete ? row.onDelete : rowData.onDelete}
                       options={['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION', 'SET DEFAULT']}
                       renderInput={(params) => (
                         <div ref={params.InputProps.ref}>
