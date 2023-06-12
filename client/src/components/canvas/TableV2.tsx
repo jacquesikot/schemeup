@@ -1,25 +1,25 @@
 import { useState } from 'react';
-import { Box, IconButton } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { Box, IconButton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
-import EditableText from '../global/EditableText';
-import { CancelIcon } from '../../images/icons/CancelIcon';
 import { TickIcon } from '../../images/icons/TickIcon';
+import { CancelIcon } from '../../images/icons/CancelIcon';
+import EditableText from '../global/EditableText';
 import { NewRowPlus } from '../../images/icons/canvas-controls/NewRowPlus';
-import TableRow, { TableRowProps } from './TableRow';
+import TableRowV2, { TableRowProps } from './TableRowV2';
+import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { Table as TableProps, deleteTable, editTable } from '../../redux/slice/schemas';
 
-const Table = ({ data }: any) => {
+function TableV2(data: any) {
+  const theme = useTheme();
+  const colors = theme.palette;
   const editMode = data.isEdit;
   const params = useParams();
   const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
   const tableArray = schema?.tables?.filter((t) => t.id === data.id);
   const table = tableArray && tableArray?.length > 0 ? tableArray[0] : ({ name: 'new_table' } as any);
-  const [tableName, setTableName] = useState<string>(editMode ? table?.name : 'new_table');
-
+  const [tableName, setTableName] = useState<string>('new_table');
   const checkIfFkExists = (name: string) => {
     const fk = table.foreignKeys.filter((fk: any) => fk.column === name)[0];
 
@@ -28,7 +28,6 @@ const Table = ({ data }: any) => {
       fk,
     };
   };
-
   const [tableRows, setTableRows] = useState<TableRowProps[]>(
     editMode
       ? table.columns.map((c: any) => {
@@ -55,7 +54,7 @@ const Table = ({ data }: any) => {
             type: 'int',
             defaultValue: '',
             nullable: false,
-            unique: true,
+            unique: false,
             primaryKey: true,
             index: false,
             autoInc: true,
@@ -63,14 +62,13 @@ const Table = ({ data }: any) => {
           },
         ]
   );
-
   return (
     <Box
       display={'flex'}
       border={1}
-      borderColor={'#EAECF0'}
+      borderColor={colors.divider}
       bgcolor={'#FFFF'}
-      width={768}
+      width={400}
       flexDirection={'column'}
       borderRadius={'8px'}
     >
@@ -90,107 +88,16 @@ const Table = ({ data }: any) => {
             onSave={(e) => setTableName(e)}
             fontFamily={'Work Sans'}
             fontSize={16}
-            fontColor="#344054"
+            fontColor={colors.grey[800]}
             fontWeight={600}
           />
         </Box>
 
         <Box display={'flex'} alignItems={'center'}>
-          <IconButton
-            onClick={
-              editMode
-                ? () =>
-                    dispatch(
-                      editTable({
-                        schemaId: schema.id,
-                        table: {
-                          ...table,
-                          meta: {
-                            type: 'table',
-                            isEdit: false,
-                          },
-                        },
-                      })
-                    )
-                : () => dispatch(deleteTable({ schemaId: schema.id, tableId: data.id }))
-            }
-            style={{ marginRight: 15, marginLeft: 10 }}
-          >
+          <IconButton onClick={() => true} style={{ marginRight: 15, marginLeft: 10 }}>
             <CancelIcon />
           </IconButton>
-          <IconButton
-            onClick={() => {
-              const table: TableProps = {
-                ...(schema?.tables?.filter((t) => t.id === data.id)[0] as any),
-                name: tableName,
-                columns: [
-                  ...tableRows.map((row) => {
-                    return {
-                      name: row.name,
-                      type: row.type,
-                      default: row.defaultValue,
-                      nullable: row.nullable,
-                      unique: row.unique,
-                      index: row.index,
-                      autoInc: row.autoInc,
-                      primaryKey: row.primaryKey,
-                      comment: '',
-                    };
-                  }),
-                ],
-                foreignKeys: [
-                  ...tableRows
-                    .map((row) => {
-                      if (row.foreignKey) {
-                        return {
-                          column: row.name,
-                          referenceTable: row.referenceTable,
-                          referenceColumn: row.referenceColumn,
-                          onUpdate: row.onUpdate,
-                          onDelete: row.onDelete,
-                        };
-                      } else {
-                        return null;
-                      }
-                    })
-                    .filter((key) => key != null),
-                ],
-                indexes: [
-                  ...tableRows
-                    .map((row) => {
-                      if (row.index) {
-                        return {
-                          column: row.name,
-                          unique: row.unique,
-                          sorting: 'ASC',
-                        };
-                      } else {
-                        return null;
-                      }
-                    })
-                    .filter((key) => key != null),
-                  ...tableRows
-                    .map((row) => {
-                      if (row.unique) {
-                        return {
-                          column: row.name,
-                          unique: true,
-                          sorting: 'ASC',
-                        };
-                      } else {
-                        return null;
-                      }
-                    })
-                    .filter((key) => key != null),
-                ],
-                meta: {
-                  type: 'table',
-                },
-              };
-
-              dispatch(editTable({ schemaId: schema.id, table }));
-            }}
-          >
+          <IconButton onClick={() => true}>
             <TickIcon />
           </IconButton>
         </Box>
@@ -198,7 +105,7 @@ const Table = ({ data }: any) => {
 
       {tableRows.map((row, index) => {
         return (
-          <TableRow
+          <TableRowV2
             {...{
               ...row,
               isEdit: editMode,
@@ -226,7 +133,7 @@ const Table = ({ data }: any) => {
       <Box
         display={'flex'}
         borderTop={1}
-        borderColor={'#EAECF0'}
+        borderColor={colors.divider}
         height={40}
         alignItems={'center'}
         justifyContent={'flex-end'}
@@ -256,6 +163,6 @@ const Table = ({ data }: any) => {
       </Box>
     </Box>
   );
-};
+}
 
-export default Table;
+export default TableV2;

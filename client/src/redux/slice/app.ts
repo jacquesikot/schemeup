@@ -1,15 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { SnackbarMessage } from '../../components/global/SnackNotification';
 
 interface AppState {
   sideBarOpen: boolean;
   codeEditorOpen: boolean;
   rightPanelOpen: boolean;
+  snackPack: readonly SnackbarMessage[];
+  showSnack: boolean;
 }
 
 const initialState: AppState = {
   sideBarOpen: true,
   codeEditorOpen: false,
   rightPanelOpen: true,
+  snackPack: [],
+  showSnack: false,
 };
 
 const appSlice = createSlice({
@@ -28,9 +33,17 @@ const appSlice = createSlice({
     hideCodeEditor: (state) => {
       state.codeEditorOpen = false;
     },
+    setSnackPack: (state, action) => {
+      state.snackPack = action.payload;
+      state.showSnack = true;
+    },
+    setShowSnack: (state, action) => {
+      state.showSnack = action.payload;
+    },
   },
 });
 
-export const { toggleCodeEditor, toggleRightPanel, toggleSideBar, hideCodeEditor } = appSlice.actions;
+export const { toggleCodeEditor, toggleRightPanel, toggleSideBar, hideCodeEditor, setSnackPack, setShowSnack } =
+  appSlice.actions;
 
 export default appSlice.reducer;

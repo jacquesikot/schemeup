@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import React from 'react';
+import { useTheme } from '@mui/material/styles';
 
 interface AiSuggestCardProps {
   title: string;
@@ -7,27 +7,29 @@ interface AiSuggestCardProps {
 }
 
 const AiSuggestCard = ({ title, body }: AiSuggestCardProps) => {
+  const theme = useTheme();
+  const colors = theme.palette;
   const returnStatus = () => {
     if (title === 'high') {
       return {
-        color: '#F04438',
+        color: colors.error.main,
         text: 'High',
       };
     }
     if (title === 'medium') {
       return {
-        color: '#FDC04F',
+        color: colors.warning.main,
         text: 'Medium',
       };
     }
     if (title === 'low') {
       return {
-        color: '#076839',
+        color: colors.success.main,
         text: 'Low',
       };
     }
     return {
-      color: '#076839',
+      color: colors.success.main,
       text: 'Low',
     };
   };
@@ -45,7 +47,7 @@ const AiSuggestCard = ({ title, body }: AiSuggestCardProps) => {
       <Typography fontWeight={500} fontSize={16} color={returnStatus().color}>
         {returnStatus()?.text}
       </Typography>
-      <Typography fontWeight={400} fontSize={16} color={'#101828'}>
+      <Typography fontWeight={400} fontSize={16} color={colors.grey[900]}>
         {body}
       </Typography>
     </Box>

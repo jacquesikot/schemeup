@@ -1,4 +1,4 @@
-import { ClickAwayListener, Grow, MenuList, Paper, Popper } from '@mui/material';
+import { ClickAwayListener, Grow, MenuList, Paper, Popper, PopperPlacementType } from '@mui/material';
 import { ReactNode } from 'react';
 
 interface MenuPopperProps {
@@ -7,10 +7,19 @@ interface MenuPopperProps {
   anchorRef: React.RefObject<HTMLButtonElement>;
   handleClose: (event: Event | React.SyntheticEvent) => void;
   menuItems: ReactNode;
+  placement?: PopperPlacementType;
   containerStyle?: React.CSSProperties;
 }
 
-const MenuPopper = ({ open, anchorRef, handleClose, setOpen, menuItems, containerStyle }: MenuPopperProps) => {
+const MenuPopper = ({
+  open,
+  anchorRef,
+  handleClose,
+  setOpen,
+  menuItems,
+  containerStyle,
+  placement,
+}: MenuPopperProps) => {
   const handleListKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Tab') {
       event.preventDefault();
@@ -25,7 +34,7 @@ const MenuPopper = ({ open, anchorRef, handleClose, setOpen, menuItems, containe
       open={open}
       anchorEl={anchorRef.current}
       role={undefined}
-      placement="bottom-start"
+      placement={placement ? placement : 'bottom-start'}
       transition
       disablePortal
       style={{ zIndex: 1000 }}

@@ -24,12 +24,12 @@ import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
 import ImportModal from '../../components/modals/ImportModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 import routes from '../../routes';
+import TableV2 from '../../components/canvas/TableV2';
 
 const EditSchema = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
-  // console.log('schema', schema);
   const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
   const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
@@ -40,7 +40,7 @@ const EditSchema = () => {
     (state) => state.schemas.schemas.filter((s) => s.id === params.id)[0].activeTable
   );
 
-  const nodeTypes = useMemo(() => ({ table: CanvasTable, editTable: Table }), []);
+  const nodeTypes = useMemo(() => ({ table: CanvasTable, editTable: TableV2 }), []);
 
   const containerRef = useRef<any>(null);
 
@@ -244,6 +244,8 @@ const EditSchema = () => {
             setOpenDeleteModal(true);
           }}
           fitView
+          panOnScroll
+          selectionOnDrag
           // style={{ width: '100%', height: '100%' }}
         >
           <Background />
