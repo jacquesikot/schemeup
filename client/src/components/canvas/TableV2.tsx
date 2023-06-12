@@ -9,6 +9,7 @@ import { NewRowPlus } from '../../images/icons/canvas-controls/NewRowPlus';
 import TableRowV2, { TableRowProps } from './TableRowV2';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { Table as TableProps, editTable } from '../../redux/slice/schemas';
 
 function TableV2({ data }: any) {
   const theme = useTheme();
@@ -88,7 +89,79 @@ function TableV2({ data }: any) {
           >
             <CancelIcon />
           </IconButton>
-          <IconButton onClick={() => true}>
+          <IconButton
+            onClick={() => {
+              const table: TableProps = {
+                ...(schema?.tables?.filter((t) => t.id === data.id)[0] as any),
+                name: tableName,
+                columns: [
+                  ...tableRows.map((row) => {
+                    return {
+                      name: row.name,
+                      type: row.type,
+                      default: row.defaultValue,
+                      nullable: row.nullable,
+                      unique: row.unique,
+                      index: row.index,
+                      autoInc: row.autoInc,
+                      primaryKey: row.primaryKey,
+                      comment: '',
+                    };
+                  }),
+                ],
+                foreignKeys: [
+                  ...tableRows
+                    .map((row) => {
+                      if (row.foreignKey) {
+                        return {
+                          column: row.name,
+                          referenceTable: row.referenceTable,
+                          referenceColumn: row.referenceColumn,
+                          onUpdate: row.onUpdate,
+                          onDelete: row.onDelete,
+                        };
+                      } else {
+                        return null;
+                      }
+                    })
+                    .filter((key) => key != null),
+                ],
+                indexes: [
+                  ...tableRows
+                    .map((row) => {
+                      if (row.index) {
+                        return {
+                          column: row.name,
+                          unique: row.unique,
+                          sorting: 'ASC',
+                        };
+                      } else {
+                        return null;
+                      }
+                    })
+                    .filter((key) => key != null),
+                  ...tableRows
+                    .map((row) => {
+                      if (row.unique) {
+                        return {
+                          column: row.name,
+                          unique: true,
+                          sorting: 'ASC',
+                        };
+                      } else {
+                        return null;
+                      }
+                    })
+                    .filter((key) => key != null),
+                ],
+                meta: {
+                  type: 'table',
+                },
+              };
+
+              dispatch(editTable({ schemaId: schema.id, table }));
+            }}
+          >
             <TickIcon />
           </IconButton>
         </Box>
