@@ -24,6 +24,10 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
       boxShadow: '0 0 0 0.2rem rgba(105, 65, 198, 0.2)',
     },
   },
+  '& .Mui-error': {
+    backgroundColor: theme.palette.background.paper,
+    border: '1px solid red',
+  }
 }));
 
 export default BootstrapInput;
