@@ -51,7 +51,7 @@ const ShareSchemaModal = ({ open, handleClose, containerStyle }: BaseModalProps)
         <Typography id="modal-title" variant="h5" component="h2" fontWeight={700} fontSize={18}>
           Share with people
         </Typography>
-        <Typography id="modal-description" sx={{ mt: 0.7 }}>
+        <Typography id="modal-description" variant="subtitle2" sx={{ mt: 0.7 }}>
           The following users have access to this project:
         </Typography>
       </Box>
@@ -73,7 +73,7 @@ const ShareSchemaModal = ({ open, handleClose, containerStyle }: BaseModalProps)
             onChange={() => {
               setChecked((prevState) => !prevState);
             }}
-            label={'Enable Public'}
+            label={<Typography variant='subtitle2'>Enable Public</Typography>}
             control={<CheckboxIcon />}
           />
         </FormControl>

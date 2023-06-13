@@ -3,18 +3,19 @@ import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebas
 import { auth } from '../../firebase.config';
 import SignIn from '../../components/auth/SignIn';
 import SignUp from '../../components/auth/SignUp';
-import { Box, Grid, Typography } from '@mui/material';
+import { Avatar, Box, Grid, Typography } from '@mui/material';
 import SchemeupLogo from '../../images/schemup_logo.png';
 import { useNavigate } from 'react-router-dom';
 import routes from '../../routes';
 import { setCurrentUser } from '../../redux/slice/user';
 import { useAppDispatch } from '../../redux/hooks';
+import ResetPassword from '../../components/auth/ResetPassword';
 
 type Pages = 'login' | 'signup' | 'reset';
 
 export interface PageProps {
   flowSwitch: (page: Pages) => void;
-  googleAuthHandler: () => void;
+  googleAuthHandler?: () => void;
 }
 
 const AuthenticateUser = () => {
@@ -75,9 +76,19 @@ const AuthenticateUser = () => {
 
   return (
     <Grid container>
-      <Grid item xs={6}>
-        <Box width="60%" mx="auto" mt={5} p={7} sx={{}}>
+      <Grid item xs={12} lg={6}>
+
+        <Box width="60%" maxWidth={490} mx="auto" mt={5} p={7} sx={{}}>
+          <Avatar
+            variant="rounded"
+            alt="schemeup-logo"
+            src={SchemeupLogo}
+            sx={{backgroundColor: "lightgray", padding: 1, marginBottom: 10}}
+          >
+            Schemeup Logo
+          </Avatar>
           {activePage === 'login' && <SignIn flowSwitch={flowSwitchHandler} googleAuthHandler={googleSignInHandler} />}
+          {activePage === 'reset' && <ResetPassword flowSwitch={flowSwitchHandler} />}
           {activePage === 'signup' && <SignUp flowSwitch={flowSwitchHandler} googleAuthHandler={googleSignInHandler} />}
         </Box>
         <Typography sx={{ position: 'absolute', bottom: 15, left: 25 }}>
@@ -91,7 +102,7 @@ const AuthenticateUser = () => {
           Schemeup {currentYear}
         </Typography>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={0} lg={6}>
         <Box
           display="flex"
           justifyContent="right"
