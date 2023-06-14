@@ -1,29 +1,46 @@
-import { useState } from "react";
-import { Box, FormControl, FormControlLabel, Icon, IconButton, List, Typography } from "@mui/material";
-import BaseModal, { ModalProps } from "../BaseModal";
-import { CancelIcon } from "../../../images/icons/CancelIcon";
-import ShareModalIcon from "../../../images/icons/modals/ShareModalIcon";
-import SharedUser from "./SharedUser";
-import AddUsers from "./AddUsers";
-import Button from "../../global/Button";
-import CopyIcon from "../../../images/icons/modals/CopyIcon";
-import CheckboxIcon from "../../../images/icons/modals/CheckboxIcon";
+import { useState } from 'react';
+import { Box, FormControl, FormControlLabel, Icon, IconButton, List, Typography } from '@mui/material';
+import BaseModal, { BaseModalProps } from '../BaseModal';
+import { CancelIcon } from '../../../images/icons/CancelIcon';
+import ShareModalIcon from '../../../images/icons/modals/ShareModalIcon';
+import SharedUser from './SharedUser';
+import AddUsers from './AddUsers';
+import Button from '../../global/Button';
+import CopyIcon from '../../../images/icons/modals/CopyIcon';
+import CheckboxIcon from '../../../images/icons/modals/CheckboxIcon';
 
 // Can be managed with state for all users who have access to schema
 const DUMMY_SHARED_USERS = [
-  { name: "Candice Wu", email: "cane@untitledui.com", image: "https://mkorostoff.github.io/hundred-thousand-faces/img/f/4.jpg" },
-  { name: "Demi Wikinson", email: "demi@untitledui.com", image: "" },
-  { name: "Drew Cano", email: "drew@untitledui.com", image: "https://mkorostoff.github.io/hundred-thousand-faces/img/m/18.jpg" },
-]
+  {
+    name: 'Candice Wu',
+    email: 'cane@untitledui.com',
+    image: 'https://mkorostoff.github.io/hundred-thousand-faces/img/f/4.jpg',
+  },
+  { name: 'Demi Wikinson', email: 'demi@untitledui.com', image: '' },
+  {
+    name: 'Drew Cano',
+    email: 'drew@untitledui.com',
+    image: 'https://mkorostoff.github.io/hundred-thousand-faces/img/m/18.jpg',
+  },
+];
 
-const ShareSchemaModal = ({ open, handleClose, containerStyle }: ModalProps) => {
+const ShareSchemaModal = ({ open, handleClose, containerStyle }: BaseModalProps) => {
   const [checked, setChecked] = useState<boolean>(false);
 
   return (
     <BaseModal open={open} handleClose={handleClose} containerStyle={containerStyle}>
-      <Box display={"flex"} justifyContent={"space-between"} alignItems={"center"} mb={2.5}>
-        <Icon style={{ border: "1px solid #EAECF0", borderRadius: 10, width: 40, height: 40, textAlign: "center", padding: "6px 0" }}>
-          <ShareModalIcon color={"#344054"} />
+      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={2.5}>
+        <Icon
+          style={{
+            border: '1px solid #EAECF0',
+            borderRadius: 10,
+            width: 40,
+            height: 40,
+            textAlign: 'center',
+            padding: '6px 0',
+          }}
+        >
+          <ShareModalIcon color={'#344054'} />
         </Icon>
         <IconButton onClick={handleClose}>
           <CancelIcon color="#667085" />
@@ -34,7 +51,7 @@ const ShareSchemaModal = ({ open, handleClose, containerStyle }: ModalProps) => 
         <Typography id="modal-title" variant="h5" component="h2" fontWeight={700} fontSize={18}>
           Share with people
         </Typography>
-        <Typography id="modal-description" sx={{ mt: 0.7 }}>
+        <Typography id="modal-description" variant="subtitle2" sx={{ mt: 0.7 }}>
           The following users have access to this project:
         </Typography>
       </Box>
@@ -43,36 +60,36 @@ const ShareSchemaModal = ({ open, handleClose, containerStyle }: ModalProps) => 
       <AddUsers />
       {/* List of all shared users */}
       <List sx={{ mb: 1 }}>
-        { DUMMY_SHARED_USERS.map(user => (
-            <SharedUser
-              key={user.email}
-              name={user.name}
-              email={user.email}
-              image={user.image}
-            />
-          ))}
+        {DUMMY_SHARED_USERS.map((user) => (
+          <SharedUser key={user.email} name={user.name} email={user.email} image={user.image} />
+        ))}
       </List>
 
       {/* Secondary Actions */}
-      <Box display={"flex"} justifyContent={"space-between"} alignItems={"center"}>
+      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <FormControl sx={{ px: 1 }}>
           <FormControlLabel
             checked={checked}
-            onChange={() => { setChecked(prevState => !prevState) }}
-            label={"Enable Public"}
+            onChange={() => {
+              setChecked((prevState) => !prevState);
+            }}
+            label={<Typography variant='subtitle2'>Enable Public</Typography>}
             control={<CheckboxIcon />}
           />
         </FormControl>
         <IconButton
           sx={{
-            "&:hover": {
+            '&:hover': {
               backgroundColor: 'transparent',
               color: '#6941C6',
               transform: 'scale(1.03)',
-            }
-          }}>
+            },
+          }}
+        >
           <CopyIcon color="#667085" />
-          <Typography variant="subtitle2" mx={0.5} fontWeight={700} fontSize={14}>Copy</Typography>
+          <Typography variant="subtitle2" mx={0.5} fontWeight={700} fontSize={14}>
+            Copy
+          </Typography>
         </IconButton>
       </Box>
 
@@ -83,6 +100,6 @@ const ShareSchemaModal = ({ open, handleClose, containerStyle }: ModalProps) => 
       </Box>
     </BaseModal>
   );
-}
+};
 
 export default ShareSchemaModal;

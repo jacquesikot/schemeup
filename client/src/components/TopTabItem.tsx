@@ -1,9 +1,8 @@
-import { Box, IconButton, Tooltip, Typography } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Box, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-import { tokens } from '../theme';
 import TopBarX from '../images/icons/TopBarX';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { useAppDispatch } from '../redux/hooks';
 import { Tab, removeTab } from '../redux/slice/apptabs';
 
 interface TopTabItemProps {
@@ -16,7 +15,7 @@ interface TopTabItemProps {
 }
 
 export default function TopTabItem({ active, title, index, tabs, width, meta }: TopTabItemProps) {
-  const colors = tokens();
+  const theme = useTheme();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -32,16 +31,16 @@ export default function TopTabItem({ active, title, index, tabs, width, meta }: 
       alignItems={'center'}
       pl={2}
       pr={2}
-      bgcolor={active ? colors.primary[50] : '#FFF'}
+      bgcolor={active ? theme.palette.primary.light : '#FFF'}
       height={44}
       borderRight={1}
-      borderColor={colors.grey[900]}
+      borderColor={theme.palette.grey[100]}
     >
       <Tooltip title={title}>
         <Typography
-          variant="h5"
+          variant="h6"
           fontWeight={600}
-          color={active ? '#6941C6' : '#667085'}
+          color={active ? theme.palette.primary.main : theme.palette.grey[700]}
           width={'100%'}
           height={'100%'}
           alignItems={'center'}
@@ -58,7 +57,13 @@ export default function TopTabItem({ active, title, index, tabs, width, meta }: 
       </Tooltip>
 
       {tabs.length > 1 && (
-        <Box justifyContent={'center'} alignItems={'center'} display={'flex'} color={colors.primary[900]} zIndex={1}>
+        <Box
+          justifyContent={'center'}
+          alignItems={'center'}
+          display={'flex'}
+          color={theme.palette.primary.main}
+          zIndex={1}
+        >
           <IconButton
             onClick={() => {
               const indexValue = index - 1 < 0 ? 1 : index - 1;

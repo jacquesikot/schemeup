@@ -3,10 +3,10 @@ import React from 'react';
 
 export const appColors = {
   primary: '#6941C6',
-  error: '#D92D20'
+  error: '#D92D20',
 };
 
-export interface ModalProps {
+export interface BaseModalProps {
   open: boolean;
   handleClose: (event: Event | React.SyntheticEvent) => void;
   containerStyle?: React.CSSProperties;
@@ -14,7 +14,7 @@ export interface ModalProps {
   children?: React.ReactNode;
 }
 
-const BaseModal = ({ open, handleClose, containerStyle, children }: ModalProps) => {
+const BaseModal = ({ open, handleClose, containerStyle, children }: BaseModalProps) => {
   return (
     <Modal
       open={open}
@@ -27,10 +27,7 @@ const BaseModal = ({ open, handleClose, containerStyle, children }: ModalProps) 
         alignItems: 'center',
       }}
     >
-      <Box sx={{ ...containerStyle, paddingX: 3, paddingY: 2.5, borderRadius: 3 }}>
-        {children}
-      </Box>
-
+      <Box sx={{ ...containerStyle, paddingX: 3, paddingY: 2.5, borderRadius: 2 }}>{children}</Box>
     </Modal>
   );
 };

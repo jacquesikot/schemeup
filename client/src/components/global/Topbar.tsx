@@ -1,11 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { Box, IconButton, MenuItem, Typography } from '@mui/material';
+import { Box, IconButton, MenuItem, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 import TopTabItem from '../TopTabItem';
-import { tokens } from '../../theme';
 import TopBarPlus from '../../images/icons/Plus';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import newAppTab from '../../utils/newAppTab';
@@ -24,7 +23,8 @@ const menuItemStyle = {
 };
 
 export default function Topbar({ items }: TopBarProps) {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = theme.palette;
   const { pathname } = useLocation();
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const dispatch = useAppDispatch();
@@ -79,7 +79,7 @@ export default function Topbar({ items }: TopBarProps) {
       maxWidth={'100%'}
       bgcolor={'red'}
       borderBottom={1}
-      borderColor={colors.grey[900]}
+      borderColor={colors.grey[200]}
       sx={{
         overflow: 'hidden',
       }}
@@ -102,7 +102,7 @@ export default function Topbar({ items }: TopBarProps) {
         alignItems={'center'}
         width={50}
         height={'100%'}
-        bgcolor={colors.primary[50]}
+        bgcolor={colors.primary.light}
       >
         <IconButton
           ref={anchorRef}
@@ -120,7 +120,7 @@ export default function Topbar({ items }: TopBarProps) {
           setOpen={setOpen}
           anchorRef={anchorRef}
           handleClose={handleClose}
-          containerStyle={{ border: '1px solid #EAECF0', width: '200px', borderRadius: '6px' }}
+          containerStyle={{ border: `1px solid ${theme.palette.divider}`, width: '200px', borderRadius: '6px' }}
           menuItems={
             <>
               <MenuItem
@@ -135,17 +135,17 @@ export default function Topbar({ items }: TopBarProps) {
                   handleClose(e);
                 }}
               >
-                <Typography color={'#344054'} fontSize={14} fontWeight={600}>
+                <Typography color={theme.palette.grey[700]} fontSize={14} fontWeight={600}>
                   New Schema
                 </Typography>
               </MenuItem>
               <MenuItem style={menuItemStyle} onClick={handleClose}>
-                <Typography color={'#344054'} fontSize={14} fontWeight={500}>
+                <Typography color={theme.palette.grey[700]} fontSize={14} fontWeight={500}>
                   New Mock Dataset
                 </Typography>
               </MenuItem>
               <MenuItem style={menuItemStyle} onClick={handleClose}>
-                <Typography color={'#344054'} fontSize={14} fontWeight={500}>
+                <Typography color={theme.palette.grey[700]} fontSize={14} fontWeight={500}>
                   New Database
                 </Typography>
               </MenuItem>

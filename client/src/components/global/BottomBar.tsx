@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, IconButton, Typography } from '@mui/material';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { a11yLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -23,6 +23,9 @@ const BottomBar = () => {
   const codeEditorOpen = useAppSelector((state) => state.app.codeEditorOpen);
   const rightPanelOpen = useAppSelector((state) => state.app.rightPanelOpen);
 
+  // useEffect(() => {
+  //   console.log(codeEditorOpen);
+  // }, []);
   const urlParts = location.pathname.split('/');
   const id = urlParts[urlParts.length - 1];
 
@@ -30,30 +33,28 @@ const BottomBar = () => {
 
   const schema = schemaArr && schemaArr.length > 0 ? schemaArr[0] : { tables: [] };
 
+  // console.log(schema);
+
   const dispatch = useAppDispatch();
 
-  const [boxHeight, setBoxHeight] = useState(500);
-  const [boxBottom, setBoxBottom] = useState(BOTTOM_BAR_HEIGHT);
+  // const [boxHeight, setBoxHeight] = useState(500);
+  // const [boxBottom, setBoxBottom] = useState(BOTTOM_BAR_HEIGHT);
   const [schemaSql, setSchemaSql] = useState<string>('');
 
-  const handleDrag = (e: any, { deltaY }: any) => {
-    setBoxHeight((prevHeight) => prevHeight - deltaY);
-    setBoxBottom((prevBottom) => prevBottom + deltaY);
-  };
+  // const handleDrag = (e: any, { deltaY }: any) => {
+  //   setBoxHeight((prevHeight) => prevHeight - deltaY);
+  //   setBoxBottom((prevBottom) => prevBottom + deltaY);
+  // };
 
-  useEffect(() => {
-    if (!location.pathname.includes(routes.EDIT_SCHEMA)) {
-      dispatch(toggleCodeEditor());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
+  const sqlAccessRoutes =
+    location.pathname.includes(routes.EDIT_SCHEMA) || location.pathname.includes(routes.SHARE_SCHEMA);
 
-  useEffect(() => {
-    if (schema) {
-      setSchemaSql(generateSchemaTablesSql(schema.tables as any));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schema.tables]);
+  // useEffect(() => {
+  //   if (schema) {
+  //     setSchemaSql(generateSchemaTablesSql(schema.tables as any));
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [schema.tables]);
 
   const returnBoxWidth = () => {
     if (rightPanelOpen && sideBarOpen) {
@@ -94,9 +95,9 @@ const BottomBar = () => {
           borderLeft={1}
           borderTop={1}
           borderColor={'divider'}
-          height={boxHeight}
+          height={500}
           width={BOX_WIDTH}
-          bottom={boxBottom}
+          bottom={BOTTOM_BAR_HEIGHT}
           left={sideBarOpen ? SIDEBAR_WIDTH : 80}
           sx={{
             transition: 'width 0.3s ease, left 0.3s ease',
@@ -146,7 +147,7 @@ const BottomBar = () => {
       </Typography>
 
       <Box display="flex">
-        {location.pathname.includes(routes.EDIT_SCHEMA) && (
+        {sqlAccessRoutes && (
           <IconButton onClick={() => dispatch(toggleCodeEditor())}>
             <Typography color={'#101828'}>SQL</Typography>
           </IconButton>
@@ -155,8 +156,9 @@ const BottomBar = () => {
         <Box
           display={'flex'}
           alignItems={'center'}
-          bgcolor={'#ECFDF3'}
           borderRadius={12}
+          height={30}
+          alignSelf={'center'}
           paddingX={1}
           paddingY={0.5}
           marginLeft={5}

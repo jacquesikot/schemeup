@@ -9,33 +9,24 @@ import { v4 as uuidv4 } from 'uuid';
 import NewSchemaHeader from '../../components/NewSchemaHeader';
 import CanvasDrawer from '../../components/canvas/CanvasDrawer';
 import SchemaProperties from '../../components/canvas/SchemaProperties';
-import Table from '../../components/canvas/Table';
 import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import generateForeignKeyName from '../../utils/generateFkName';
 import generateTableLayout from '../../utils/generateTableLayout';
-import {
-  Schema,
-  Table as TableProps,
-  deleteTable,
-  editTable,
-  newTable,
-  setActiveTable,
-} from '../../redux/slice/schemas';
-import DeleteModal from '../../components/global/DeleteModal';
+import { Schema, Table as TableProps, deleteTable, newTable, setActiveTable } from '../../redux/slice/schemas';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
-import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
-import { removeBottomBar, toggleRightPanel } from '../../redux/slice/app';
-import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
-import ImportModal from '../../components/canvas/ImportModal';
+// import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
+import { openRightPanel, toggleRightPanel } from '../../redux/slice/app';
+import ImportModal from '../../components/modals/ImportModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
+import routes from '../../routes';
+import DeleteTableModal from '../../components/modals/DeleteTableModal';
 
 const EditSchema = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
-  // console.log('schema', schema);
   const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
   const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
@@ -46,7 +37,7 @@ const EditSchema = () => {
     (state) => state.schemas.schemas.filter((s) => s.id === params.id)[0].activeTable
   );
 
-  const nodeTypes = useMemo(() => ({ table: CanvasTable, editTable: Table }), []);
+  const nodeTypes = useMemo(() => ({ table: CanvasTable }), []);
 
   const containerRef = useRef<any>(null);
 
@@ -80,7 +71,7 @@ const EditSchema = () => {
   const initialNodes: Node<Schema>[] = nodeSchemaTables.map((table: TableProps) => {
     return {
       id: table.name,
-      type: table.meta.type,
+      type: 'table',
       position: {
         x: tableLayout.filter((t) => t.id === table.id)[0].x,
         y: tableLayout.filter((t) => t.id === table.id)[0].y,
@@ -88,20 +79,10 @@ const EditSchema = () => {
       data: {
         id: table.id,
         title: table.name,
-        isEdit: table.meta.isEdit,
-        handleEdit: () =>
-          dispatch(
-            editTable({
-              schemaId: schema.id,
-              table: {
-                ...table,
-                meta: {
-                  type: 'editTable',
-                  isEdit: true,
-                },
-              },
-            })
-          ),
+        handleUpdate: () => {
+          dispatch(setActiveTable({ schemaId: schema.id, tableId: '' }));
+          dispatch(openRightPanel());
+        },
         columns: table.columns.map((c) => {
           return {
             name: c.name,
@@ -177,17 +158,23 @@ const EditSchema = () => {
   //   run();
   // }, [schema.tables, schema.description, schema.title]);
 
+  const showPreview = () => {
+    const url = `${routes.SHARE_SCHEMA}/${schema.id}`;
+    window.open(url, '_blank', 'noreferrer');
+  };
+
   return (
     <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 150, position: 'relative' }}>
       <NewSchemaHeader
         toggleSettingsDrawer={() => dispatch(toggleRightPanel())}
         drawerState={drawerOpen}
-        handleNewTable={() =>
+        handleNewTable={() => {
+          const newTableId = uuidv4();
           dispatch(
             newTable({
               schemaId: schema.id,
               table: {
-                id: uuidv4(),
+                id: newTableId,
                 name: generateSchemaName(),
                 columns: [
                   {
@@ -202,15 +189,15 @@ const EditSchema = () => {
                 ],
                 foreignKeys: [],
                 indexes: [],
-                meta: {
-                  type: 'editTable',
-                },
               },
             })
-          )
-        }
+          );
+          dispatch(setActiveTable({ schemaId: schema.id, tableId: newTableId }));
+          dispatch(openRightPanel());
+        }}
         handleShare={() => toggleShowShareModal(true)}
         handleImport={() => setShowImportModal(true)}
+        showPreview={showPreview}
       />
 
       <CanvasDrawer open={drawerOpen}>
@@ -219,6 +206,7 @@ const EditSchema = () => {
           toggleOpen={() => dispatch(toggleRightPanel())}
           showRelations={showRelations}
           toggleRelations={setShowRelations}
+          handleTableDelete={() => setOpenDeleteModal(true)}
         />
       </CanvasDrawer>
 
@@ -232,8 +220,10 @@ const EditSchema = () => {
           onConnect={onConnect}
           onNodeClick={(_event, node) => {
             dispatch(setActiveTable({ schemaId: schema.id, tableId: node.data.id }));
+            dispatch(openRightPanel());
           }}
           onClick={(e) => {
+            console.log('target', e.currentTarget);
             if (activeTableId) {
               dispatch(setActiveTable({ schemaId: schema.id, tableId: '' }));
             } else {
@@ -244,7 +234,8 @@ const EditSchema = () => {
             setOpenDeleteModal(true);
           }}
           fitView
-          // style={{ width: '100%', height: '100%' }}
+          panOnScroll
+          selectionOnDrag
         >
           <Background />
           <Controls />
@@ -252,24 +243,32 @@ const EditSchema = () => {
         </ReactFlow>
       </Box>
 
-      <ImportModal open={showImportModal} handleClose={() => setShowImportModal(false)} schemaId={schema.id} />
+      <ImportModal
+        open={showImportModal}
+        handleClose={() => setShowImportModal(false)}
+        schemaId={schema.id}
+        containerStyle={{
+          backgroundColor: '#FFFFFF',
+          width: 480,
+          borderRadius: 8,
+          padding: '14px',
+        }}
+      />
 
-      <DeleteModal
+      <DeleteTableModal
         open={openDeleteModal}
         handleClose={() => {
           setOpenDeleteModal(false);
         }}
+        handleTableDelete={() =>
+          dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }))
+        }
+        itemId={schema.id}
         containerStyle={{
           width: '400px',
           backgroundColor: '#FFFFFF',
           borderRadius: '8px',
           padding: '20px',
-        }}
-        title={`Delete Table`}
-        body={`Are you sure you want to delete this table? This action cannot be undone.`}
-        handleDelete={() => {
-          dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }));
-          setOpenDeleteModal(false);
         }}
       />
 

@@ -12,10 +12,15 @@ import TopBarPlus from "../../images/icons/Plus";
 import newAppTab from "../../utils/newAppTab";
 import generateSchemaName from "../../utils/generateSchemaName";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import DeleteModal from "../../components/global/DeleteModal";
-import { deleteSchema, newSchema } from "../../redux/slice/schemas";
+import DeleteModal from "../../components/modals/DeleteTableModal";
+import {
+  clearSchemas,
+  deleteSchema,
+  newSchema,
+} from "../../redux/slice/schemas";
 import routes from "../../routes";
-import { removeBottomBar } from "../../redux/slice/app";
+import { hideCodeEditor } from "../../redux/slice/app";
+import DeleteSchemaModal from "../../components/modals/DeleteSchemaModal";
 import EmptyState from "../../components/global/EmptyState";
 
 const Dashboard = () => {
@@ -26,7 +31,7 @@ const Dashboard = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const schemas = useAppSelector((state) => state.schemas.schemas);
-  const [activeSchema, setActiveSchema] = useState<any>(null);
+  const [activeSchema, setActiveSchema] = useState<any>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -55,8 +60,10 @@ const Dashboard = () => {
 
   // Do not allow codeEditor show up when user is in dashboard
   useEffect(() => {
-    dispatch(removeBottomBar());
-  }, [dispatch]);
+    dispatch(hideCodeEditor());
+    // dispatch(clearSchemas()); dev only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const xsScreen = useMediaQuery(theme.breakpoints.down("xs"));
   const smScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -254,20 +261,16 @@ const Dashboard = () => {
         </Grid>
       )}
 
-      <DeleteModal
+      <DeleteSchemaModal
         open={openDeleteModal}
         handleClose={() => setOpenDeleteModal(false)}
+        handleSchemaDelete={() => dispatch(deleteSchema(activeSchema.id))}
+        itemId={activeSchema?.id}
         containerStyle={{
           width: "400px",
           backgroundColor: "#FFFFFF",
           borderRadius: "8px",
           padding: "20px",
-        }}
-        title={`Delete Schema`}
-        body={`Are you sure you want to delete this schema? This action cannot be undone.`}
-        handleDelete={() => {
-          dispatch(deleteSchema(activeSchema.id));
-          setOpenDeleteModal(false);
         }}
       />
     </Box>
