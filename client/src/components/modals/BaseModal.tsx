@@ -27,7 +27,7 @@ const BaseModal = ({ open, handleClose, containerStyle, children }: BaseModalPro
         alignItems: 'center',
       }}
     >
-      <Box sx={{ ...containerStyle, paddingX: 3, paddingY: 2.5, borderRadius: 2 }}>{children}</Box>
+      <Box sx={{ ...containerStyle, paddingX: 3, paddingY: 2.5, borderRadius: 1 }}>{children}</Box>
     </Modal>
   );
 };
