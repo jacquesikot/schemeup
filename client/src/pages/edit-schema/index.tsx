@@ -18,7 +18,7 @@ import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/sl
 import generateSchemaName from '../../utils/generateSchemaName';
 // import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
 import { openRightPanel, toggleRightPanel } from '../../redux/slice/app';
-import ImportModal from '../../components/modals/ImportModal';
+import ImportModal from '../../components/modals/import/ImportSchemaModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 import routes from '../../routes';
 import DeleteTableModal from '../../components/modals/DeleteTableModal';

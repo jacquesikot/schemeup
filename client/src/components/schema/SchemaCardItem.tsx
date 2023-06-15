@@ -43,14 +43,14 @@ const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: Sc
     alignItems: 'center',
   };
   return (
-    <Box width={343} height={174} border={1} borderRadius={'12px'} borderColor={'#EAECF0'} sx={{whiteSpace: "wrap", overflow: "hidden", textOverflow: "ellipsis"}}>
+    <Box width={343} height={174} py={"6px"} border={1} borderRadius={'12px'} borderColor={'#EAECF0'} sx={{whiteSpace: "wrap", overflow: "hidden", textOverflow: "ellipsis"}}>
       <Box
         borderBottom={1}
         borderColor={'#EAECF0'}
         display={'flex'}
         justifyContent={'space-between'}
         alignItems={'center'}
-        p={'14px'}
+        p={'8px 14px 14px 14px'}
       >
         <Box display={'flex'} alignItems={'center'}>
           <SchemaCardIcon />
