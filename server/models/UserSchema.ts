@@ -82,7 +82,7 @@ const TableSchema = new MongooseSchema({
 });
 
 const UserSchemaSchema = new MongooseSchema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: String, required: true },
   title: { type: String, required: true },
   description: String,
   tables: [TableSchema],

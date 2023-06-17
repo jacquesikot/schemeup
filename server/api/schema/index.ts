@@ -2,9 +2,13 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 
 import connectToDatabase from '../../db';
 import createSchema from './createSchema';
+import getUserSchemas from './getUserSchemas';
 import { validateUserSchema } from '../../models/UserSchema';
+import useMiddlewares from '../../middlewares/useMiddlewares';
+import useCors from '../../middlewares/cors';
+import useAuth from '../../middlewares/auth';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+async function handler(req: any, res: VercelResponse) {
   await connectToDatabase();
 
   if (req.method === 'POST') {
@@ -21,5 +25,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
+  if (req.method === 'GET') {
+    const schemas = await getUserSchemas(req.authId);
+
+    return res.status(200).json({
+      message: 'Schema fetched successfully',
+      data: schemas,
+    });
+  }
+
   return res.status(405).json({ message: 'Method not allowed' });
 }
+
+export default useMiddlewares(useCors, useAuth, handler);
