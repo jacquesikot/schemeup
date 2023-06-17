@@ -1,7 +1,7 @@
 import './index.css';
 import { ThemeProvider } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 
 import Dashboard from './pages/schema';
 import MockData from './pages/mock-data';
@@ -22,6 +22,7 @@ function App() {
   const theme = createTheme();
   const showSnack = useAppSelector((state) => state.app.showSnack);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -32,6 +33,9 @@ function App() {
         photoUrl: user.photoURL ? user.photoURL : '',
       };
       dispatch(setCurrentUser({ ...currentUser }));
+    } else {
+      // User is signed out
+      return navigate(routes.AUTH);
     }
   });
 
