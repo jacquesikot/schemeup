@@ -12,13 +12,33 @@ import ShareSchema from './pages/share-schema';
 import AuthenticateUser from './pages/auth';
 import Layout from './components/global/Layout';
 import { createTheme } from './theme';
+import SnackNotification from './components/global/SnackNotification';
+import { useAppDispatch, useAppSelector } from './redux/hooks';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase.config';
+import { setCurrentUser } from './redux/slice/user';
 
 function App() {
   const theme = createTheme();
+  const showSnack = useAppSelector((state) => state.app.showSnack);
+  const dispatch = useAppDispatch();
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const currentUser = {
+        id: user.uid,
+        name: user.displayName ? user.displayName : 'Anonymous',
+        email: user.email ? user.email : '',
+        photoUrl: user.photoURL ? user.photoURL : '',
+      };
+      dispatch(setCurrentUser({ ...currentUser }));
+    }
+  });
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {showSnack && <SnackNotification />}
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route path={routes.HOME} element={<Dashboard />} />

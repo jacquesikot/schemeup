@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase.config';
 import SignIn from '../../components/auth/SignIn';
 import SignUp from '../../components/auth/SignUp';
@@ -7,9 +7,9 @@ import { Avatar, Box, Grid, Typography } from '@mui/material';
 import SchemeupLogo from '../../images/schemup_logo.png';
 import { useNavigate } from 'react-router-dom';
 import routes from '../../routes';
-import { setCurrentUser } from '../../redux/slice/user';
-import { useAppDispatch } from '../../redux/hooks';
 import ResetPassword from '../../components/auth/ResetPassword';
+import { useAppDispatch } from '../../redux/hooks';
+import { triggerSnack } from '../../redux/slice/app';
 
 type Pages = 'login' | 'signup' | 'reset';
 
@@ -20,23 +20,10 @@ export interface PageProps {
 
 const AuthenticateUser = () => {
   const [activePage, setActivePage] = useState<Pages>('login');
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const provider = new GoogleAuthProvider();
   const currentYear = new Date().getFullYear();
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // console.log(user);
-      const currentUser = {
-        id: user.uid,
-        name: user.displayName ? user.displayName : 'Anonymous',
-        email: user.email ? user.email : '',
-      };
-      dispatch(setCurrentUser({ ...currentUser }));
-      return navigate(routes.HOME);
-    }
-  });
+  const dispatch = useAppDispatch();
 
   const flowSwitchHandler = (page: Pages) => {
     switch (page) {
@@ -54,12 +41,7 @@ const AuthenticateUser = () => {
   const googleSignInHandler = async () => {
     await signInWithPopup(auth, provider)
       .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        console.log(token, user);
+        dispatch(triggerSnack({ message: 'Google Auth Success!', severity: 'success', hideDuration: 3000 }));
         return navigate(routes.HOME);
       })
       .catch((error) => {
@@ -71,19 +53,20 @@ const AuthenticateUser = () => {
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
         console.log({ errorCode, errorMessage, email, credential });
+
+        dispatch(triggerSnack({ message: 'Google Auth Error!', severity: 'error', hideDuration: 3000 }));
       });
   };
 
   return (
     <Grid container>
       <Grid item xs={12} lg={6}>
-
-        <Box width="60%" maxWidth={490} mx="auto" mt={5} p={7} sx={{}}>
+        <Box width="80%" maxWidth={600} mx="auto" mt={5} p={7} sx={{}}>
           <Avatar
             variant="rounded"
             alt="schemeup-logo"
             src={SchemeupLogo}
-            sx={{backgroundColor: "lightgray", padding: 1, marginBottom: 10}}
+            sx={{ backgroundColor: 'lightgray', padding: 1, marginBottom: 10 }}
           >
             Schemeup Logo
           </Avatar>

@@ -15,9 +15,10 @@ import newAppTab from '../../utils/newAppTab';
 import SideBarToggleClose from '../../images/icons/SideBarToggleClose';
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
 import routes from '../../routes';
-import { toggleSideBar } from '../../redux/slice/app';
+import { toggleSideBar, triggerSnack } from '../../redux/slice/app';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase.config';
+import { setCurrentUser } from '../../redux/slice/user';
 
 export const SIDEBAR_WIDTH = 280;
 
@@ -83,17 +84,11 @@ const Sidebar = () => {
   const dispatch = useAppDispatch();
   const [_, setSelected] = useState('Schema');
   const { pathname } = useLocation();
-  const navigate = useNavigate();
 
-  const logOutHandler = () => {
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-        return navigate(routes.AUTH);
-      })
-      .catch((error) => {
-        // An error happened.
-      });
+  const logOutHandler = async () => {
+    dispatch(setCurrentUser(null));
+    await signOut(auth);
+    dispatch(triggerSnack({ message: 'Logged out successfully', severity: 'success', hideDuration: 3000 }));
   };
 
   return (
@@ -184,19 +179,24 @@ const Sidebar = () => {
 
         {/* PROFILE SECTION */}
         <Box width={'90%'} height={1.1} bgcolor={theme.palette.divider} alignSelf={'center'} />
-        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} pl={2} pr={2} pb={8} pt={2}>
-          <Avatar style={{ width: 30, height: 30, borderRadius: 15 }} />
+        <Box display={'flex'} alignItems={'center'} pl={2} pr={2} pb={8} pt={2}>
+          <Avatar
+            src={activeUser ? activeUser.photoUrl : undefined}
+            style={{ width: 30, height: 30, borderRadius: 15, marginLeft: sideBarOpen ? 0 : 7, marginRight: 10 }}
+          />
 
           {!sideBarOpen ? undefined : (
             <>
               <Box>
-                <Typography fontSize={14} fontWeight={500} color={theme.palette.grey[800]}>
-                  {activeUser.name}
+                <Typography fontSize={12} fontWeight={500} color={theme.palette.grey[800]}>
+                  {activeUser ? activeUser.name : ''}
                 </Typography>
-                <Typography fontSize={14} fontWeight={400} color={theme.palette.grey[800]}>
-                  {activeUser.email}
+                <Typography overflow={'hidden'} fontSize={12} fontWeight={400} color={theme.palette.grey[800]}>
+                  {activeUser ? activeUser.email : ''}
                 </Typography>
               </Box>
+
+              <Box flex={1} />
 
               <IconButton onClick={logOutHandler}>
                 <SideBarLogout />

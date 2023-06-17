@@ -1,27 +1,22 @@
-import { useEffect, useRef, useState } from "react";
-import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import { useEffect, useRef, useState } from 'react';
+import { Box, Grid, useMediaQuery, useTheme } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import SchemaCardItem from "../../components/schema/SchemaCardItem";
-import MainSeachInput from "../../components/MainSearchInput";
-import DashboardHeader from "../../components/global/DashboardHeader";
-import Button from "../../components/global/Button";
-import SchemaButtonUpload from "../../images/icons/schema/SchemaButtonUpload";
-import TopBarPlus from "../../images/icons/Plus";
-import newAppTab from "../../utils/newAppTab";
-import generateSchemaName from "../../utils/generateSchemaName";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import DeleteModal from "../../components/modals/DeleteTableModal";
-import {
-  clearSchemas,
-  deleteSchema,
-  newSchema,
-} from "../../redux/slice/schemas";
-import routes from "../../routes";
-import { hideCodeEditor } from "../../redux/slice/app";
-import DeleteSchemaModal from "../../components/modals/DeleteSchemaModal";
-import EmptyState from "../../components/global/EmptyState";
+import SchemaCardItem from '../../components/schema/SchemaCardItem';
+import MainSeachInput from '../../components/MainSearchInput';
+import DashboardHeader from '../../components/global/DashboardHeader';
+import Button from '../../components/global/Button';
+import SchemaButtonUpload from '../../images/icons/schema/SchemaButtonUpload';
+import TopBarPlus from '../../images/icons/Plus';
+import newAppTab from '../../utils/newAppTab';
+import generateSchemaName from '../../utils/generateSchemaName';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { deleteSchema, newSchema } from '../../redux/slice/schemas';
+import routes from '../../routes';
+import { hideCodeEditor } from '../../redux/slice/app';
+import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
+import EmptyState from '../../components/global/EmptyState';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -50,10 +45,10 @@ const Dashboard = () => {
 
     const gridElement = gridRef.current;
     if (gridElement) {
-      gridElement.addEventListener("scroll", handleScroll);
+      gridElement.addEventListener('scroll', handleScroll);
 
       return () => {
-        gridElement.removeEventListener("scroll", handleScroll);
+        gridElement.removeEventListener('scroll', handleScroll);
       };
     }
   }, [isHeaderVisible, prevScrollTop]);
@@ -61,15 +56,14 @@ const Dashboard = () => {
   // Do not allow codeEditor show up when user is in dashboard
   useEffect(() => {
     dispatch(hideCodeEditor());
-    // dispatch(clearSchemas()); dev only
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const xsScreen = useMediaQuery(theme.breakpoints.down("xs"));
-  const smScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  const mdScreen = useMediaQuery(theme.breakpoints.between("md", "lg"));
-  const lgScreen = useMediaQuery(theme.breakpoints.between("lg", "xl"));
-  const xlScreen = useMediaQuery(theme.breakpoints.up("xl"));
+  const xsScreen = useMediaQuery(theme.breakpoints.down('xs'));
+  const smScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const mdScreen = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+  const lgScreen = useMediaQuery(theme.breakpoints.between('lg', 'xl'));
+  const xlScreen = useMediaQuery(theme.breakpoints.up('xl'));
 
   let itemsPerRow = 3; // Default number of items per row
 
@@ -96,31 +90,36 @@ const Dashboard = () => {
 
   // Calculate the number of placeholder items needed in the last row
   const remainingItems = data.length % itemsPerRow;
-  const placeholderItemsCount =
-    remainingItems === 0 ? 0 : itemsPerRow - remainingItems;
+  const placeholderItemsCount = remainingItems === 0 ? 0 : itemsPerRow - remainingItems;
 
   // Create an array of all items including the data items and placeholder items
   const allItems = [
     ...data,
     ...Array(placeholderItemsCount).fill({
-      title: "",
-      description: "",
+      title: '',
+      description: '',
       noOfTables: 0,
     }),
   ];
 
+  const handleNewSchema = () => {
+    const id = uuidv4();
+    const newSchemaName = generateSchemaName();
+    dispatch(newSchema({ id, title: newSchemaName, tables: [] }));
+    newAppTab(dispatch, `Schema - ${newSchemaName}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate, { id });
+  };
+
   return (
     <Box
-      overflow={"hidden"}
-      bgcolor={"white"}
-      display={"flex"}
-      flexDirection={"column"}
-      height={"95%"}
+      overflow={'hidden'}
+      bgcolor={'white'}
+      display={'flex'}
+      flexDirection={'column'}
+      height={'95%'}
       id="dashboard-box"
     >
       {/* HEADER-START */}
 
-      {/* <Box className={`header ${isHeaderVisible ? 'visible' : ''}`}> */}
       <DashboardHeader
         title="Schemas"
         dataCount={data.length > 0 ? data.length : undefined}
@@ -128,41 +127,16 @@ const Dashboard = () => {
         actionButtons={
           <>
             <Button
-              label={"Upload"}
-              type={"secondary"}
-              icon={<SchemaButtonUpload />}
-              style={{ marginRight: 10 }}
-            />
-            <Button
-              label={"New Schema"}
-              type={"primary"}
+              label={'New Schema'}
+              type={'primary'}
               icon={<TopBarPlus color="#FFF" />}
-              onClick={(e: any) => {
-                const id = uuidv4();
-                const newSchemaName = generateSchemaName();
-                dispatch(newSchema({ id, title: newSchemaName, tables: [] }));
-                newAppTab(
-                  dispatch,
-                  `Schema - ${newSchemaName}`,
-                  `${routes.EDIT_SCHEMA}/${id}`,
-                  tabs,
-                  navigate,
-                  { id }
-                );
-              }}
+              onClick={handleNewSchema}
             />
           </>
         }
       />
 
-      <Box
-        display={"flex"}
-        height={80}
-        borderBottom={1}
-        borderColor={"#EAECF0"}
-        alignItems={"center"}
-        pl={2}
-      >
+      <Box display={'flex'} height={80} borderBottom={1} borderColor={'#EAECF0'} alignItems={'center'} pl={2}>
         <MainSeachInput placeholder="Search Schemas" />
       </Box>
       {/* </Box> */}
@@ -170,53 +144,47 @@ const Dashboard = () => {
       {/* HEADER-END */}
       {data.length === 0 ? (
         // Render the EmptyState component when data is empty
-        <EmptyState
-          title="No schemas found"
-          message="Your search “Landing page schema” did not match any projects. Please try again."
-          actionButtons={
-            <>
-              <Button
-                style={{ marginRight: 10 }}
-                label="Import Schema"
-                type={"secondary"}
-                icon={<SchemaButtonUpload />}
-                onClick={() => true}
-              />
-              <Button
-                label="New Schema"
-                type={"primary"}
-                icon={<TopBarPlus color="#FFF" />}
-                onClick={() => true}
-              />
-            </>
-          }
-        />
+        <Box marginTop={'20%'}>
+          <EmptyState
+            title="No schemas found"
+            message="Create a new schema or import an existing one to get started."
+            actionButtons={
+              <>
+                <Button
+                  label="New Schema"
+                  type={'primary'}
+                  icon={<TopBarPlus color="#FFF" />}
+                  onClick={handleNewSchema}
+                />
+              </>
+            }
+          />
+        </Box>
       ) : (
         <Grid
           // ref={gridRef}
           container
           // maxHeight={isHeaderVisible ? '75vh' : '100vh'}
-          maxHeight={"75vh"}
+          maxHeight={'75vh'}
           pt={5}
           pb={5}
-          justifyContent={"center"}
-          alignContent={"flex-start"}
+          justifyContent={'center'}
+          alignContent={'flex-start'}
           sx={{
-            overflowY:
-              "auto" /* To allow main grid scroll vertically but not entire screen */,
-            scrollbarWidth: "none" /* Firefox */,
-            "-ms-overflow-style": "none" /* IE 10+ */,
-            "&::-webkit-scrollbar": {
+            overflowY: 'auto' /* To allow main grid scroll vertically but not entire screen */,
+            scrollbarWidth: 'none' /* Firefox */,
+            '-ms-overflow-style': 'none' /* IE 10+ */,
+            '&::-webkit-scrollbar': {
               width: 0,
               height: 0,
             },
-            "&::-webkit-scrollbar-track": {
-              background: "transparent",
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
             },
-            "&::-webkit-scrollbar-thumb": {
-              background: "transparent",
+            '&::-webkit-scrollbar-thumb': {
+              background: 'transparent',
             },
-            "-webkit-overflow-scrolling": "touch" /* For hide on scroll */,
+            '-webkit-overflow-scrolling': 'touch' /* For hide on scroll */,
           }}
         >
           {allItems.map((item, index) => (
@@ -229,19 +197,12 @@ const Dashboard = () => {
               key={item.id}
               mb={2}
               style={{
-                maxWidth: "343px",
-                height: "174px",
+                maxWidth: '343px',
+                height: '174px',
               }}
             >
-              {item.title !== "" ? (
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  maxWidth="343px"
-                  height="174px"
-                  p={1}
-                >
+              {item.title !== '' ? (
+                <Box display="flex" justifyContent="center" alignItems="center" maxWidth="343px" height="174px" p={1}>
                   <SchemaCardItem
                     id={item.id}
                     title={item.title}
@@ -254,7 +215,7 @@ const Dashboard = () => {
                   />
                 </Box>
               ) : (
-                <Box width={"343px"} />
+                <Box width={'343px'} />
               )}
             </Grid>
           ))}
@@ -267,10 +228,10 @@ const Dashboard = () => {
         handleSchemaDelete={() => dispatch(deleteSchema(activeSchema.id))}
         itemId={activeSchema?.id}
         containerStyle={{
-          width: "400px",
-          backgroundColor: "#FFFFFF",
-          borderRadius: "8px",
-          padding: "20px",
+          width: '400px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '8px',
+          padding: '20px',
         }}
       />
     </Box>

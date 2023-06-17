@@ -31,6 +31,7 @@ const SnackNotification = () => {
 
   const handleExited = () => {
     dispatch(unloadSnacks());
+    dispatch(setShowSnack(false));
   };
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
@@ -42,7 +43,7 @@ const SnackNotification = () => {
       <Snackbar
         key={snackPack && snackPack.length > 0 ? snackPack[0].key : undefined}
         open={showSnack}
-        autoHideDuration={snackPack && snackPack.length > 0 ? snackPack[0].hideDuration : 4000}
+        autoHideDuration={snackPack && snackPack.length > 0 ? snackPack[0].hideDuration : 3000}
         onClose={handleClose}
         TransitionProps={{ onExited: handleExited }}
       >

@@ -112,7 +112,7 @@ export default function Topbar({ items }: TopBarProps) {
           aria-haspopup="true"
           onClick={handleToggle}
         >
-          <TopBarPlus />
+          <TopBarPlus color={theme.palette.primary.main} />
         </IconButton>
 
         <MenuPopper
