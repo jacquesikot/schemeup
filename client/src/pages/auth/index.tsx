@@ -64,31 +64,16 @@ const AuthenticateUser = () => {
   };
 
   return (
-    <Grid container>
-      <Grid item xs={12} lg={6}>
-        <Box width="80%" maxWidth={600} mx="auto" mt={5} p={7} sx={{}}>
-          <Avatar
-            variant="rounded"
-            alt="schemeup-logo"
-            src={SchemeupLogo}
-            sx={{ backgroundColor: 'lightgray', padding: 1, marginBottom: 10 }}
-          >
+    <Grid container sx={{ height: '100%', alignItems: 'center' }}>
+      <Grid item xs={12} lg={6} pt={2} pb={2}>
+        <Box width="80%" maxWidth={400} mx="auto">
+          <Avatar variant="rounded" alt="schemeup-logo" src={SchemeupLogo} sx={{ padding: 1, marginBottom: 3 }}>
             Schemeup Logo
           </Avatar>
           {activePage === 'login' && <SignIn flowSwitch={flowSwitchHandler} googleAuthHandler={googleSignInHandler} />}
           {activePage === 'reset' && <ResetPassword flowSwitch={flowSwitchHandler} />}
           {activePage === 'signup' && <SignUp flowSwitch={flowSwitchHandler} googleAuthHandler={googleSignInHandler} />}
         </Box>
-        <Typography sx={{ position: 'absolute', bottom: 15, left: 25 }}>
-          <img
-            alt="schemeup logo"
-            src={SchemeupLogo}
-            width={12}
-            height={12}
-            style={{ marginRight: 6, color: 'gray' }}
-          />
-          Schemeup {currentYear}
-        </Typography>
       </Grid>
       <Grid item xs={0} lg={6}>
         <Box
