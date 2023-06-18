@@ -12,17 +12,18 @@ import {
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useMutation } from 'react-query';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+
 import Button from '../global/Button';
 import BootstrapInput from '../global/BootstrapInput';
 import GoogleIcon from '../../images/icons/GoogleIcon';
 import { PageProps } from '../../pages/auth';
 import { auth } from '../../firebase.config';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import PulseLoader from 'react-spinners/PulseLoader';
 import * as yup from 'yup';
 import { useAppDispatch } from '../../redux/hooks';
 import { triggerSnack } from '../../redux/slice/app';
-import { useMutation } from 'react-query';
 import { SignUpUserDto, signUp } from '../../api/auth';
 
 const validationSchema = yup.object({
@@ -30,7 +31,7 @@ const validationSchema = yup.object({
   email: yup.string().email('Enter a valid email').required('Mandatory. Cannot be empty!'),
   password: yup
     .string()
-    .min(8, 'Password should be of minimum 8 characters length')
+    .min(6, 'Password should be of minimum 6 characters length')
     .required('Mandatory. Cannot be empty!'),
 });
 
@@ -63,11 +64,9 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
         })
 
         .catch((error) => {
-          console.log(error);
+          console.log('error from signup', error);
           setIsLoading(false);
-
           let message = 'Auth Error!';
-
           switch (error.code) {
             case 'auth/email-already-in-use':
               message = 'This email is already in use.';
@@ -174,11 +173,12 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
       <Box component="div" display="flex" flexDirection="column" gap={1.8} mt={4}>
         <Button
           type="primary"
-          label={isLoading ? '' : 'Sign up'}
+          label={'Sign up'}
           onClick={formik.handleSubmit}
-          icon={isLoading ? <PulseLoader size={10} color="#fff" /> : null}
+          isLoading={isLoading}
+          isLoadingText="Signing you up..."
         />
-        <Button type="secondary" icon={<GoogleIcon />} label="Sign in with Google" onClick={googleAuthHandler} />
+        <Button type="secondary" icon={<GoogleIcon />} label="Sign up with Google" onClick={googleAuthHandler} />
       </Box>
 
       <Box display="flex" justifyContent="center" alignItems="center" gap={0.5} mt={4}>

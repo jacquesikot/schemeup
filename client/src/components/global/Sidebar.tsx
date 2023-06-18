@@ -19,6 +19,9 @@ import { toggleSideBar, triggerSnack } from '../../redux/slice/app';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase.config';
 import useAppTab from '../../hooks/useAppTab';
+import { persistor } from '../../redux/store';
+import { setSchemas } from '../../redux/slice/schemas';
+import { resetTabs } from '../../redux/slice/apptabs';
 
 export const SIDEBAR_WIDTH = 280;
 
@@ -85,6 +88,8 @@ const Sidebar = () => {
 
   const logOutHandler = async () => {
     await signOut(auth);
+    dispatch(setSchemas([]));
+    dispatch(resetTabs());
     dispatch(triggerSnack({ message: 'Logged out successfully', severity: 'success', hideDuration: 3000 }));
   };
 

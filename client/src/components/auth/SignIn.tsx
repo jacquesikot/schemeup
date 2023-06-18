@@ -151,9 +151,10 @@ const SignIn = ({ flowSwitch, googleAuthHandler }: PageProps) => {
       <Box component="div" display="flex" flexDirection="column" gap={1.8}>
         <Button
           type="primary"
-          label={isLoading ? '' : 'Sign in'}
+          label={'Sign in'}
           onClick={formik.handleSubmit}
-          icon={isLoading ? <PulseLoader size={10} color="#fff" /> : null}
+          isLoading={isLoading}
+          isLoadingText="Logging you in..."
         />
         <Button type="secondary" icon={<GoogleIcon />} label="Sign in with Google" onClick={googleAuthHandler} />
       </Box>
