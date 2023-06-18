@@ -22,6 +22,8 @@ import PulseLoader from 'react-spinners/PulseLoader';
 import * as yup from 'yup';
 import { useAppDispatch } from '../../redux/hooks';
 import { triggerSnack } from '../../redux/slice/app';
+import { useMutation } from 'react-query';
+import { SignUpUserDto, signUp } from '../../api/auth';
 
 const validationSchema = yup.object({
   name: yup.string().required('Mandatory. Cannot be empty!'),
@@ -36,6 +38,7 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
+  const signUpMutation = useMutation((values: SignUpUserDto) => signUp(values));
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -48,9 +51,13 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
       createUserWithEmailAndPassword(auth, values.email, values.password)
         .then(async (userCredential) => {
           // Set the user's display name
-          console.log(values.name);
           await updateProfile(auth.currentUser as any, {
             displayName: values.name,
+          });
+          signUpMutation.mutate({
+            fullName: values.name,
+            email: values.email,
+            authId: userCredential.user.uid,
           });
           dispatch(triggerSnack({ message: 'Sign up successful!', severity: 'success', hideDuration: 3000 }));
         })

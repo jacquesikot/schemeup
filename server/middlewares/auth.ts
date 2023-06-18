@@ -1,6 +1,9 @@
+import { connect } from 'http2';
 import { User } from '../models/User';
+import connectToDatabase from '../db';
 
 export const useAuth = async (req: any, res) => {
+  await connectToDatabase();
   const userId = req.headers['x-auth-id'];
 
   if (!userId) {

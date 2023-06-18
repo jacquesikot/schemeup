@@ -12,13 +12,25 @@ async function handler(req: any, res: VercelResponse) {
   await connectToDatabase();
 
   if (req.method === 'POST') {
-    const validationError = validateUserSchema(req.body);
+    const validationError = validateUserSchema({
+      id: req.body.id,
+      description: req.body.description,
+      userId: req.authId,
+      title: req.body.title,
+      tables: req.body.tables,
+    });
 
     if (validationError) {
       return res.status(400).json({ error: validationError.message });
     }
 
-    const schema = await createSchema(req.body);
+    const schema = await createSchema({
+      id: req.body.id,
+      description: req.body.description,
+      userId: req.authId,
+      title: req.body.title,
+      tables: req.body.tables,
+    });
     return res.status(200).json({
       message: 'Schema created successfully',
       data: schema,

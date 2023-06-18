@@ -36,10 +36,10 @@ interface Table {
 
 export interface IUserSchema {
   id: string;
+  userId: string;
   title: string;
   description?: string;
   tables?: Table[];
-  //   meta?: any;
 }
 
 interface UserSchemaModelInterface extends mongoose.Model<any> {
@@ -74,6 +74,7 @@ const IndexSchema = new MongooseSchema({
 });
 
 const TableSchema = new MongooseSchema({
+  id: { type: String, required: true },
   name: { type: String, required: true },
   comment: String,
   columns: [ColumnSchema],
@@ -82,6 +83,7 @@ const TableSchema = new MongooseSchema({
 });
 
 const UserSchemaSchema = new MongooseSchema({
+  id: { type: String, required: true },
   userId: { type: String, required: true },
   title: { type: String, required: true },
   description: String,

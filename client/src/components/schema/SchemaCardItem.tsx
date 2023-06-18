@@ -1,15 +1,14 @@
 import { Box, IconButton, MenuItem, Typography } from '@mui/material';
+import { useRef, useState } from 'react';
+
 import SchemaCardIcon from '../../images/icons/schema/SchemaCardIcon';
 import ThreeDotsV from '../../images/icons/ThreeDotsV';
 import MenuPopper from '../global/MenuPopper';
-import { useRef, useState } from 'react';
 import EditIcon from '../../images/icons/EditIcon';
 import SchemaButtonUpload from '../../images/icons/schema/SchemaButtonUpload';
 import TrashIconPlain from '../../images/icons/TrashIconPlain';
-import newAppTab from '../../utils/newAppTab';
 import routes from '../../routes';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { useNavigate } from 'react-router-dom';
+import useAppTab from '../../hooks/useAppTab';
 
 interface SchemaCardItemProps {
   id: string;
@@ -20,9 +19,7 @@ interface SchemaCardItemProps {
 }
 
 const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: SchemaCardItemProps) => {
-  const tabs = useAppSelector((state) => state.appTabs.tabs);
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const { newAppTab } = useAppTab();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
 
@@ -43,7 +40,15 @@ const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: Sc
     alignItems: 'center',
   };
   return (
-    <Box width={343} height={174} py={"6px"} border={1} borderRadius={'12px'} borderColor={'#EAECF0'} sx={{whiteSpace: "wrap", overflow: "hidden", textOverflow: "ellipsis"}}>
+    <Box
+      width={343}
+      height={174}
+      py={'6px'}
+      border={1}
+      borderRadius={'12px'}
+      borderColor={'#EAECF0'}
+      sx={{ whiteSpace: 'wrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+    >
       <Box
         borderBottom={1}
         borderColor={'#EAECF0'}
@@ -83,7 +88,7 @@ const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: Sc
                 <MenuItem
                   style={menuItemStyle}
                   onClick={() => {
-                    newAppTab(dispatch, `Schema - ${title}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate, { id });
+                    newAppTab(`${routes.EDIT_SCHEMA}/${id}`);
                   }}
                 >
                   <EditIcon />
@@ -123,9 +128,11 @@ const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: Sc
           <Typography mb={1}>tables</Typography>
         </Box>
 
-        <Typography fontSize={'14px'} color={'#475467'}>
-          {description}
-        </Typography>
+        <Box>
+          <Typography fontSize={'14px'} color={'#475467'} className="truncate">
+            {description}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
