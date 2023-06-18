@@ -115,9 +115,9 @@ const schemasSlice = createSlice({
       });
     },
     updateSchema: (state, action: PayloadAction<Schema>) => {
+      console.log('unsavedChnages', action.payload);
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.id);
       state.schemas[index] = action.payload;
-      state.schemas[index].hasUnsavedChanges = true;
     },
     deleteSchema: (state, action: PayloadAction<string>) => {
       state.schemas = state.schemas.filter((schema) => schema.id !== action.payload);

@@ -47,6 +47,7 @@ export default function NewSchemaHeader({
 
   const createOrUpdateSchemaMutation = useMutation((schema: Schema) => createOrUpdateUserSchemaApi(user!.uid, schema), {
     onSuccess: (data) => {
+      console.log('data', data);
       dispatch(
         updateSchema({
           id: data.id,
@@ -54,17 +55,18 @@ export default function NewSchemaHeader({
           tables: data.tables,
           description: data.description,
           hasUnsavedChanges: false,
+          activeTable: '',
+          meta: {
+            showColumns: true,
+          },
         })
       );
       dispatch(triggerSnack({ message: 'Schema saved!', severity: 'success', hideDuration: 2000 }));
     },
     onError: (error) => {
-      console.log(error);
       dispatch(triggerSnack({ message: 'Error saving schema', severity: 'error', hideDuration: 2000 }));
     },
   });
-
-  console.log(schema);
 
   return (
     <Box
