@@ -19,7 +19,6 @@ import { toggleSideBar, triggerSnack } from '../../redux/slice/app';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase.config';
 import useAppTab from '../../hooks/useAppTab';
-import { persistor } from '../../redux/store';
 import { setSchemas } from '../../redux/slice/schemas';
 import { resetTabs } from '../../redux/slice/apptabs';
 
@@ -32,9 +31,10 @@ interface ItemProps {
   selected: string;
   setSelected: any;
   theme: any;
+  count?: number;
 }
 
-const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
+const Item = ({ title, to, icon, selected, setSelected, theme, count }: ItemProps) => {
   const { newAppTab } = useAppTab();
 
   return (
@@ -60,19 +60,21 @@ const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
           {title}
         </Typography>
         <Link to={to} />
-        <Box
-          display={'flex'}
-          justifyContent={'center'}
-          alignItems={'center'}
-          width={30}
-          height={22}
-          borderRadius={16}
-          bgcolor={theme.palette.grey[100]}
-        >
-          <Typography variant="body2" color={theme.palette.grey[800]}>
-            10
-          </Typography>
-        </Box>
+        {count && count > 0 && (
+          <Box
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            width={30}
+            height={22}
+            borderRadius={16}
+            bgcolor={theme.palette.grey[100]}
+          >
+            <Typography variant="body2" color={theme.palette.grey[800]}>
+              {count}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </MenuItem>
   );
@@ -81,6 +83,7 @@ const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
 const Sidebar = () => {
   const theme = useTheme();
   const sideBarOpen = useAppSelector((state) => state.app.sideBarOpen);
+  const schemas = useAppSelector((state) => state.schemas.schemas);
   const dispatch = useAppDispatch();
   const [_, setSelected] = useState('Schema');
   const { pathname } = useLocation();
@@ -155,6 +158,7 @@ const Sidebar = () => {
               icon={<SideBarSchema />}
               selected={pathname === '/' || pathname.includes(routes.SCHEMA) ? 'Schema' : ''}
               setSelected={setSelected}
+              count={schemas.length}
             />
 
             <Item

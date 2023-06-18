@@ -50,7 +50,10 @@ const Dashboard = () => {
 
         // iterate over the fetched schemas
         res.forEach((schema: Schema) => {
-          schemaMap.set(schema.id, schema);
+          // only set in map if not already set
+          if (!schemaMap.has(schema.id)) {
+            schemaMap.set(schema.id, schema);
+          }
         });
 
         // convert the Map back to an array
@@ -132,6 +135,7 @@ const Dashboard = () => {
           title: s.title,
           description: s.description,
           noOfTables: s.tables?.length || 0,
+          hasUnsavedChanges: s.hasUnsavedChanges,
         };
       })
     : [];
@@ -269,6 +273,7 @@ const Dashboard = () => {
                 <Box display="flex" justifyContent="center" alignItems="center" maxWidth="343px" height="174px" p={1}>
                   <SchemaCardItem
                     id={item.id}
+                    hasUnsavedChanges={item.hasUnsavedChanges}
                     title={item.title}
                     description={item.description}
                     noOfTables={item.noOfTables.toString()}
