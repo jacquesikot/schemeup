@@ -29,9 +29,9 @@ const BottomBar = () => {
   const urlParts = location.pathname.split('/');
   const id = urlParts[urlParts.length - 1];
 
-  const schemaArr = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === id));
+  // const schemaArr = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === id));
 
-  const schema = schemaArr && schemaArr.length > 0 ? schemaArr[0] : { tables: [] };
+  // const schema = schemaArr && schemaArr.length > 0 ? schemaArr[0] : { tables: [] };
 
   // console.log(schema);
 

@@ -1,7 +1,7 @@
 import 'react-pro-sidebar/dist/css/styles.css';
 import { useState } from 'react';
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
-import { Avatar, Box, IconButton, Typography } from '@mui/material';
+import { Avatar, Box, IconButton, Skeleton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -19,6 +19,7 @@ import { toggleSideBar, triggerSnack } from '../../redux/slice/app';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase.config';
 import { setCurrentUser } from '../../redux/slice/user';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export const SIDEBAR_WIDTH = 280;
 
@@ -84,6 +85,7 @@ const Sidebar = () => {
   const dispatch = useAppDispatch();
   const [_, setSelected] = useState('Schema');
   const { pathname } = useLocation();
+  const [user] = useAuthState(auth);
 
   const logOutHandler = async () => {
     dispatch(setCurrentUser(null));
@@ -188,11 +190,15 @@ const Sidebar = () => {
           {!sideBarOpen ? undefined : (
             <>
               <Box>
-                <Typography fontSize={12} fontWeight={500} color={theme.palette.grey[800]}>
-                  {activeUser ? activeUser.name : ''}
-                </Typography>
+                {user?.displayName ? (
+                  <Typography fontSize={12} fontWeight={500} color={theme.palette.grey[800]}>
+                    {user.displayName}
+                  </Typography>
+                ) : (
+                  <Skeleton width={100} height={20} />
+                )}
                 <Typography overflow={'hidden'} fontSize={12} fontWeight={400} color={theme.palette.grey[800]}>
-                  {activeUser ? activeUser.email : ''}
+                  {user?.email}
                 </Typography>
               </Box>
 

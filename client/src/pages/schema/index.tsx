@@ -1,22 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, Grid, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { useMutation, useQuery } from 'react-query';
 
 import SchemaCardItem from '../../components/schema/SchemaCardItem';
 import MainSeachInput from '../../components/MainSearchInput';
 import DashboardHeader from '../../components/global/DashboardHeader';
 import Button from '../../components/global/Button';
-import SchemaButtonUpload from '../../images/icons/schema/SchemaButtonUpload';
 import TopBarPlus from '../../images/icons/Plus';
 import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { deleteSchema, newSchema } from '../../redux/slice/schemas';
+import { Schema, deleteSchema, newSchema, setSchemas } from '../../redux/slice/schemas';
 import routes from '../../routes';
-import { hideCodeEditor } from '../../redux/slice/app';
+import { hideCodeEditor, triggerSnack } from '../../redux/slice/app';
 import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
 import EmptyState from '../../components/global/EmptyState';
+import { createUserSchemaApi, getUserSchemasApi } from '../../api/schema';
+import queryKeys from '../../utils/keys/query';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -29,6 +31,41 @@ const Dashboard = () => {
   const [activeSchema, setActiveSchema] = useState<any>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const currentUser = useAppSelector((state) => state.activeUser.activeUser);
+  const { isLoading: fetchUserSchemaLoading } = useQuery(
+    [queryKeys.USER_SCHEMAS, currentUser?.id],
+    () => {
+      return getUserSchemasApi(currentUser!.id);
+    },
+    {
+      enabled: !!currentUser?.id,
+      onSuccess: (res) => {
+        dispatch(setSchemas(res.data));
+      },
+      onError: (err) => {
+        dispatch(triggerSnack({ message: 'Error fetching user schemas', severity: 'error', hideDuration: 3000 }));
+      },
+    }
+  );
+  const createSchemaMutation = useMutation(
+    (schema: Omit<Schema, 'id'>) => createUserSchemaApi(currentUser!.id, schema),
+    {
+      onSuccess: (data) => {
+        dispatch(
+          newSchema({
+            id: data._id,
+            ...data,
+            meta: {
+              showColumns: true,
+            },
+          })
+        );
+        newAppTab(dispatch, `Schema - ${data.title}`, `${routes.EDIT_SCHEMA}/${data._id}`, tabs, navigate, {
+          id: data._id,
+        });
+      },
+    }
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,34 +116,95 @@ const Dashboard = () => {
     itemsPerRow = 4;
   }
 
-  const data = schemas.map((s) => {
-    return {
-      id: s.id,
-      title: s.title,
-      description: s.description,
-      noOfTables: s.tables?.length || 0,
-    };
-  });
+  const data = schemas
+    ? schemas.map((s) => {
+        return {
+          id: s.id,
+          title: s.title,
+          description: s.description,
+          noOfTables: s.tables?.length || 0,
+        };
+      })
+    : [];
 
   // Calculate the number of placeholder items needed in the last row
   const remainingItems = data.length % itemsPerRow;
   const placeholderItemsCount = remainingItems === 0 ? 0 : itemsPerRow - remainingItems;
 
   // Create an array of all items including the data items and placeholder items
-  const allItems = [
-    ...data,
-    ...Array(placeholderItemsCount).fill({
-      title: '',
-      description: '',
-      noOfTables: 0,
-    }),
-  ];
+  const allItems = fetchUserSchemaLoading
+    ? [
+        ...Array(6).fill({
+          title: '',
+          description: '',
+          noOfTables: 0,
+        }),
+      ]
+    : [
+        ...data,
+        ...Array(placeholderItemsCount).fill({
+          title: '',
+          description: '',
+          noOfTables: 0,
+        }),
+      ];
 
   const handleNewSchema = () => {
     const id = uuidv4();
     const newSchemaName = generateSchemaName();
-    dispatch(newSchema({ id, title: newSchemaName, tables: [] }));
-    newAppTab(dispatch, `Schema - ${newSchemaName}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate, { id });
+    createSchemaMutation.mutate({
+      title: newSchemaName,
+      description: 'A user and post default schema for reference. Feel free to delete this',
+      tables: [
+        {
+          id: '1',
+          name: 'user',
+          columns: [
+            { name: 'id', type: 'int', nullable: false, primaryKey: true, unique: true, autoInc: true },
+            { name: 'name', type: 'text', nullable: false, primaryKey: false, unique: false, index: true },
+            { name: 'email', type: 'text', nullable: false, primaryKey: false, unique: true },
+            {
+              name: 'created_at',
+              type: 'timestamp with time zone',
+              nullable: false,
+              primaryKey: false,
+              unique: false,
+              default: 'now()',
+            },
+            {
+              name: 'updated_at',
+              type: 'timestamp with time zone',
+              nullable: false,
+              primaryKey: false,
+              unique: false,
+              autoUpdateTime: true,
+            },
+          ],
+          foreignKeys: [],
+          indexes: [{ column: 'name', unique: false, sorting: 'ASC' }],
+        },
+        {
+          id: '2',
+          name: 'post',
+          columns: [
+            { name: 'id', type: 'int', nullable: false, primaryKey: true, unique: true, autoInc: true },
+            { name: 'title', type: 'text', nullable: false, primaryKey: false, unique: false },
+            { name: 'content', type: 'text', nullable: true, primaryKey: false, unique: false },
+            { name: 'user_id', type: 'int', nullable: true, primaryKey: false, unique: false },
+          ],
+          foreignKeys: [
+            {
+              column: 'user_id',
+              referenceTable: 'user',
+              referenceColumn: 'id',
+              onUpdate: 'CASCADE',
+              onDelete: 'CASCADE',
+            },
+          ],
+          indexes: [{ column: 'title', unique: false, sorting: 'ASC' }],
+        },
+      ],
+    });
   };
 
   return (
@@ -124,6 +222,7 @@ const Dashboard = () => {
         title="Schemas"
         dataCount={data.length > 0 ? data.length : undefined}
         subtitle="Manage and export your schemas"
+        isLoading={fetchUserSchemaLoading}
         actionButtons={
           <>
             <Button
@@ -142,7 +241,7 @@ const Dashboard = () => {
       {/* </Box> */}
 
       {/* HEADER-END */}
-      {data.length === 0 ? (
+      {allItems.length === 0 ? (
         // Render the EmptyState component when data is empty
         <Box marginTop={'20%'}>
           <EmptyState
@@ -168,7 +267,8 @@ const Dashboard = () => {
           maxHeight={'75vh'}
           pt={5}
           pb={5}
-          justifyContent={'center'}
+          // justifyContent={'center'}
+          ml={1.5}
           alignContent={'flex-start'}
           sx={{
             overflowY: 'auto' /* To allow main grid scroll vertically but not entire screen */,
@@ -187,7 +287,7 @@ const Dashboard = () => {
             '-webkit-overflow-scrolling': 'touch' /* For hide on scroll */,
           }}
         >
-          {allItems.map((item, index) => (
+          {allItems.map((item) => (
             <Grid
               item
               xs={12}
@@ -214,6 +314,18 @@ const Dashboard = () => {
                     }}
                   />
                 </Box>
+              ) : fetchUserSchemaLoading ? (
+                <>
+                  <Box display="flex" justifyContent="center" alignItems="center" maxWidth="343px" height="174px" p={1}>
+                    <Skeleton
+                      variant="rectangular"
+                      animation="pulse"
+                      width={'343px'}
+                      height={174}
+                      sx={{ borderRadius: '12px' }}
+                    />
+                  </Box>
+                </>
               ) : (
                 <Box width={'343px'} />
               )}

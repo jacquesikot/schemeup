@@ -43,7 +43,15 @@ const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: Sc
     alignItems: 'center',
   };
   return (
-    <Box width={343} height={174} py={"6px"} border={1} borderRadius={'12px'} borderColor={'#EAECF0'} sx={{whiteSpace: "wrap", overflow: "hidden", textOverflow: "ellipsis"}}>
+    <Box
+      width={343}
+      height={174}
+      py={'6px'}
+      border={1}
+      borderRadius={'12px'}
+      borderColor={'#EAECF0'}
+      sx={{ whiteSpace: 'wrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+    >
       <Box
         borderBottom={1}
         borderColor={'#EAECF0'}
@@ -123,9 +131,11 @@ const SchemaCardItem = ({ id, title, description, noOfTables, handleDelete }: Sc
           <Typography mb={1}>tables</Typography>
         </Box>
 
-        <Typography fontSize={'14px'} color={'#475467'}>
-          {description}
-        </Typography>
+        <Box>
+          <Typography fontSize={'14px'} color={'#475467'} className="truncate">
+            {description}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

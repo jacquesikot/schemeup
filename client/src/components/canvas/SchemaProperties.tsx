@@ -1,15 +1,16 @@
+import { useEffect, useState } from 'react';
 import { Typography, Box, IconButton, TextField, styled, Checkbox, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useParams } from 'react-router-dom';
 
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
 import Switch from '../Switch';
-import { useEffect, useState } from 'react';
 import Button from '../global/Button';
-import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { updateSchema } from '../../redux/slice/schemas';
 import AiSuggestCard from './AiSuggestCard';
 import TableV2 from './TableV2';
+import { triggerSnack } from '../../redux/slice/app';
 
 interface SchemaPropertiesProps {
   toggleOpen: (open: boolean) => void;
@@ -169,6 +170,9 @@ const SchemaProperties = ({
                         ...schema,
                         description,
                       })
+                    );
+                    dispatch(
+                      triggerSnack({ message: 'Schema description updated', severity: 'success', hideDuration: 2000 })
                     );
                   }}
                 />

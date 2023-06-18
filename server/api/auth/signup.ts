@@ -1,10 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import connectToDatabase from '../../db';
 import { User, validateUser } from '../../models/User';
+import useMiddlewares from '../../middlewares/useMiddlewares';
+import useCors from '../../middlewares/cors';
 
-export default async function signup(req: VercelRequest, res: VercelResponse) {
+async function signup(req: VercelRequest, res: VercelResponse) {
   await connectToDatabase();
-
   const validationError = validateUser(req.body);
 
   if (validationError) {
@@ -16,7 +17,7 @@ export default async function signup(req: VercelRequest, res: VercelResponse) {
   });
 
   if (userExists) {
-    return res.status(400).json({ error: 'User already exists' });
+    return res.status(200).json({ error: 'User already exists allowance' });
   }
 
   const user = await User.create({
@@ -30,3 +31,5 @@ export default async function signup(req: VercelRequest, res: VercelResponse) {
     data: user,
   });
 }
+
+export default useMiddlewares(useCors, signup);

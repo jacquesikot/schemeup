@@ -36,6 +36,7 @@ interface Table {
 
 export interface IUserSchema {
   id: string;
+  userId: string;
   title: string;
   description?: string;
   tables?: Table[];

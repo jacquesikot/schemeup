@@ -54,65 +54,7 @@ const schemasSlice = createSlice({
   initialState,
   reducers: {
     newSchema: (state, action: PayloadAction<Schema>) => {
-      state.schemas.push({
-        id: action.payload.id,
-        title: action.payload.title,
-        description: 'A user and post default schema for reference. Feel free to delete this',
-        tables: [
-          {
-            id: '1',
-            name: 'user',
-            columns: [
-              { name: 'id', type: 'int', nullable: false, primaryKey: true, unique: true, autoInc: true },
-              { name: 'name', type: 'text', nullable: false, primaryKey: false, unique: false, index: true },
-              { name: 'email', type: 'text', nullable: false, primaryKey: false, unique: true },
-              {
-                name: 'created_at',
-                type: 'timestamp with time zone',
-                nullable: false,
-                primaryKey: false,
-                unique: false,
-                default: 'now()',
-              },
-              {
-                name: 'updated_at',
-                type: 'timestamp with time zone',
-                nullable: false,
-                primaryKey: false,
-                unique: false,
-                autoUpdateTime: true,
-              },
-            ],
-            foreignKeys: [],
-            indexes: [{ column: 'name', unique: false, sorting: 'ASC' }],
-            meta: {},
-          },
-          {
-            id: '2',
-            name: 'post',
-            columns: [
-              { name: 'id', type: 'int', nullable: false, primaryKey: true, unique: true, autoInc: true },
-              { name: 'title', type: 'text', nullable: false, primaryKey: false, unique: false },
-              { name: 'content', type: 'text', nullable: true, primaryKey: false, unique: false },
-              { name: 'user_id', type: 'int', nullable: true, primaryKey: false, unique: false },
-            ],
-            foreignKeys: [
-              {
-                column: 'user_id',
-                referenceTable: 'user',
-                referenceColumn: 'id',
-                onUpdate: 'CASCADE',
-                onDelete: 'CASCADE',
-              },
-            ],
-            indexes: [{ column: 'title', unique: false, sorting: 'ASC' }],
-            meta: {},
-          },
-        ],
-        meta: {
-          showColumns: true,
-        },
-      });
+      state.schemas.push(action.payload);
     },
     updateSchema: (state, action: PayloadAction<Schema>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.id);
@@ -149,6 +91,9 @@ const schemasSlice = createSlice({
         state.schemas[index].activeTable = action.payload.tableId;
       }
     },
+    setSchemas: (state, action: PayloadAction<Schema[]>) => {
+      state.schemas = action.payload;
+    },
     // dev only
     clearSchemas: (state) => {
       state.schemas = [];
@@ -166,6 +111,7 @@ export const {
   editTable,
   setActiveTable,
   importTables,
+  setSchemas,
 } = schemasSlice.actions;
 
 export default schemasSlice.reducer;

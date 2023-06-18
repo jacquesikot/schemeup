@@ -82,3 +82,11 @@ body,
   animation: hideHeader 0.5s ease-out;
   animation-fill-mode: forwards;
 }
+
+.truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

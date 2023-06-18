@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useMutation } from 'react-query';
+
 import { auth } from '../../firebase.config';
 import SignIn from '../../components/auth/SignIn';
 import SignUp from '../../components/auth/SignUp';
 import { Avatar, Box, Grid, Typography } from '@mui/material';
 import SchemeupLogo from '../../images/schemup_logo.png';
-import { useNavigate } from 'react-router-dom';
-import routes from '../../routes';
 import ResetPassword from '../../components/auth/ResetPassword';
 import { useAppDispatch } from '../../redux/hooks';
 import { triggerSnack } from '../../redux/slice/app';
+import { SignUpUserDto, signUp } from '../../api/auth';
 
 type Pages = 'login' | 'signup' | 'reset';
 
@@ -20,10 +21,10 @@ export interface PageProps {
 
 const AuthenticateUser = () => {
   const [activePage, setActivePage] = useState<Pages>('login');
-  const navigate = useNavigate();
   const provider = new GoogleAuthProvider();
   const currentYear = new Date().getFullYear();
   const dispatch = useAppDispatch();
+  const signUpMutation = useMutation((values: SignUpUserDto) => signUp(values));
 
   const flowSwitchHandler = (page: Pages) => {
     switch (page) {
@@ -41,8 +42,12 @@ const AuthenticateUser = () => {
   const googleSignInHandler = async () => {
     await signInWithPopup(auth, provider)
       .then((result) => {
+        signUpMutation.mutate({
+          fullName: result.user.displayName as string,
+          email: result.user.email as string,
+          authId: result.user.uid,
+        });
         dispatch(triggerSnack({ message: 'Google Auth Success!', severity: 'success', hideDuration: 3000 }));
-        return navigate(routes.HOME);
       })
       .catch((error) => {
         // Handle Errors here.
