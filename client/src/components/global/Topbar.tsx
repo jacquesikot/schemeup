@@ -1,18 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { Box, IconButton, MenuItem, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 import TopTabItem from '../TopTabItem';
 import TopBarPlus from '../../images/icons/Plus';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import newAppTab from '../../utils/newAppTab';
 import { Tab } from '../../redux/slice/apptabs';
 import generateSchemaName from '../../utils/generateSchemaName';
 import MenuPopper from './MenuPopper';
 import routes from '../../routes';
 import { newSchema } from '../../redux/slice/schemas';
+import useAppTab from '../../hooks/useAppTab';
 
 interface TopBarProps {
   items: Tab[];
@@ -24,11 +24,11 @@ const menuItemStyle = {
 
 export default function Topbar({ items }: TopBarProps) {
   const theme = useTheme();
+  const { newAppTab } = useAppTab();
   const colors = theme.palette;
   const { pathname } = useLocation();
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [boxSize, setBoxSize] = useState(70);
@@ -92,7 +92,6 @@ export default function Topbar({ items }: TopBarProps) {
           index={index}
           tabs={tabs}
           width={boxSize}
-          meta={i.meta}
         />
       ))}
 
@@ -128,10 +127,8 @@ export default function Topbar({ items }: TopBarProps) {
                 onClick={(e) => {
                   const id = uuidv4();
                   const newSchemaName = generateSchemaName();
-                  newAppTab(dispatch, `Schema - ${newSchemaName}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate, {
-                    id,
-                  });
                   dispatch(newSchema({ id, title: newSchemaName, tables: [] }));
+                  newAppTab(`${routes.EDIT_SCHEMA}/${id}`);
                   handleClose(e);
                 }}
               >

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Avatar, Box, IconButton, Skeleton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 // import logo from '../../images/schemup_logo.png';
@@ -12,13 +12,13 @@ import SideBarMockData from '../../images/icons/SideBarMockData';
 import SideBarDatasources from '../../images/icons/SideBarDatasources';
 import SideBarLogout from '../../images/icons/SideBarLogout';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import newAppTab from '../../utils/newAppTab';
 import SideBarToggleClose from '../../images/icons/SideBarToggleClose';
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
 import routes from '../../routes';
 import { toggleSideBar, triggerSnack } from '../../redux/slice/app';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase.config';
+import useAppTab from '../../hooks/useAppTab';
 
 export const SIDEBAR_WIDTH = 280;
 
@@ -32,9 +32,7 @@ interface ItemProps {
 }
 
 const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
-  const dispatch = useAppDispatch();
-  const tabs = useAppSelector((state) => state.appTabs.tabs);
-  const navigate = useNavigate();
+  const { newAppTab } = useAppTab();
 
   return (
     <MenuItem
@@ -50,7 +48,7 @@ const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
       }}
       onClick={() => {
         setSelected(title);
-        newAppTab(dispatch, title, to, tabs, navigate);
+        newAppTab(to);
       }}
       icon={icon}
     >

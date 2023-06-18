@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
 
-import Pointer from '../images/icons/canvas-controls/Pointer';
+// import Pointer from '../images/icons/canvas-controls/Pointer';
 import Comment from '../images/icons/canvas-controls/Comment';
 import Table from '../images/icons/canvas-controls/Table';
 import Share from '../images/icons/canvas-controls/Share';

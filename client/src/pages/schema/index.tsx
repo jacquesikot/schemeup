@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { useQuery } from 'react-query';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -10,7 +9,6 @@ import MainSeachInput from '../../components/MainSearchInput';
 import DashboardHeader from '../../components/global/DashboardHeader';
 import Button from '../../components/global/Button';
 import TopBarPlus from '../../images/icons/Plus';
-import newAppTab from '../../utils/newAppTab';
 import generateSchemaName from '../../utils/generateSchemaName';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { Schema, deleteSchema, newSchema, setSchemas } from '../../redux/slice/schemas';
@@ -21,18 +19,18 @@ import EmptyState from '../../components/global/EmptyState';
 import { getUserSchemasApi } from '../../api/schema';
 import queryKeys from '../../utils/keys/query';
 import { auth } from '../../firebase.config';
+import useAppTab from '../../hooks/useAppTab';
 
 const Dashboard = () => {
   const theme = useTheme();
   const gridRef = useRef<any>(null);
+  const { newAppTab } = useAppTab();
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [prevScrollTop, setPrevScrollTop] = useState<number>(0);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
-  const tabs = useAppSelector((state) => state.appTabs.tabs);
   const schemas = useAppSelector((state) => state.schemas.schemas);
   const [activeSchema, setActiveSchema] = useState<any>();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const [user] = useAuthState(auth);
   const { isLoading: fetchUserSchemaLoading } = useQuery(
     [queryKeys.USER_SCHEMAS, user?.uid],
@@ -170,9 +168,7 @@ const Dashboard = () => {
         tables: [],
       })
     );
-    newAppTab(dispatch, `Schema - ${newSchemaName}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate, {
-      id,
-    });
+    newAppTab(`${routes.EDIT_SCHEMA}/${id}`);
   };
 
   return (
