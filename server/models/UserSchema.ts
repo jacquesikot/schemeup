@@ -11,7 +11,6 @@ interface Table {
   id: string;
   name: string;
   comment?: string;
-  //   meta?: any;
   columns: {
     name: string;
     type: PostgresColumnType;
@@ -34,12 +33,25 @@ interface Table {
   indexes: { column: string; unique: boolean; sorting: PostgresIndexSorting }[];
 }
 
+enum Role {
+  Admin = 'admin',
+  Editor = 'editor',
+  Viewer = 'viewer',
+}
+
+interface SchemaUser {
+  name: string;
+  email: string;
+  role: Role;
+}
+
 export interface IUserSchema {
   id: string;
   userId: string;
   title: string;
   description?: string;
   tables?: Table[];
+  users?: SchemaUser[];
 }
 
 interface UserSchemaModelInterface extends mongoose.Model<any> {
@@ -82,12 +94,19 @@ const TableSchema = new MongooseSchema({
   indexes: [IndexSchema],
 });
 
+const SchemaUserSchema = new MongooseSchema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  role: { type: String, required: true }, // Map your Role to a suitable value
+});
+
 const UserSchemaSchema = new MongooseSchema({
   id: { type: String, required: true },
   userId: { type: String, required: true },
   title: { type: String, required: true },
   description: String,
   tables: [TableSchema],
+  users: [SchemaUserSchema],
 });
 
 UserSchemaSchema.statics.build = (attr: IUserSchema) => {
