@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { useMutation, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 import SchemaCardItem from '../../components/schema/SchemaCardItem';
 import MainSeachInput from '../../components/MainSearchInput';
@@ -17,8 +18,9 @@ import routes from '../../routes';
 import { hideCodeEditor, triggerSnack } from '../../redux/slice/app';
 import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
 import EmptyState from '../../components/global/EmptyState';
-import { createUserSchemaApi, getUserSchemasApi } from '../../api/schema';
+import { getUserSchemasApi } from '../../api/schema';
 import queryKeys from '../../utils/keys/query';
+import { auth } from '../../firebase.config';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -31,38 +33,47 @@ const Dashboard = () => {
   const [activeSchema, setActiveSchema] = useState<any>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentUser = useAppSelector((state) => state.activeUser.activeUser);
+  const [user] = useAuthState(auth);
   const { isLoading: fetchUserSchemaLoading } = useQuery(
-    [queryKeys.USER_SCHEMAS, currentUser?.id],
+    [queryKeys.USER_SCHEMAS, user?.uid],
     () => {
-      return getUserSchemasApi(currentUser!.id);
+      return getUserSchemasApi(user!.uid);
     },
     {
-      enabled: !!currentUser?.id,
+      enabled: !!user?.uid,
       onSuccess: (res) => {
-        dispatch(setSchemas(res.data));
+        // create a new Map
+        const schemaMap = new Map();
+
+        // iterate over the existing schemas
+        schemas.forEach((schema) => {
+          schemaMap.set(schema.id, schema);
+        });
+
+        // iterate over the fetched schemas
+        res.forEach((schema: Schema) => {
+          schemaMap.set(schema.id, schema);
+        });
+
+        // convert the Map back to an array
+        const uniqueSchemas = Array.from(schemaMap.values());
+
+        dispatch(
+          setSchemas(
+            uniqueSchemas.map((s) => {
+              return {
+                ...s,
+                meta: {
+                  showColumns: true,
+                },
+                activeTable: '',
+              };
+            })
+          )
+        );
       },
       onError: (err) => {
         dispatch(triggerSnack({ message: 'Error fetching user schemas', severity: 'error', hideDuration: 3000 }));
-      },
-    }
-  );
-  const createSchemaMutation = useMutation(
-    (schema: Omit<Schema, 'id'>) => createUserSchemaApi(currentUser!.id, schema),
-    {
-      onSuccess: (data) => {
-        dispatch(
-          newSchema({
-            id: data._id,
-            ...data,
-            meta: {
-              showColumns: true,
-            },
-          })
-        );
-        newAppTab(dispatch, `Schema - ${data.title}`, `${routes.EDIT_SCHEMA}/${data._id}`, tabs, navigate, {
-          id: data._id,
-        });
       },
     }
   );
@@ -152,58 +163,15 @@ const Dashboard = () => {
   const handleNewSchema = () => {
     const id = uuidv4();
     const newSchemaName = generateSchemaName();
-    createSchemaMutation.mutate({
-      title: newSchemaName,
-      description: 'A user and post default schema for reference. Feel free to delete this',
-      tables: [
-        {
-          id: '1',
-          name: 'user',
-          columns: [
-            { name: 'id', type: 'int', nullable: false, primaryKey: true, unique: true, autoInc: true },
-            { name: 'name', type: 'text', nullable: false, primaryKey: false, unique: false, index: true },
-            { name: 'email', type: 'text', nullable: false, primaryKey: false, unique: true },
-            {
-              name: 'created_at',
-              type: 'timestamp with time zone',
-              nullable: false,
-              primaryKey: false,
-              unique: false,
-              default: 'now()',
-            },
-            {
-              name: 'updated_at',
-              type: 'timestamp with time zone',
-              nullable: false,
-              primaryKey: false,
-              unique: false,
-              autoUpdateTime: true,
-            },
-          ],
-          foreignKeys: [],
-          indexes: [{ column: 'name', unique: false, sorting: 'ASC' }],
-        },
-        {
-          id: '2',
-          name: 'post',
-          columns: [
-            { name: 'id', type: 'int', nullable: false, primaryKey: true, unique: true, autoInc: true },
-            { name: 'title', type: 'text', nullable: false, primaryKey: false, unique: false },
-            { name: 'content', type: 'text', nullable: true, primaryKey: false, unique: false },
-            { name: 'user_id', type: 'int', nullable: true, primaryKey: false, unique: false },
-          ],
-          foreignKeys: [
-            {
-              column: 'user_id',
-              referenceTable: 'user',
-              referenceColumn: 'id',
-              onUpdate: 'CASCADE',
-              onDelete: 'CASCADE',
-            },
-          ],
-          indexes: [{ column: 'title', unique: false, sorting: 'ASC' }],
-        },
-      ],
+    dispatch(
+      newSchema({
+        id: id,
+        title: newSchemaName,
+        tables: [],
+      })
+    );
+    newAppTab(dispatch, `Schema - ${newSchemaName}`, `${routes.EDIT_SCHEMA}/${id}`, tabs, navigate, {
+      id,
     });
   };
 

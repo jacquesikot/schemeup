@@ -4,6 +4,7 @@ import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Avatar, Box, IconButton, Skeleton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 // import logo from '../../images/schemup_logo.png';
 import SideBarSchema from '../../images/icons/SideBarSchema';
@@ -18,8 +19,6 @@ import routes from '../../routes';
 import { toggleSideBar, triggerSnack } from '../../redux/slice/app';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase.config';
-import { setCurrentUser } from '../../redux/slice/user';
-import { useAuthState } from 'react-firebase-hooks/auth';
 
 export const SIDEBAR_WIDTH = 280;
 
@@ -81,14 +80,12 @@ const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
 const Sidebar = () => {
   const theme = useTheme();
   const sideBarOpen = useAppSelector((state) => state.app.sideBarOpen);
-  const { activeUser } = useAppSelector((state) => state.activeUser);
   const dispatch = useAppDispatch();
   const [_, setSelected] = useState('Schema');
   const { pathname } = useLocation();
   const [user] = useAuthState(auth);
 
   const logOutHandler = async () => {
-    dispatch(setCurrentUser(null));
     await signOut(auth);
     dispatch(triggerSnack({ message: 'Logged out successfully', severity: 'success', hideDuration: 3000 }));
   };
@@ -183,7 +180,7 @@ const Sidebar = () => {
         <Box width={'90%'} height={1.1} bgcolor={theme.palette.divider} alignSelf={'center'} />
         <Box display={'flex'} alignItems={'center'} pl={2} pr={2} pb={8} pt={2}>
           <Avatar
-            src={activeUser ? activeUser.photoUrl : undefined}
+            src={user?.photoURL || undefined}
             style={{ width: 30, height: 30, borderRadius: 15, marginLeft: sideBarOpen ? 0 : 7, marginRight: 10 }}
           />
 

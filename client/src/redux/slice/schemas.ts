@@ -39,6 +39,7 @@ export interface Schema {
   tables?: Table[];
   activeTable?: string;
   meta?: any;
+  hasUnsavedChanges?: boolean;
 }
 
 interface SchemaState {
@@ -54,11 +55,69 @@ const schemasSlice = createSlice({
   initialState,
   reducers: {
     newSchema: (state, action: PayloadAction<Schema>) => {
-      state.schemas.push(action.payload);
+      state.schemas.push({
+        id: action.payload.id,
+        title: action.payload.title,
+        hasUnsavedChanges: true,
+        description: 'A user and post default schema for reference. Feel free to delete this',
+        tables: [
+          {
+            id: '1',
+            name: 'user',
+            columns: [
+              { name: 'id', type: 'int', nullable: false, primaryKey: true, unique: true, autoInc: true },
+              { name: 'name', type: 'text', nullable: false, primaryKey: false, unique: false, index: true },
+              { name: 'email', type: 'text', nullable: false, primaryKey: false, unique: true },
+              {
+                name: 'created_at',
+                type: 'timestamp with time zone',
+                nullable: false,
+                primaryKey: false,
+                unique: false,
+                default: 'now()',
+              },
+              {
+                name: 'updated_at',
+                type: 'timestamp with time zone',
+                nullable: false,
+                primaryKey: false,
+                unique: false,
+                autoUpdateTime: true,
+              },
+            ],
+            foreignKeys: [],
+            indexes: [{ column: 'name', unique: false, sorting: 'ASC' }],
+          },
+          {
+            id: '2',
+            name: 'post',
+            columns: [
+              { name: 'id', type: 'int', nullable: false, primaryKey: true, unique: true, autoInc: true },
+              { name: 'title', type: 'text', nullable: false, primaryKey: false, unique: false },
+              { name: 'content', type: 'text', nullable: true, primaryKey: false, unique: false },
+              { name: 'user_id', type: 'int', nullable: true, primaryKey: false, unique: false },
+            ],
+            foreignKeys: [
+              {
+                column: 'user_id',
+                referenceTable: 'user',
+                referenceColumn: 'id',
+                onUpdate: 'CASCADE',
+                onDelete: 'CASCADE',
+              },
+            ],
+            indexes: [{ column: 'title', unique: false, sorting: 'ASC' }],
+          },
+        ],
+        meta: {
+          showColumns: true,
+        },
+      });
     },
     updateSchema: (state, action: PayloadAction<Schema>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.id);
       state.schemas[index] = action.payload;
+      state.schemas[index].hasUnsavedChanges = true;
     },
     deleteSchema: (state, action: PayloadAction<string>) => {
       state.schemas = state.schemas.filter((schema) => schema.id !== action.payload);
@@ -66,21 +125,25 @@ const schemasSlice = createSlice({
     newTable: (state, action: PayloadAction<{ schemaId: string; table: Table }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables?.push(action.payload.table);
+      state.schemas[index].hasUnsavedChanges = true;
     },
     deleteTable: (state, action: PayloadAction<{ schemaId: string; tableId: string }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables = state.schemas[index].tables?.filter((table) => table.id !== action.payload.tableId);
+      state.schemas[index].hasUnsavedChanges = true;
     },
     editTable: (state, action: PayloadAction<{ schemaId: string; table: Table }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       const tableIndex = state.schemas[index].tables?.findIndex((table) => table.id === action.payload.table.id);
       if (tableIndex !== undefined && tableIndex !== -1) {
         state.schemas[index].tables![tableIndex] = action.payload.table;
+        state.schemas[index].hasUnsavedChanges = true;
       }
     },
     importTables: (state, action: PayloadAction<{ schemaId: string; tables: Table[] }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables = action.payload.tables;
+      state.schemas[index].hasUnsavedChanges = true;
     },
     setActiveTable: (state, action: PayloadAction<{ schemaId: string; tableId: string }>) => {
       if (action.payload.tableId.length < 1) {

@@ -11,19 +11,12 @@ export const getUserSchemasApi = async (authId: string) => {
   return res.data.data;
 };
 
-export const createUserSchemaApi = async (authId: string, schema: Omit<Schema, 'id'>) => {
-  const res = await client.post(
-    '/schema',
-    {
-      ...schema,
-      userId: authId,
+export const createOrUpdateUserSchemaApi = async (authId: string, schema: Schema) => {
+  const res = await client.post('/schema', schema, {
+    headers: {
+      'x-auth-id': authId,
     },
-    {
-      headers: {
-        'x-auth-id': authId,
-      },
-    }
-  );
+  });
 
   return res.data.data;
 };

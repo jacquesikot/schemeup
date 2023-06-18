@@ -4,15 +4,21 @@ import { useTheme } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
 
 import Pointer from '../images/icons/canvas-controls/Pointer';
-import Link from '../images/icons/canvas-controls/Link';
 import Comment from '../images/icons/canvas-controls/Comment';
 import Table from '../images/icons/canvas-controls/Table';
 import Share from '../images/icons/canvas-controls/Share';
-import Export from '../images/icons/canvas-controls/Export';
 import Settings from '../images/icons/canvas-controls/Settings';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import EditableText from './global/EditableText';
-import { updateSchema } from '../redux/slice/schemas';
+import { Schema, updateSchema } from '../redux/slice/schemas';
+import ImportIcon from '../images/icons/canvas-controls/ImportIcon';
+import Button from './global/Button';
+import SchemaButtonUpload from '../images/icons/schema/SchemaButtonUpload';
+import { useMutation } from 'react-query';
+import { createOrUpdateUserSchemaApi } from '../api/schema';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase.config';
+import { triggerSnack } from '../redux/slice/app';
 
 interface NewSchemaHeaderProps {
   toggleSettingsDrawer: (open: boolean) => void;
@@ -37,6 +43,28 @@ export default function NewSchemaHeader({
   const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === id))[0];
   const rightPanelOpen = useAppSelector((state) => state.app.rightPanelOpen);
+  const [user] = useAuthState(auth);
+
+  const createOrUpdateSchemaMutation = useMutation((schema: Schema) => createOrUpdateUserSchemaApi(user!.uid, schema), {
+    onSuccess: (data) => {
+      dispatch(
+        updateSchema({
+          id: data.id,
+          title: data.title,
+          tables: data.tables,
+          description: data.description,
+          hasUnsavedChanges: false,
+        })
+      );
+      dispatch(triggerSnack({ message: 'Schema saved!', severity: 'success', hideDuration: 2000 }));
+    },
+    onError: (error) => {
+      console.log(error);
+      dispatch(triggerSnack({ message: 'Error saving schema', severity: 'error', hideDuration: 2000 }));
+    },
+  });
+
+  console.log(schema);
 
   return (
     <Box
@@ -93,11 +121,11 @@ export default function NewSchemaHeader({
           </IconButton>
         </Tooltip> */}
 
-        <Tooltip title="Mouse">
+        {/* <Tooltip title="Mouse">
           <IconButton>
             <Pointer />
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
 
         <Tooltip title="New Table">
           <IconButton onClick={handleNewTable}>
@@ -105,11 +133,11 @@ export default function NewSchemaHeader({
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="New Relation">
+        {/* <Tooltip title="New Relation">
           <IconButton>
             <Link />
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
 
         <Tooltip title="Comment">
           <IconButton>
@@ -122,10 +150,7 @@ export default function NewSchemaHeader({
             <VisibilityIcon />
           </IconButton>
         </Tooltip>
-      </Box>
 
-      {/* SHARE/EXPORT CONTROLS */}
-      <Box display={'flex'} width={180} justifyContent={'space-between'}>
         <Tooltip title="Share Schema">
           <IconButton onClick={handleShare}>
             <Share />
@@ -134,9 +159,22 @@ export default function NewSchemaHeader({
 
         <Tooltip title="Import Schema">
           <IconButton onClick={handleImport}>
-            <Export />
+            <ImportIcon />
           </IconButton>
         </Tooltip>
+      </Box>
+
+      {/* SHARE/EXPORT CONTROLS */}
+      <Box display={'flex'} width={150} justifyContent={'space-between'}>
+        <Button
+          disabled={!schema.hasUnsavedChanges}
+          type="primary"
+          label="Save"
+          isLoadingText="Saving..."
+          isLoading={createOrUpdateSchemaMutation.isLoading}
+          onClick={() => createOrUpdateSchemaMutation.mutate(schema)}
+          icon={<SchemaButtonUpload color={!schema.hasUnsavedChanges ? colors.grey[300] : colors.grey[100]} />}
+        />
 
         <Tooltip title="Settings">
           <IconButton onClick={() => toggleSettingsDrawer(!drawerState)}>
