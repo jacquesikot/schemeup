@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { SuggestionInfoIcon } from "../../images/icons/SuggestionInfoIcon";
 
 interface SolutionProps {
