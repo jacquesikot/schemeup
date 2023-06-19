@@ -249,7 +249,7 @@ const EditSchema = () => {
         schemaId={schema.id}
         containerStyle={{
           backgroundColor: '#FFFFFF',
-          width: 480,
+          width: 450,
           borderRadius: 8,
           padding: '14px',
         }}

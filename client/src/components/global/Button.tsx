@@ -58,7 +58,7 @@ const Button = ({ label, width, height = 40, type, icon, style, onClick }: Butto
         border: `${type === 'primary' ? '0' : '1.5'}px solid #D0D5DD`,
         color: returnButtonColors().text,
         fontWeight: 600,
-        fontSize: 14,
+        fontSize: 15,
         letterSpacing: '0.02em',
         textTransform: 'none',
         paddingLeft: 2,
