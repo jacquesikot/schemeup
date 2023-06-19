@@ -1,5 +1,6 @@
-import { Button as MuiButton } from '@mui/material';
+import { CircularProgress, Button as MuiButton } from '@mui/material';
 import { ReactNode } from 'react';
+import { useTheme } from '@mui/material/styles';
 
 interface ButtonProps {
   label: string;
@@ -8,32 +9,48 @@ interface ButtonProps {
   type: 'primary' | 'secondary' | 'error';
   icon?: ReactNode;
   style?: React.CSSProperties;
+  isLoading?: boolean;
+  isLoadingText?: string;
   onClick?: (e: any) => void;
+  disabled?: boolean;
 }
 
-const Button = ({ label, width, height = 40, type, icon, style, onClick }: ButtonProps) => {
+const Button = ({
+  label,
+  width,
+  height = 40,
+  type,
+  icon,
+  style,
+  onClick,
+  isLoading,
+  isLoadingText = 'Loading...',
+  disabled,
+}: ButtonProps) => {
+  const theme = useTheme();
+  const colors = theme.palette;
   const returnButtonColors = () => {
     if (type === 'primary') {
       return {
-        bg: '#6941C6',
-        hover: '#512DA8',
-        active: '#371F7E',
+        bg: disabled ? colors.grey[100] : '#6941C6',
+        hover: disabled ? colors.grey[100] : '#512DA8',
+        active: disabled ? colors.grey[100] : '#371F7E',
         text: 'white',
       };
     }
     if (type === 'secondary') {
       return {
-        bg: '#FFF',
-        hover: '#F7F7F7',
-        active: '#F2F2F2',
+        bg: disabled ? '#EEE' : '#FFF',
+        hover: disabled ? '#EEE' : '#F7F7F7',
+        active: disabled ? '#EEE' : '#F2F2F2',
         text: '#344054',
       };
     }
     if (type === 'error') {
       return {
-        bg: '#D92D20',
-        hover: '#D32F2F',
-        active: '#B71C1C',
+        bg: disabled ? '#A66' : '#D92D20',
+        hover: disabled ? '#A66' : '#D32F2F',
+        active: disabled ? '#A66' : '#B71C1C',
         text: 'white',
       };
     }
@@ -47,8 +64,11 @@ const Button = ({ label, width, height = 40, type, icon, style, onClick }: Butto
 
   return (
     <MuiButton
-      startIcon={icon}
+      startIcon={
+        isLoading ? <CircularProgress sx={{ color: returnButtonColors().text }} size={20} thickness={2} /> : icon
+      }
       onClick={onClick}
+      disabled={disabled}
       style={style}
       sx={{
         width,
@@ -61,18 +81,18 @@ const Button = ({ label, width, height = 40, type, icon, style, onClick }: Butto
         fontSize: 15,
         letterSpacing: '0.02em',
         textTransform: 'none',
-        paddingLeft: 2,
-        paddingRight: 2,
+        paddingLeft: 3,
+        paddingRight: 3,
         transition: 'background-color 0.3s',
         '&:hover': {
-          bgcolor: returnButtonColors().hover,
+          bgcolor: disabled ? returnButtonColors().bg : returnButtonColors().hover,
         },
         '&:active': {
-          bgcolor: returnButtonColors().active,
+          bgcolor: disabled ? returnButtonColors().bg : returnButtonColors().active,
         },
       }}
     >
-      {label}
+      {isLoading ? isLoadingText : label}
     </MuiButton>
   );
 };

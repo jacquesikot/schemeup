@@ -1,41 +1,45 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
-import { Box, FormControl, InputLabel, Typography, Link, InputAdornment, IconButton, FormHelperText } from '@mui/material';
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  Typography,
+  Link,
+  InputAdornment,
+  IconButton,
+  FormHelperText,
+} from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useMutation } from 'react-query';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+
 import Button from '../global/Button';
 import BootstrapInput from '../global/BootstrapInput';
 import GoogleIcon from '../../images/icons/GoogleIcon';
 import { PageProps } from '../../pages/auth';
 import { auth } from '../../firebase.config';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import routes from '../../routes';
 import PulseLoader from 'react-spinners/PulseLoader';
 import * as yup from 'yup';
-
-interface User {
-  [prop: string]: string;
-}
+import { useAppDispatch } from '../../redux/hooks';
+import { triggerSnack } from '../../redux/slice/app';
+import { SignUpUserDto, signUp } from '../../api/auth';
 
 const validationSchema = yup.object({
-  name: yup
-    .string()
-    .required("Mandatory. Cannot be empty!"),
-  email: yup
-    .string()
-    .email('Enter a valid email')
-    .required('Mandatory. Cannot be empty!'),
+  name: yup.string().required('Mandatory. Cannot be empty!'),
+  email: yup.string().email('Enter a valid email').required('Mandatory. Cannot be empty!'),
   password: yup
     .string()
-    .min(8, 'Password should be of minimum 8 characters length')
+    .min(6, 'Password should be of minimum 6 characters length')
     .required('Mandatory. Cannot be empty!'),
-})
+});
 
 const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const signUpMutation = useMutation((values: SignUpUserDto) => signUp(values));
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -46,11 +50,41 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
     onSubmit: (values) => {
       setIsLoading(true);
       createUserWithEmailAndPassword(auth, values.email, values.password)
-        .then((userCredential) => {
-          navigate(routes.HOME);
+        .then(async (userCredential) => {
+          // Set the user's display name
+          await updateProfile(auth.currentUser as any, {
+            displayName: values.name,
+          });
+          signUpMutation.mutate({
+            fullName: values.name,
+            email: values.email,
+            authId: userCredential.user.uid,
+          });
+          dispatch(triggerSnack({ message: 'Sign up successful!', severity: 'success', hideDuration: 3000 }));
         })
+
         .catch((error) => {
+          console.log('error from signup', error);
           setIsLoading(false);
+          let message = 'Auth Error!';
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              message = 'This email is already in use.';
+              break;
+            case 'auth/invalid-email':
+              message = 'The email address is badly formatted.';
+              break;
+            case 'auth/operation-not-allowed':
+              message = 'Email/password accounts are not enabled.';
+              break;
+            case 'auth/weak-password':
+              message = 'The password is too weak.';
+              break;
+            default:
+              message = 'An unknown error occurred.';
+          }
+
+          dispatch(triggerSnack({ message, severity: 'error', hideDuration: 3000 }));
         });
     },
   });
@@ -83,7 +117,12 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
           <FormHelperText id="name-error">{formik.touched.name && formik.errors.name}</FormHelperText>
         </FormControl>
 
-        <FormControl variant="standard" sx={{ my: 2 }} fullWidth error={formik.touched.email && Boolean(formik.errors.email)}>
+        <FormControl
+          variant="standard"
+          sx={{ my: 2 }}
+          fullWidth
+          error={formik.touched.email && Boolean(formik.errors.email)}
+        >
           <InputLabel shrink htmlFor="email" sx={{ fontSize: 18, fontWeight: 600 }}>
             Email
           </InputLabel>
@@ -134,11 +173,12 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
       <Box component="div" display="flex" flexDirection="column" gap={1.8} mt={4}>
         <Button
           type="primary"
-          label={isLoading ? '' : 'Sign up'}
+          label={'Sign up'}
           onClick={formik.handleSubmit}
-          icon={isLoading ? <PulseLoader size={10} color="#fff" /> : null}
+          isLoading={isLoading}
+          isLoadingText="Signing you up..."
         />
-        <Button type="secondary" icon={<GoogleIcon />} label="Sign in with Google" onClick={googleAuthHandler} />
+        <Button type="secondary" icon={<GoogleIcon />} label="Sign up with Google" onClick={googleAuthHandler} />
       </Box>
 
       <Box display="flex" justifyContent="center" alignItems="center" gap={0.5} mt={4}>

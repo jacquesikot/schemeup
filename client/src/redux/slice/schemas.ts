@@ -32,13 +32,27 @@ export interface Table {
   indexes: { column: string; unique: boolean; sorting: PostgresIndexSorting }[];
 }
 
+enum Role {
+  Admin = 'admin',
+  Editor = 'editor',
+  Viewer = 'viewer',
+}
+
+interface SchemaUser {
+  name: string;
+  email: string;
+  role: Role;
+}
+
 export interface Schema {
   id: string;
   title: string;
   description?: string;
   tables?: Table[];
   activeTable?: string;
+  users?: SchemaUser[];
   meta?: any;
+  hasUnsavedChanges?: boolean;
 }
 
 interface SchemaState {
@@ -57,6 +71,7 @@ const schemasSlice = createSlice({
       state.schemas.push({
         id: action.payload.id,
         title: action.payload.title,
+        hasUnsavedChanges: true,
         description: 'A user and post default schema for reference. Feel free to delete this',
         tables: [
           {
@@ -85,7 +100,6 @@ const schemasSlice = createSlice({
             ],
             foreignKeys: [],
             indexes: [{ column: 'name', unique: false, sorting: 'ASC' }],
-            meta: {},
           },
           {
             id: '2',
@@ -106,7 +120,6 @@ const schemasSlice = createSlice({
               },
             ],
             indexes: [{ column: 'title', unique: false, sorting: 'ASC' }],
-            meta: {},
           },
         ],
         meta: {
@@ -124,21 +137,45 @@ const schemasSlice = createSlice({
     newTable: (state, action: PayloadAction<{ schemaId: string; table: Table }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables?.push(action.payload.table);
+      state.schemas[index].hasUnsavedChanges = true;
     },
     deleteTable: (state, action: PayloadAction<{ schemaId: string; tableId: string }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables = state.schemas[index].tables?.filter((table) => table.id !== action.payload.tableId);
+      state.schemas[index].hasUnsavedChanges = true;
     },
     editTable: (state, action: PayloadAction<{ schemaId: string; table: Table }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       const tableIndex = state.schemas[index].tables?.findIndex((table) => table.id === action.payload.table.id);
       if (tableIndex !== undefined && tableIndex !== -1) {
         state.schemas[index].tables![tableIndex] = action.payload.table;
+        state.schemas[index].hasUnsavedChanges = true;
+      }
+    },
+    addSchemaUsers: (state, action: PayloadAction<{ schemaId: string; users: SchemaUser[] }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      state.schemas[index].users = [...state.schemas[index].users!, ...action.payload.users];
+      state.schemas[index].hasUnsavedChanges = true;
+    },
+    removeSchemaUsers: (state, action: PayloadAction<{ schemaId: string; users: SchemaUser[] }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      state.schemas[index].users = state.schemas[index].users?.filter(
+        (user) => !action.payload.users.find((u) => u.email === user.email)
+      );
+      state.schemas[index].hasUnsavedChanges = true;
+    },
+    updateSchemaUser: (state, action: PayloadAction<{ schemaId: string; user: SchemaUser }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      const userIndex = state.schemas[index].users?.findIndex((user) => user.email === action.payload.user.email);
+      if (userIndex !== undefined && userIndex !== -1) {
+        state.schemas[index].users![userIndex] = action.payload.user;
+        state.schemas[index].hasUnsavedChanges = true;
       }
     },
     importTables: (state, action: PayloadAction<{ schemaId: string; tables: Table[] }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables = action.payload.tables;
+      state.schemas[index].hasUnsavedChanges = true;
     },
     setActiveTable: (state, action: PayloadAction<{ schemaId: string; tableId: string }>) => {
       if (action.payload.tableId.length < 1) {
@@ -148,6 +185,9 @@ const schemasSlice = createSlice({
         const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
         state.schemas[index].activeTable = action.payload.tableId;
       }
+    },
+    setSchemas: (state, action: PayloadAction<Schema[]>) => {
+      state.schemas = action.payload;
     },
     // dev only
     clearSchemas: (state) => {
@@ -166,6 +206,10 @@ export const {
   editTable,
   setActiveTable,
   importTables,
+  setSchemas,
+  addSchemaUsers,
+  removeSchemaUsers,
+  updateSchemaUser,
 } = schemasSlice.actions;
 
 export default schemasSlice.reducer;

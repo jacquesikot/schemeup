@@ -1,23 +1,26 @@
 import 'react-pro-sidebar/dist/css/styles.css';
 import { useState } from 'react';
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
-import { Avatar, Box, IconButton, Typography } from '@mui/material';
+import { Avatar, Box, IconButton, Skeleton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
-// import logo from '../../images/schemup_logo.png';
+import logo from '../../images/schemeup_logo.png';
 import SideBarSchema from '../../images/icons/SideBarSchema';
 import SideBarMockData from '../../images/icons/SideBarMockData';
 import SideBarDatasources from '../../images/icons/SideBarDatasources';
 import SideBarLogout from '../../images/icons/SideBarLogout';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import newAppTab from '../../utils/newAppTab';
 import SideBarToggleClose from '../../images/icons/SideBarToggleClose';
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
 import routes from '../../routes';
-import { toggleSideBar } from '../../redux/slice/app';
+import { toggleSideBar, triggerSnack } from '../../redux/slice/app';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase.config';
+import useAppTab from '../../hooks/useAppTab';
+import { setSchemas } from '../../redux/slice/schemas';
+import { resetTabs } from '../../redux/slice/apptabs';
 
 export const SIDEBAR_WIDTH = 280;
 
@@ -28,12 +31,11 @@ interface ItemProps {
   selected: string;
   setSelected: any;
   theme: any;
+  count?: number;
 }
 
-const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
-  const dispatch = useAppDispatch();
-  const tabs = useAppSelector((state) => state.appTabs.tabs);
-  const navigate = useNavigate();
+const Item = ({ title, to, icon, selected, setSelected, theme, count }: ItemProps) => {
+  const { newAppTab } = useAppTab();
 
   return (
     <MenuItem
@@ -49,7 +51,7 @@ const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
       }}
       onClick={() => {
         setSelected(title);
-        newAppTab(dispatch, title, to, tabs, navigate);
+        newAppTab(to);
       }}
       icon={icon}
     >
@@ -58,19 +60,21 @@ const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
           {title}
         </Typography>
         <Link to={to} />
-        <Box
-          display={'flex'}
-          justifyContent={'center'}
-          alignItems={'center'}
-          width={30}
-          height={22}
-          borderRadius={16}
-          bgcolor={theme.palette.grey[100]}
-        >
-          <Typography variant="body2" color={theme.palette.grey[800]}>
-            10
-          </Typography>
-        </Box>
+        {count && count > 0 && (
+          <Box
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            width={30}
+            height={22}
+            borderRadius={16}
+            bgcolor={theme.palette.grey[100]}
+          >
+            <Typography variant="body2" color={theme.palette.grey[800]}>
+              {count}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </MenuItem>
   );
@@ -79,21 +83,17 @@ const Item = ({ title, to, icon, selected, setSelected, theme }: ItemProps) => {
 const Sidebar = () => {
   const theme = useTheme();
   const sideBarOpen = useAppSelector((state) => state.app.sideBarOpen);
-  const { activeUser } = useAppSelector((state) => state.activeUser);
+  const schemas = useAppSelector((state) => state.schemas.schemas);
   const dispatch = useAppDispatch();
   const [_, setSelected] = useState('Schema');
   const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const [user] = useAuthState(auth);
 
-  const logOutHandler = () => {
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-        return navigate(routes.AUTH);
-      })
-      .catch((error) => {
-        // An error happened.
-      });
+  const logOutHandler = async () => {
+    await signOut(auth);
+    dispatch(setSchemas([]));
+    dispatch(resetTabs());
+    dispatch(triggerSnack({ message: 'Logged out successfully', severity: 'success', hideDuration: 3000 }));
   };
 
   return (
@@ -126,9 +126,9 @@ const Sidebar = () => {
             {sideBarOpen && (
               <Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center" pl={4} pr={3}>
-                  {/* <Box display={'flex'} alignItems={'center'}>
-                    <img src={logo} alt="SchemupLogo" />
-                  </Box> */}
+                  <Box display={'flex'} alignItems={'center'}>
+                    <img src={logo} alt="SchemupLogo" style={{ width: 30 }} />
+                  </Box>
                   <Typography variant="h5" color={theme.palette.grey[900]} fontWeight="medium">
                     SchemeUp
                   </Typography>
@@ -158,6 +158,7 @@ const Sidebar = () => {
               icon={<SideBarSchema />}
               selected={pathname === '/' || pathname.includes(routes.SCHEMA) ? 'Schema' : ''}
               setSelected={setSelected}
+              count={schemas.length}
             />
 
             <Item
@@ -184,19 +185,28 @@ const Sidebar = () => {
 
         {/* PROFILE SECTION */}
         <Box width={'90%'} height={1.1} bgcolor={theme.palette.divider} alignSelf={'center'} />
-        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} pl={2} pr={2} pb={8} pt={2}>
-          <Avatar style={{ width: 30, height: 30, borderRadius: 15 }} />
+        <Box display={'flex'} alignItems={'center'} pl={2} pr={2} pb={8} pt={2}>
+          <Avatar
+            src={user?.photoURL || undefined}
+            style={{ width: 30, height: 30, borderRadius: 15, marginLeft: sideBarOpen ? 0 : 7, marginRight: 10 }}
+          />
 
           {!sideBarOpen ? undefined : (
             <>
               <Box>
-                <Typography fontSize={14} fontWeight={500} color={theme.palette.grey[800]}>
-                  {activeUser.name}
-                </Typography>
-                <Typography fontSize={14} fontWeight={400} color={theme.palette.grey[800]}>
-                  {activeUser.email}
+                {user?.displayName ? (
+                  <Typography fontSize={12} fontWeight={500} color={theme.palette.grey[800]}>
+                    {user.displayName}
+                  </Typography>
+                ) : (
+                  <Skeleton width={100} height={20} />
+                )}
+                <Typography overflow={'hidden'} fontSize={12} fontWeight={400} color={theme.palette.grey[800]}>
+                  {user?.email}
                 </Typography>
               </Box>
+
+              <Box flex={1} />
 
               <IconButton onClick={logOutHandler}>
                 <SideBarLogout />

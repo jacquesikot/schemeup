@@ -34,7 +34,7 @@ export default function TopTabItem({ active, title, index, tabs, width, meta }: 
       bgcolor={active ? theme.palette.primary.light : '#FFF'}
       height={44}
       borderRight={1}
-      borderColor={theme.palette.grey[100]}
+      borderColor={theme.palette.grey[300]}
     >
       <Tooltip title={title}>
         <Typography
