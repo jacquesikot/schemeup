@@ -1,55 +1,87 @@
-import { Box, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Box, Button, Typography } from "@mui/material";
+import { SuggestionInfoIcon } from "../../images/icons/SuggestionInfoIcon";
 
-interface AiSuggestCardProps {
-  title: string;
+interface SolutionProps {
+  header: string;
   body: string;
+  onPressLearnMore: () => void;
+  onPressFixNow: () => void;
 }
 
-const AiSuggestCard = ({ title, body }: AiSuggestCardProps) => {
-  const theme = useTheme();
-  const colors = theme.palette;
-  const returnStatus = () => {
-    if (title === 'high') {
-      return {
-        color: colors.error.main,
-        text: 'High',
-      };
-    }
-    if (title === 'medium') {
-      return {
-        color: colors.warning.main,
-        text: 'Medium',
-      };
-    }
-    if (title === 'low') {
-      return {
-        color: colors.success.main,
-        text: 'Low',
-      };
-    }
-    return {
-      color: colors.success.main,
-      text: 'Low',
-    };
-  };
+interface AiSuggestCardProps {
+  question: string;
+  onPressInfo: () => void;
+  solutions: SolutionProps[];
+  severity: "high" | "medium" | "low";
+}
+
+const AiSuggestCard = ({
+  question,
+  solutions,
+  severity,
+}: AiSuggestCardProps) => {
   return (
     <Box
-      display={'flex'}
-      flexDirection={'column'}
-      width={'100%'}
-      border={1}
-      borderRadius={'8px'}
-      mb={1}
-      p={'10px'}
-      borderColor={returnStatus()?.color}
+      sx={{
+        border: "1px solid #4caf50",
+        borderRadius: 1,
+        bgcolor: "#ECFDF2",
+        p: 2,
+        mb: "18px",
+      }}
     >
-      <Typography fontWeight={500} fontSize={16} color={returnStatus().color}>
-        {returnStatus()?.text}
-      </Typography>
-      <Typography fontWeight={400} fontSize={16} color={colors.grey[900]}>
-        {body}
-      </Typography>
+      <Box display={"flex"} justifyContent={"space-between"} p={0}>
+        <Typography
+          sx={{ fontWeight: 600, fontSize: 14, color: "rgba(6, 80, 44, 1)" }}
+        >
+          {question}
+        </Typography>
+        <SuggestionInfoIcon />
+      </Box>
+      {solutions.map((s) => (
+        <Box
+          sx={{
+            bgcolor: "rgba(255, 255, 255, 0.5)",
+            my: "13px",
+            fontSize: 14,
+            p: "16px",
+          }}
+        >
+          <Box
+            sx={{
+              p: 0,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              height: "165px",
+            }}
+          >
+            <Typography sx={{ fontWeight: 600 }}>{s.header}</Typography>
+            <Typography sx={{ fontWeight: 400 }}>{s.body}</Typography>
+            <Box
+              sx={{
+                fontWeight: 600,
+                p: "0",
+              }}
+            >
+              <Button
+                sx={{ color: "rgba(45, 48, 53, 1)" }}
+                size="small"
+                onClick={s.onPressFixNow}
+              >
+                Fix Now
+              </Button>
+              <Button
+                sx={{ color: "rgba(45, 48, 53, 1)" }}
+                size="small"
+                onClick={s.onPressLearnMore}
+              >
+                Learn More
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      ))}
     </Box>
   );
 };
