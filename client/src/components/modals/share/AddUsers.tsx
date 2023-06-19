@@ -17,15 +17,17 @@ const Label = styled('label')({
   padding: "0 0 4px",
   lineHeight: 1.5,
   display: "block",
+  fontSize: 15,
+  fontWeight: 500,
 });
 
 const InputWrapper = styled('div')({
   width: "100%",
-  height: "40px",
+  height: "43px",
   border: `1px solid #d9d9d9`,
   backgroundColor: '#fff',
-  borderRadius: "5px",
-  padding: "3px",
+  borderRadius: "10px",
+  padding: "5px 6px",
   display: "flex",
   flexWrap: "nowrap",
   overflowX: "scroll",
@@ -42,7 +44,8 @@ const InputWrapper = styled('div')({
   ' & input': {
     backgroundColor: '#fff',
     color: 'rgba(0,0,0,.85)',
-    height: "30px",
+    height: "33px",
+    fontSize: 16,
     boxSizing: "border-box",
     padding: "4px 6px",
     width: 0,
@@ -68,7 +71,7 @@ const Tag = (props: TagProps) => {
   return (
     <div {...other}>
       <span><Avatar src={src} sx={{ width: 16, height: 16, mr: .5 }}/></span>
-      <span>{label}</span>
+      <span style={{fontWeight:450}}>{label}</span>
       <CloseIcon onClick={onDelete} />
     </div>
   );
@@ -79,13 +82,13 @@ const StyledTag = styled(Tag)<TagProps>(
     display: "flex",
     alignItems: "center",
     height: "24px",
-    margin: "2px",
+    margin: "2px 2.7px",
     lineHeight: "22px",
-    backgroundColor: `${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#fafafa'}`,
-    border: `1px solid ${theme.palette.mode === 'dark' ? '#303030' : '#e8e8e8'}`,
-    borderRadius: "2px",
+    backgroundColor: `${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'transparent'}`,
+    border: `1px solid ${theme.palette.mode === 'dark' ? '#303030' : '#d9d9d9'}`,
+    borderRadius: "8px",
     boxSizing: "content-box",
-    padding: "0 4px 0 10px",
+    padding: "0 2px 0 4px",
     outline: 0,
     overflow: "visible",
 
