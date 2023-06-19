@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useMutation } from 'react-query';
+import { Avatar, Box, Grid } from '@mui/material';
 
 import { auth } from '../../firebase.config';
 import SignIn from '../../components/auth/SignIn';
 import SignUp from '../../components/auth/SignUp';
-import { Avatar, Box, Grid, Typography } from '@mui/material';
-import SchemeupLogo from '../../images/schemup_logo.png';
+import SchemeupLogo from '../../images/schemeup_logo.png';
 import ResetPassword from '../../components/auth/ResetPassword';
 import { useAppDispatch } from '../../redux/hooks';
 import { triggerSnack } from '../../redux/slice/app';
@@ -22,7 +22,6 @@ export interface PageProps {
 const AuthenticateUser = () => {
   const [activePage, setActivePage] = useState<Pages>('login');
   const provider = new GoogleAuthProvider();
-  const currentYear = new Date().getFullYear();
   const dispatch = useAppDispatch();
   const signUpMutation = useMutation((values: SignUpUserDto) => signUp(values));
 
@@ -67,9 +66,10 @@ const AuthenticateUser = () => {
     <Grid container sx={{ height: '100%', alignItems: 'center' }}>
       <Grid item xs={12} lg={6} pt={2} pb={2}>
         <Box width="80%" maxWidth={400} mx="auto">
-          <Avatar variant="rounded" alt="schemeup-logo" src={SchemeupLogo} sx={{ padding: 1, marginBottom: 3 }}>
+          <Avatar variant="square" alt="schemeup-logo" style={{ marginBottom: 20 }} src={SchemeupLogo}>
             Schemeup Logo
           </Avatar>
+
           {activePage === 'login' && <SignIn flowSwitch={flowSwitchHandler} googleAuthHandler={googleSignInHandler} />}
           {activePage === 'reset' && <ResetPassword flowSwitch={flowSwitchHandler} />}
           {activePage === 'signup' && <SignUp flowSwitch={flowSwitchHandler} googleAuthHandler={googleSignInHandler} />}
