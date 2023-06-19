@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-// import logo from '../../images/schemup_logo.png';
+import logo from '../../images/schemeup_logo.png';
 import SideBarSchema from '../../images/icons/SideBarSchema';
 import SideBarMockData from '../../images/icons/SideBarMockData';
 import SideBarDatasources from '../../images/icons/SideBarDatasources';
@@ -126,9 +126,9 @@ const Sidebar = () => {
             {sideBarOpen && (
               <Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center" pl={4} pr={3}>
-                  {/* <Box display={'flex'} alignItems={'center'}>
-                    <img src={logo} alt="SchemupLogo" />
-                  </Box> */}
+                  <Box display={'flex'} alignItems={'center'}>
+                    <img src={logo} alt="SchemupLogo" style={{ width: 30 }} />
+                  </Box>
                   <Typography variant="h5" color={theme.palette.grey[900]} fontWeight="medium">
                     SchemeUp
                   </Typography>
