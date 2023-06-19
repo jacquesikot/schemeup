@@ -6,6 +6,8 @@ import PostgresIcon from '../../../images/icons/PostgresIcon';
 import Mysql from '../../../images/icons/Mysql';
 import Cloud from '../../../images/icons/Cloud';
 import BootstrapInput from '../../global/BootstrapInput';
+import ArrowDown from '../../../images/icons/ArrowDown';
+import ArrowUp from '../../../images/icons/ArrowUp';
 
 const StyledTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -45,6 +47,7 @@ const ImportSchemaModalForm = ({ getSql }: any) => {
   const [inputType, setInputType] = useState<"fileInput" | "textField" | null>(null);
   const [fileContent, setFileContent] = useState<File | null>();
   const [textContent, setTextContent] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
   const fileTypes = ["SQL", "JSON", "DOCX", "PDF"];
   // Sets the disabled styling for fileInput ui
   let dynamicSkins; 
@@ -81,15 +84,19 @@ const ImportSchemaModalForm = ({ getSql }: any) => {
   return (
     <Box>
       <FormControl sx={{ mt: 3 }} fullWidth variant="standard">
-        <InputLabel shrink={false} sx={{ my: -2.5, fontWeight: 600, fontSize: 14 }} htmlFor="database-type">
-          Database Type
+        <InputLabel shrink={false} sx={{ my: -2.5, fontWeight: 500, fontSize: 14 }} htmlFor="database-type">
+          Database Type*
         </InputLabel>
         <Select
           id="database-type"
           value={dbType}
           onChange={handleDbType}
+          onOpen={() => setOpen(true)}
+          onClose={() => setOpen(false)}
           input={<BootstrapInput />}
+          IconComponent={open ? ArrowUp : ArrowDown}
           sx={{ width: "50%" }}
+          SelectDisplayProps={{ style: {fontSize:16, fontWeight:450, }}}
         >
           <MenuItem value={"postgres"}>
             <PostgresIcon width={25} height={25} style={{ marginRight: 5 }} /> Postgres
@@ -102,11 +109,11 @@ const ImportSchemaModalForm = ({ getSql }: any) => {
 
       <FormControl fullWidth variant="standard">
         <FileUploader handleChange={fileUploadHandler} name="file" types={fileTypes} disabled={inputType === "textField"}>
-          <Box sx={{ textAlign: "center", border: "1px solid #E0E3E7", borderRadius: "4px", py: 2, my: 2, ...dynamicSkins}}>
+          <Box sx={{ textAlign: "center", border: "1px solid #E0E3E7", borderRadius: "8px", py: 2, my: 2, ...dynamicSkins}}>
             <Avatar sx={{ mx: "auto", mb: 1, backgroundColor: "#F2F4F7" }}><Cloud color="#475467" /></Avatar>
             <Link fontWeight={600} sx={{ textDecoration: "none", color: `${inputType==="textField"? "#9ca3af" : "#6941C6"}` }}>Click to upload</Link>
-            <Typography component="span"> or drag and drop</Typography>
-            <Typography variant="subtitle1" fontSize={12}>SQL, JSON (max 20mb)</Typography>
+            <Typography component="span"  fontWeight={400}> or drag and drop</Typography>
+            <Typography variant="subtitle2" fontSize={12.5} fontWeight={400} mt={.5}>SQL, JSON (max. 20mb)</Typography>
           </Box>
         </FileUploader>
       </FormControl>

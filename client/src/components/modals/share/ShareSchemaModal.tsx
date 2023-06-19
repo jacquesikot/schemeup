@@ -48,10 +48,10 @@ const ShareSchemaModal = ({ open, handleClose, containerStyle }: BaseModalProps)
       </Box>
 
       <Box component="div" mb={2.5}>
-        <Typography id="modal-title" variant="h5" component="h2" fontWeight={700} fontSize={18}>
+        <Typography id="modal-title" variant="h5" component="h2" fontWeight={700} fontSize={20}>
           Share with people
         </Typography>
-        <Typography id="modal-description" variant="subtitle2" sx={{ mt: 0.7 }}>
+        <Typography id="modal-description" variant="subtitle2" sx={{ mt: 0.7, fontWeight: 400, fontSize:15 }}>
           The following users have access to this project:
         </Typography>
       </Box>
@@ -73,7 +73,7 @@ const ShareSchemaModal = ({ open, handleClose, containerStyle }: BaseModalProps)
             onChange={() => {
               setChecked((prevState) => !prevState);
             }}
-            label={<Typography variant='subtitle2'>Enable Public</Typography>}
+            label={<Typography variant='subtitle1'>Enable Public</Typography>}
             control={<CheckboxIcon />}
           />
         </FormControl>
@@ -81,13 +81,12 @@ const ShareSchemaModal = ({ open, handleClose, containerStyle }: BaseModalProps)
           sx={{
             '&:hover': {
               backgroundColor: 'transparent',
-              color: '#6941C6',
               transform: 'scale(1.03)',
             },
           }}
         >
-          <CopyIcon color="#667085" />
-          <Typography variant="subtitle2" mx={0.5} fontWeight={700} fontSize={14}>
+          <CopyIcon /> 
+          <Typography variant="subtitle1" marginLeft={1} fontWeight={600} fontSize={14} color="#333">
             Copy
           </Typography>
         </IconButton>

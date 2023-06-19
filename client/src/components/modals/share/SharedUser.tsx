@@ -43,8 +43,8 @@ const SharedUser = ({ name, email, image }: UserProps) => {
           <Avatar alt={name} src={image}>{userInitials}</Avatar>
         </Grid>
         <Grid item>
-          <Typography variant="subtitle1" fontWeight={600}>{name}</Typography>
-          <Typography variant="subtitle2">{email}</Typography>
+          <Typography variant="subtitle1" fontWeight={600} fontSize={15} lineHeight={1.2}>{name}</Typography>
+          <Typography variant="subtitle2" sx={{fontWeight:400}}>{email}</Typography>
         </Grid>
         <Grid item>
           <Button
