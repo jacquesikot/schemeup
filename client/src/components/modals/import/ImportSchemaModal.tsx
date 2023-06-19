@@ -1,53 +1,32 @@
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { Box, Typography, IconButton, styled, TextField } from '@mui/material';
+import { Box, Typography, IconButton } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 
-import BaseModal, { BaseModalProps } from './BaseModal';
-import { CancelIcon } from '../../images/icons/CancelIcon';
-import Button from '../global/Button';
-import { ImportSchemaIcon } from '../../images/icons/canvas-controls/ImportSchemaIcon';
-import parsePgDump from '../../utils/parsers/parsePgDump';
-import { importTables } from '../../redux/slice/schemas';
-import { useAppDispatch } from '../../redux/hooks';
-import { triggerSnack } from '../../redux/slice/app';
-
-const StyledTextField = styled(TextField)({
-  '& label.Mui-focused': {
-    color: '#A0AAB4',
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#B2BAC2',
-  },
-  '& .MuiOutlinedInput-root': {
-    color: '#667085',
-    fontSize: 14,
-    fontFamily: 'IBM Plex Mono',
-    overflow: 'hidden',
-    height: 300,
-
-    '& fieldset': {
-      borderColor: '#E0E3E7',
-      borderRadius: 8,
-    },
-    '&:hover fieldset': {
-      borderColor: '#B2BAC2',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#6941C6',
-    },
-  },
-});
+import BaseModal, { BaseModalProps } from '../BaseModal';
+import { CancelIcon } from '../../../images/icons/CancelIcon';
+import Button from '../../global/Button';
+import { ImportSchemaIcon } from '../../../images/icons/canvas-controls/ImportSchemaIcon';
+import parsePgDump from '../../../utils/parsers/parsePgDump';
+import { importTables } from '../../../redux/slice/schemas';
+import { useAppDispatch } from '../../../redux/hooks';
+import { triggerSnack } from '../../../redux/slice/app';
+import ImportSchemaModalForm from './ImportSchemaModalForm';
 
 interface ImportModalProps extends BaseModalProps {
   schemaId: string;
 }
 
-const ImportModal = ({ open, handleClose, containerStyle, schemaId }: ImportModalProps) => {
+const ImportSchemaModal = ({ open, handleClose, containerStyle, schemaId }: ImportModalProps) => {
   const [sql, setSql] = useState<string>('');
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const colors = theme.palette;
+
+  // get sql string from either file or text input in ImportSchemaModalForm
+  const getSqlString = (data: string) => {
+    setSql(data);
+  };
 
   const handleImport = async () => {
     const schemaData = await parsePgDump(sql);
@@ -81,7 +60,7 @@ const ImportModal = ({ open, handleClose, containerStyle, schemaId }: ImportModa
           <CancelIcon color={colors.grey[500]} />
         </IconButton>
       </Box>
-      <Box marginTop={1} marginBottom={2.5}>
+      <Box marginTop={1}>
         <Typography fontSize={18} fontWeight={600} color={colors.grey[800]}>
           Import Schema
         </Typography>
@@ -90,13 +69,7 @@ const ImportModal = ({ open, handleClose, containerStyle, schemaId }: ImportModa
         </Typography>
       </Box>
 
-      <StyledTextField
-        style={{ width: '100%' }}
-        multiline
-        placeholder="Paste SQL DDL here.."
-        value={sql}
-        onChange={(e) => setSql(e.target.value)}
-      />
+      <ImportSchemaModalForm getSql={getSqlString} />
 
       <Box mt={3.5} display={'flex'} justifyContent={'flex-end'}>
         <Button
@@ -122,4 +95,4 @@ const ImportModal = ({ open, handleClose, containerStyle, schemaId }: ImportModa
   );
 };
 
-export default ImportModal;
+export default ImportSchemaModal;

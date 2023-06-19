@@ -1,25 +1,22 @@
 {
   "name": "schemeup-server",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "license": "MIT",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node12 --outfile=dist/index.js",
-    "deploy": "sls deploy",
-    "offline": "sls offline start",
-    "offline-dev": "nodemon --exec serverless offline start --httpPort 5001"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "@vercel/node": "^2.15.1",
+    "mongoose": "^7.3.0",
+    "next-api-route-middleware": "^1.0.2"
   },
   "devDependencies": {
-    "esbuild": "^0.17.19",
-    "nodemon": "^2.0.22",
-    "serverless-dotenv-plugin": "^6.0.0",
-    "serverless-esbuild": "^1.45.0",
-    "serverless-offline": "^12.0.4",
-    "serverless-plugin-typescript": "^2.1.4"
-  },
-  "dependencies": {
-    "node-sql-parser": "^4.7.0",
-    "pg-query-parser": "^0.3.0",
-    "serverless": "^3.31.0"
+    "@types/node": "^20.3.1",
+    "typescript": "^5.1.3"
   }
 }

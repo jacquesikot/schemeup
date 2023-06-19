@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-hooks/exhaustive-deps */
 import 'reactflow/dist/style.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 import ReactFlow, { MiniMap, Controls, addEdge, applyNodeChanges, applyEdgeChanges, Background, Node } from 'reactflow';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 import NewSchemaHeader from '../../components/NewSchemaHeader';
@@ -18,15 +19,44 @@ import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/sl
 import generateSchemaName from '../../utils/generateSchemaName';
 // import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
 import { openRightPanel, toggleRightPanel } from '../../redux/slice/app';
-import ImportModal from '../../components/modals/ImportModal';
+import ImportModal from '../../components/modals/import/ImportSchemaModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 import routes from '../../routes';
 import DeleteTableModal from '../../components/modals/DeleteTableModal';
+import EmptyState from '../../components/global/EmptyState';
+import Button from '../../components/global/Button';
+import { removeTab } from '../../redux/slice/apptabs';
 
 const EditSchema = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
+  const tabs = useAppSelector((state) => state.appTabs.tabs);
+  const navigate = useNavigate();
+
+  if (!schema) {
+    return (
+      <Box style={{ marginTop: '20%' }}>
+        <EmptyState
+          title={`Schema not found`}
+          message={`This schema does not exist, has been moved or deleted.`}
+          actionButtons={
+            <>
+              <Button
+                type="primary"
+                label="Go back"
+                onClick={() => {
+                  dispatch(removeTab(tabs.filter((t) => t.route.includes(params.id as string))[0].title));
+                  navigate(routes.HOME);
+                }}
+              />
+            </>
+          }
+        />
+      </Box>
+    );
+  }
+
   const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
   const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
@@ -223,7 +253,7 @@ const EditSchema = () => {
             dispatch(openRightPanel());
           }}
           onClick={(e) => {
-            console.log('target', e.currentTarget);
+            console.log('target', e.currentTarget.nodeName);
             if (activeTableId) {
               dispatch(setActiveTable({ schemaId: schema.id, tableId: '' }));
             } else {
