@@ -186,7 +186,19 @@ const Dashboard = () => {
                 label="New Schema"
                 type={"primary"}
                 icon={<TopBarPlus color="#FFF" />}
-                onClick={() => true}
+                onClick={(e: any) => {
+                  const id = uuidv4();
+                  const newSchemaName = generateSchemaName();
+                  dispatch(newSchema({ id, title: newSchemaName, tables: [] }));
+                  newAppTab(
+                    dispatch,
+                    `Schema - ${newSchemaName}`,
+                    `${routes.EDIT_SCHEMA}/${id}`,
+                    tabs,
+                    navigate,
+                    { id }
+                  );
+                }}
               />
             </>
           }

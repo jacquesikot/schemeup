@@ -300,8 +300,23 @@ const SchemaProperties = ({
                 alignItems={"center"}
               >
                 <AiSuggestCard
-                  title="title"
-                  body="bodydddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+                  question=" Add a created and updated field to the “user” table"
+                  solutions={[
+                    {
+                      header: "add columns",
+                      body: "Create a two new columns, one for the updated at field, and another for the created_at field in the “user” table",
+                      onPressFixNow: () => console.log("fixed"),
+                      onPressLearnMore: () => console.log("learn"),
+                    },
+                    {
+                      header: "add columns",
+                      body: "Create a two new columns, one for the updated at field, and another for the created_at field in the “user” table",
+                      onPressFixNow: () => console.log("fixed"),
+                      onPressLearnMore: () => console.log("learn"),
+                    },
+                  ]}
+                  severity="high"
+                  onPressInfo={() => console.log("info")}
                 />
               </Box>
             </Grid>
