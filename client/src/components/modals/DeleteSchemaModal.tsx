@@ -1,11 +1,11 @@
 import { Box, Typography, IconButton } from '@mui/material';
 
-import BaseModal, { BaseModalProps } from './BaseModal';
+import BaseModal, { SingleModalProps } from './BaseModal';
 import { DeleteModalIcon } from '../../images/icons/DeleteModalIcon';
 import { CancelIcon } from '../../images/icons/CancelIcon';
 import Button from '../global/Button';
 
-interface DeleteSchemaModalProps extends BaseModalProps {
+interface DeleteSchemaModalProps extends SingleModalProps {
   handleSchemaDelete: () => void;
 }
 
@@ -13,7 +13,7 @@ const DeleteSchemaModal = ({
   open,
   handleClose,
   containerStyle,
-  itemId,
+  schemaId,
   handleSchemaDelete,
 }: DeleteSchemaModalProps) => {
   return (

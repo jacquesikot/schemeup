@@ -32,13 +32,13 @@ export interface Table {
   indexes: { column: string; unique: boolean; sorting: PostgresIndexSorting }[];
 }
 
-enum Role {
+export enum Role {
   Admin = 'admin',
   Editor = 'editor',
   Viewer = 'viewer',
 }
 
-interface SchemaUser {
+export interface SchemaUser {
   name: string;
   email: string;
   role: Role;
@@ -154,7 +154,11 @@ const schemasSlice = createSlice({
     },
     addSchemaUsers: (state, action: PayloadAction<{ schemaId: string; users: SchemaUser[] }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
-      state.schemas[index].users = [...state.schemas[index].users!, ...action.payload.users];
+      if (state.schemas[index].users) {
+        state.schemas[index].users = [...state.schemas[index].users!, ...action.payload.users];
+      } else {
+        state.schemas[index].users = [...action.payload.users];
+      }
       state.schemas[index].hasUnsavedChanges = true;
     },
     removeSchemaUsers: (state, action: PayloadAction<{ schemaId: string; users: SchemaUser[] }>) => {

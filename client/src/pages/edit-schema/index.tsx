@@ -293,7 +293,7 @@ const EditSchema = () => {
         handleTableDelete={() =>
           dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }))
         }
-        itemId={schema.id}
+        schemaId={schema.id}
         containerStyle={{
           width: '400px',
           backgroundColor: '#FFFFFF',
@@ -308,8 +308,9 @@ const EditSchema = () => {
         handleClose={() => {
           toggleShowShareModal(false);
         }}
+        schemaId={schema.id}
         containerStyle={{
-          width: '400px',
+          width: '450px',
           backgroundColor: '#FFFFFF',
           borderRadius: '8px',
         }}
