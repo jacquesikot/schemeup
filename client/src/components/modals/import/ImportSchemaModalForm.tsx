@@ -1,7 +1,18 @@
 import { ChangeEvent, useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { InputLabel, MenuItem, FormControl, Select, Divider, TextField, Box, Typography, Link, Avatar } from '@mui/material';
-import { FileUploader } from "react-drag-drop-files";
+import {
+  InputLabel,
+  MenuItem,
+  FormControl,
+  Select,
+  Divider,
+  TextField,
+  Box,
+  Typography,
+  Link,
+  Avatar,
+} from '@mui/material';
+import { FileUploader } from 'react-drag-drop-files';
 import PostgresIcon from '../../../images/icons/PostgresIcon';
 import Mysql from '../../../images/icons/Mysql';
 import Cloud from '../../../images/icons/Cloud';
@@ -42,20 +53,25 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const ImportSchemaModalForm = ({ getSql }: any) => {
-  const [dbType, setDbType] = useState("postgres");
-  const [inputType, setInputType] = useState<"fileInput" | "textField" | null>(null);
+interface ImportSchemaModalFormProps {
+  getSql: (sql: string) => void;
+  sql: string;
+}
+
+const ImportSchemaModalForm = ({ getSql, sql }: ImportSchemaModalFormProps) => {
+  const [dbType, setDbType] = useState('postgres');
+  const [inputType, setInputType] = useState<'fileInput' | 'textField' | null>(null);
   const [fileContent, setFileContent] = useState<File | null>();
-  const [textContent, setTextContent] = useState<string>("");
+  const [textContent, setTextContent] = useState<string>('');
   const [open, setOpen] = useState<boolean>(false);
-  const fileTypes = ["SQL", "JSON", "DOCX", "PDF"];
+  const fileTypes = ['SQL', 'JSON', 'DOCX', 'PDF'];
   // Sets the disabled styling for fileInput ui
-  let dynamicSkins; 
-  if (inputType === "textField") {
-    dynamicSkins = { cursor: "default", color: "#9ca3af", borderColor: "#d4d4d4", backgroundColor: "#e5e5e5" };
+  let dynamicSkins;
+  if (inputType === 'textField') {
+    dynamicSkins = { cursor: 'default', color: '#9ca3af', borderColor: '#d4d4d4', backgroundColor: '#EEE' };
   } else {
-    dynamicSkins = { cursor: "pointer" };
-  };
+    dynamicSkins = { cursor: 'pointer' };
+  }
 
   // Sets the internal parsing format for input
   const handleDbType = (event: { target: { value: string } }) => {
@@ -63,23 +79,23 @@ const ImportSchemaModalForm = ({ getSql }: any) => {
   };
 
   //  Handles sql input from file
-  const fileUploadHandler = (doc: File) => {
-    setInputType("fileInput");
-    setFileContent(doc);
-    // process file from server and return the contents as a string.
-    // getSql(fileContent);
-  };
+  // const fileUploadHandler = (doc: File) => {
+  //   setInputType('fileInput');
+  //   setFileContent(doc);
+  //   // process file from server and return the contents as a string.
+  //   getSql(fileContent);
+  // };
 
   // Handles sql input from text field
-  const textInputHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputType("textField");
-    setTextContent(event.target.value);
-    getSql(textContent);
+  // const textInputHandler = (event: ChangeEvent<HTMLInputElement>) => {
+  //   setInputType('textField');
+  //   setTextContent(event.target.value);
+  //   getSql(textContent);
 
-    if (!event.target.value) {
-      setInputType(null);
-    }
-  };
+  //   if (!event.target.value) {
+  //     setInputType(null);
+  //   }
+  // };
 
   return (
     <Box>
@@ -95,30 +111,56 @@ const ImportSchemaModalForm = ({ getSql }: any) => {
           onClose={() => setOpen(false)}
           input={<BootstrapInput />}
           IconComponent={open ? ArrowUp : ArrowDown}
-          sx={{ width: "50%" }}
-          SelectDisplayProps={{ style: {fontSize:16, fontWeight:450, }}}
+          sx={{ width: '50%' }}
+          SelectDisplayProps={{ style: { fontSize: 16, fontWeight: 450 } }}
         >
-          <MenuItem value={"postgres"}>
+          <MenuItem value={'postgres'}>
             <PostgresIcon width={25} height={25} style={{ marginRight: 5 }} /> Postgres
           </MenuItem>
-          <MenuItem value={"mysql"}>
+          <MenuItem value={'mysql'}>
             <Mysql width={25} height={25} style={{ marginRight: 5 }} /> MySQL
           </MenuItem>
         </Select>
       </FormControl>
 
       <FormControl fullWidth variant="standard">
-        <FileUploader handleChange={fileUploadHandler} name="file" types={fileTypes} disabled={inputType === "textField"}>
-          <Box sx={{ textAlign: "center", border: "1px solid #E0E3E7", borderRadius: "8px", py: 2, my: 2, ...dynamicSkins}}>
-            <Avatar sx={{ mx: "auto", mb: 1, backgroundColor: "#F2F4F7" }}><Cloud color="#475467" /></Avatar>
-            <Link fontWeight={600} sx={{ textDecoration: "none", color: `${inputType==="textField"? "#9ca3af" : "#6941C6"}` }}>Click to upload</Link>
-            <Typography component="span"  fontWeight={400}> or drag and drop</Typography>
-            <Typography variant="subtitle2" fontSize={12.5} fontWeight={400} mt={.5}>SQL, JSON (max. 20mb)</Typography>
+        <FileUploader
+          // handleChange={fileUploadHandler}
+          name="file"
+          types={fileTypes}
+          disabled={inputType === 'textField'}
+        >
+          <Box
+            sx={{
+              textAlign: 'center',
+              border: '1px solid #E0E3E7',
+              borderRadius: '8px',
+              py: 2,
+              my: 2,
+              ...dynamicSkins,
+            }}
+          >
+            <Avatar sx={{ mx: 'auto', mb: 1, backgroundColor: '#F2F4F7' }}>
+              <Cloud color="#475467" />
+            </Avatar>
+            <Link
+              fontWeight={600}
+              sx={{ textDecoration: 'none', color: `${inputType === 'textField' ? '#9ca3af' : '#6941C6'}` }}
+            >
+              Click to upload
+            </Link>
+            <Typography component="span" fontWeight={400}>
+              {' '}
+              or drag and drop
+            </Typography>
+            <Typography variant="subtitle2" fontSize={12.5} fontWeight={400} mt={0.5}>
+              SQL, JSON (max. 20mb)
+            </Typography>
           </Box>
         </FileUploader>
       </FormControl>
 
-      <Divider sx={{ color: "GrayText", mx: -3 }}>OR</Divider>
+      <Divider sx={{ color: 'GrayText', mx: -3 }}>OR</Divider>
 
       <FormControl fullWidth variant="standard" disabled={true}>
         <StyledTextField
@@ -126,14 +168,13 @@ const ImportSchemaModalForm = ({ getSql }: any) => {
           multiline
           rows={7}
           placeholder="Paste SQL DDL here..."
-          value={textContent}
-          onChange={textInputHandler}
-          disabled={inputType === "fileInput"}
+          value={sql}
+          onChange={(e) => getSql(e.target.value)}
+          disabled={inputType === 'fileInput'}
         />
       </FormControl>
     </Box>
-
   );
-}
+};
 
 export default ImportSchemaModalForm;
