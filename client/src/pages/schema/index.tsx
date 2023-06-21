@@ -341,7 +341,7 @@ const Dashboard = () => {
         open={openDeleteModal}
         handleClose={() => setOpenDeleteModal(false)}
         handleSchemaDelete={() => dispatch(deleteSchema(activeSchema.id))}
-        itemId={activeSchema?.id}
+        schemaId={activeSchema?.id}
         containerStyle={{
           width: "400px",
           backgroundColor: "#FFFFFF",

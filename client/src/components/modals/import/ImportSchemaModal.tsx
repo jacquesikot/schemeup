@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import { Box, Typography, IconButton } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 
-import BaseModal, { BaseModalProps } from '../BaseModal';
+import BaseModal, { BaseModalProps, SingleModalProps } from '../BaseModal';
 import { CancelIcon } from '../../../images/icons/CancelIcon';
 import Button from '../../global/Button';
 import { ImportSchemaIcon } from '../../../images/icons/canvas-controls/ImportSchemaIcon';
@@ -13,11 +13,8 @@ import { useAppDispatch } from '../../../redux/hooks';
 import { triggerSnack } from '../../../redux/slice/app';
 import ImportSchemaModalForm from './ImportSchemaModalForm';
 
-interface ImportModalProps extends BaseModalProps {
-  schemaId: string;
-}
 
-const ImportSchemaModal = ({ open, handleClose, containerStyle, schemaId }: ImportModalProps) => {
+const ImportSchemaModal = ({ open, handleClose, containerStyle, schemaId }: SingleModalProps) => {
   const [sql, setSql] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();

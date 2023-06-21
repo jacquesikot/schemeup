@@ -13,6 +13,7 @@ interface ButtonProps {
   isLoadingText?: string;
   onClick?: (e: any) => void;
   disabled?: boolean;
+  disableRipple?: boolean;
 }
 
 const Button = ({
@@ -26,6 +27,7 @@ const Button = ({
   isLoading,
   isLoadingText = 'Loading...',
   disabled,
+  disableRipple,
 }: ButtonProps) => {
   const theme = useTheme();
   const colors = theme.palette;
@@ -69,6 +71,7 @@ const Button = ({
       }
       onClick={onClick}
       disabled={disabled}
+      disableRipple={disableRipple}
       style={style}
       sx={{
         width,

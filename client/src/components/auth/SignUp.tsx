@@ -20,7 +20,6 @@ import BootstrapInput from '../global/BootstrapInput';
 import GoogleIcon from '../../images/icons/GoogleIcon';
 import { PageProps } from '../../pages/auth';
 import { auth } from '../../firebase.config';
-import PulseLoader from 'react-spinners/PulseLoader';
 import * as yup from 'yup';
 import { useAppDispatch } from '../../redux/hooks';
 import { triggerSnack } from '../../redux/slice/app';

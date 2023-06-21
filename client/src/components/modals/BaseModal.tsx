@@ -10,8 +10,11 @@ export interface BaseModalProps {
   open: boolean;
   handleClose: (event: Event | React.SyntheticEvent) => void;
   containerStyle?: React.CSSProperties;
-  itemId?: string;
   children?: React.ReactNode;
+}
+
+export interface SingleModalProps extends BaseModalProps {
+  schemaId: string;
 }
 
 const BaseModal = ({ open, handleClose, containerStyle, children }: BaseModalProps) => {

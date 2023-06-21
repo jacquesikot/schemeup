@@ -1,18 +1,18 @@
 import { Box, Typography, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-import BaseModal, { BaseModalProps } from './BaseModal';
+import BaseModal, { SingleModalProps } from './BaseModal';
 import { DeleteModalIcon } from '../../images/icons/DeleteModalIcon';
 import { CancelIcon } from '../../images/icons/CancelIcon';
 import Button from '../global/Button';
 import { useAppDispatch } from '../../redux/hooks';
 import { triggerSnack } from '../../redux/slice/app';
 
-interface DeleteTableModalProps extends BaseModalProps {
+interface DeleteTableModalProps extends SingleModalProps {
   handleTableDelete: () => void;
 }
 
-const DeleteTableModal = ({ open, handleClose, containerStyle, itemId, handleTableDelete }: DeleteTableModalProps) => {
+const DeleteTableModal = ({ open, handleClose, containerStyle, schemaId, handleTableDelete }: DeleteTableModalProps) => {
   const theme = useTheme();
   const colors = theme.palette;
   const dispatch = useAppDispatch();

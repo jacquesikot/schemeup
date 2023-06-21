@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useAutocomplete, { AutocompleteGetTagProps } from '@mui/material/useAutocomplete';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
-import { Avatar, colors } from '@mui/material';
+import { Avatar } from '@mui/material';
 import { appColors } from '../BaseModal';
+import Button from '../../global/Button';
+import { useAppDispatch } from '../../../redux/hooks';
+import { Role, addSchemaUsers } from '../../../redux/slice/schemas';
 
 // Custom Mui AutoComplete Label, Input Wrapper, Tags + Input Element
 const Root = styled('div')({
@@ -26,11 +29,11 @@ const InputWrapper = styled('div')({
   height: "43px",
   border: `1px solid #d9d9d9`,
   backgroundColor: '#fff',
-  borderRadius: "10px",
+  borderRadius: "10px 0 0 10px",
   padding: "5px 6px",
   display: "flex",
   flexWrap: "nowrap",
-  overflowX: "scroll",
+  overflowX: "auto",
 
   ' &:hover': {
     borderColor: appColors.primary,
@@ -49,7 +52,7 @@ const InputWrapper = styled('div')({
     boxSizing: "border-box",
     padding: "4px 6px",
     width: 0,
-    minWidth: "30px",
+    minWidth: "100px",
     flexGrow: 1,
     border: 0,
     margin: 0,
@@ -70,8 +73,8 @@ const Tag = (props: TagProps) => {
   const { label, src, onDelete, ...other } = props;
   return (
     <div {...other}>
-      <span><Avatar src={src} sx={{ width: 16, height: 16, mr: .5 }}/></span>
-      <span style={{fontWeight:450}}>{label}</span>
+      <span><Avatar src={src} sx={{ width: 16, height: 16, mr: .5 }} /></span>
+      <span style={{ fontWeight: 450 }}>{label}</span>
       <CloseIcon onClick={onDelete} />
     </div>
   );
@@ -158,12 +161,11 @@ const Listbox = styled('ul')(
 `,
 );
 
-interface UserInfoType {
-  name: string;
-  email: string;
+interface addUsersProps {
+  schemaId: string;
 }
 
-// List of all Schemeup Users with UserInfoType only data as autocomplete listbox options
+// List of all Schemeup Users with UserInfo only data as autocomplete listbox options
 const schemeupUsers = [
   { name: "Daniel Wu", email: "daniel@untitledui.com" },
   { name: "Candace Wallie", email: "candace@untitledui.com" },
@@ -171,16 +173,14 @@ const schemeupUsers = [
   { name: "Jacques Paul", email: "jacques@untitledui.com" },
   { name: "Demi Wikinson", email: "demi@untitledui.com" },
 ];
-// Already added users who have access to the schema
-const defaultSharedUsers = [
-  { name: "Candace", email: "candace@untitledui.com" },
-  { name: "Jacques", email: "jacques@untitledui.com" },
-];
 
-const AddUsers = () => {
+const AddUsers = ({ schemaId }: addUsersProps) => {
   // sharedUsers will contain updated list of users in the
   // current state and can be used to update the users in memory who have access on Update Schema
-  const [sharedUsers, updateSharedUsers] = useState(defaultSharedUsers);
+  const [sharedUsers, updateSharedUsers] = useState<typeof schemeupUsers>([]);
+  // Ref for the InputWrapper div
+  const inputWrapperRef = useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
 
   const {
     getRootProps,
@@ -192,10 +192,8 @@ const AddUsers = () => {
     groupedOptions,
     value,
     focused,
-    setAnchorEl,
   } = useAutocomplete({
     id: 'add-new-users',
-    defaultValue: [...sharedUsers],
     multiple: true,
     freeSolo: true,
     disableListWrap: true,
@@ -203,28 +201,51 @@ const AddUsers = () => {
     onChange: (e, value) => {
       const newInput = value[value.length - 1];
       if (typeof newInput === "string") {
-        const newUser = { name: newInput, email: newInput };
-        console.log(newUser);
-        updateSharedUsers((prevState) => ([newUser, ...prevState]));
+        value[value.length - 1] = { name: newInput, email: newInput };
       }
+      updateSharedUsers(value as typeof schemeupUsers);
     },
     getOptionLabel: (option) => option.name,
   });
+
+  const addUsersToSchema = () => {
+    const updatedSharedUsers = sharedUsers.map(user => ({ ...user, role: Role.Viewer }));
+    dispatch(addSchemaUsers({ schemaId, users: [...updatedSharedUsers] }));
+    value.splice(0, value.length);
+    // updateSharedUsers([]);
+    // console.log(updatedSharedUsers);
+  }
+
+  useEffect(() => {
+    // Scroll to the input element when there are many tags
+    if (inputWrapperRef.current) {
+      inputWrapperRef.current.scrollLeft = inputWrapperRef.current.scrollWidth;
+    }
+  }, [value]); // Scroll whenever the value (selected users) changes
 
   return (
     <Root>
       <div {...getRootProps()}>
         <Label {...getInputLabelProps()}>Add Users</Label>
-        <InputWrapper ref={setAnchorEl} className={focused ? 'focused' : ''} >
-          {value.map((option, index) => (
-            <StyledTag
-              label={typeof option === "string" ? option : (option as UserInfoType).name}
-              src={typeof option === "string" ? '' : 'https://mkorostoff.github.io/hundred-thousand-faces/img/f/4.jpg'}
-              {...getTagProps({ index })}
-            />
-          ))}
-          <input {...getInputProps()} autoFocus />
-        </InputWrapper>
+        <div style={{ display: "flex", gap: 0 }}>
+          <InputWrapper ref={inputWrapperRef} className={focused ? 'focused' : ''} >
+            {value.map((option, index) => (
+              <StyledTag
+                label={typeof option === "string" ? option : option.name}
+                src={typeof option === "string" ? '' : 'https://mkorostoff.github.io/hundred-thousand-faces/img/f/4.jpg'}
+                {...getTagProps({ index })}
+              />
+            ))}
+            <input {...getInputProps()} autoFocus />
+          </InputWrapper>
+          <Button
+            type="primary"
+            label="Add"
+            height={43}
+            style={{ borderRadius: "0 10px 10px 0" }}
+            onClick={addUsersToSchema}
+          />
+        </div>
       </div>
       {groupedOptions.length > 0 ? (
         <Listbox {...getListboxProps()}>
