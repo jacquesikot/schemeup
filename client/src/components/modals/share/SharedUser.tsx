@@ -116,6 +116,7 @@ const SharedUser = ({ name, email, role, image, schemaId }: UserProps) => {
         </Grid>
         <Grid item xs={2.5}>
           <Button
+            disableRipple={false}
             label="Remove"
             type="error"
             onClick={removeUserFromList}
@@ -126,11 +127,7 @@ const SharedUser = ({ name, email, role, image, schemaId }: UserProps) => {
               padding: 2,
               background: "none",
               color: "#D92D20",
-              border: "none"
-              // hover: {
-              //   backgroundColor: "transparent",
-              //   fontWeight: 700
-              // }
+              border: "none",
             }}
           />
         </Grid>
