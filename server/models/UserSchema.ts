@@ -95,7 +95,7 @@ const TableSchema = new MongooseSchema({
 });
 
 const SchemaUserSchema = new MongooseSchema({
-  name: { type: String, required: true },
+  name: { type: String, required: false },
   email: { type: String, required: true },
   role: { type: String, required: true }, // Map your Role to a suitable value
 });
@@ -107,6 +107,7 @@ const UserSchemaSchema = new MongooseSchema({
   description: String,
   tables: [TableSchema],
   users: [SchemaUserSchema],
+  isPublic: { type: Boolean, default: false },
 });
 
 UserSchemaSchema.statics.build = (attr: IUserSchema) => {

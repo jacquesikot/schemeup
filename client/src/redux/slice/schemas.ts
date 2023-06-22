@@ -5,6 +5,7 @@ import {
   PostgresOnDeleteOption,
   PostgresOnUpdateOption,
 } from '../../types/tableTypes';
+import generateForeignKeyName from '../../utils/generateFkName';
 
 export interface Table {
   id: string;
@@ -23,6 +24,7 @@ export interface Table {
     autoUpdateTime?: boolean;
   }[];
   foreignKeys: {
+    name: string;
     column: string;
     referenceTable: string;
     referenceColumn: string;
@@ -112,6 +114,7 @@ const schemasSlice = createSlice({
             ],
             foreignKeys: [
               {
+                name: generateForeignKeyName('user', 'user_id', 'user', 'id'),
                 column: 'user_id',
                 referenceTable: 'user',
                 referenceColumn: 'id',
@@ -126,6 +129,10 @@ const schemasSlice = createSlice({
           showColumns: true,
         },
       });
+    },
+    setNewChanges: (state, action: PayloadAction<{ schemaId: string; hasUnsavedChanges: boolean }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      state.schemas[index].hasUnsavedChanges = action.payload.hasUnsavedChanges;
     },
     updateSchema: (state, action: PayloadAction<Schema>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.id);
@@ -214,6 +221,7 @@ export const {
   addSchemaUsers,
   removeSchemaUsers,
   updateSchemaUser,
+  setNewChanges,
 } = schemasSlice.actions;
 
 export default schemasSlice.reducer;

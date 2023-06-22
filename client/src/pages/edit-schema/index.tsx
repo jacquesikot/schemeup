@@ -84,15 +84,14 @@ const EditSchema = () => {
     tablesWithForeignKeys?.flatMap((table) => {
       return table.foreignKeys.map((foreignKey, index) => {
         const refTable = foreignKey.referenceTable;
-        const refColumn = foreignKey.referenceColumn;
-        const colName = foreignKey.column;
+        const refName = foreignKey.name;
         return {
           id: table.name + 'to' + refTable,
           source: table.name,
           target: refTable,
           animated: false,
           type: 'step',
-          label: generateForeignKeyName(table.name, colName, refTable, refColumn),
+          label: refName,
         };
       });
     });

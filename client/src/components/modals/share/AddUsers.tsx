@@ -12,28 +12,28 @@ import { Role, addSchemaUsers } from '../../../redux/slice/schemas';
 
 // Custom Mui AutoComplete Label, Input Wrapper, Tags + Input Element
 const Root = styled('div')({
-  color: "rgba(0,0,0,.85)",
-  fontSize: "14px",
+  color: 'rgba(0,0,0,.85)',
+  fontSize: '14px',
 });
 
 const Label = styled('label')({
-  padding: "0 0 4px",
+  padding: '0 0 4px',
   lineHeight: 1.5,
-  display: "block",
+  display: 'block',
   fontSize: 15,
   fontWeight: 500,
 });
 
 const InputWrapper = styled('div')({
-  width: "100%",
-  height: "43px",
+  width: '100%',
+  height: '43px',
   border: `1px solid #d9d9d9`,
   backgroundColor: '#fff',
-  borderRadius: "10px 0 0 10px",
-  padding: "5px 6px",
-  display: "flex",
-  flexWrap: "nowrap",
-  overflowX: "auto",
+  borderRadius: '10px 0 0 10px',
+  padding: '5px 6px',
+  display: 'flex',
+  flexWrap: 'nowrap',
+  overflowX: 'auto',
 
   ' &:hover': {
     borderColor: appColors.primary,
@@ -41,27 +41,25 @@ const InputWrapper = styled('div')({
 
   ' &.focused': {
     borderColor: appColors.primary,
-    boxShadow: "0 0 0 2px rgba(105, 65, 198, 0.2)",
+    boxShadow: '0 0 0 2px rgba(105, 65, 198, 0.2)',
   },
 
   ' & input': {
     backgroundColor: '#fff',
     color: 'rgba(0,0,0,.85)',
-    height: "33px",
+    height: '33px',
     fontSize: 16,
-    boxSizing: "border-box",
-    padding: "4px 6px",
+    boxSizing: 'border-box',
+    padding: '4px 6px',
     width: 0,
-    minWidth: "100px",
+    minWidth: '100px',
     flexGrow: 1,
     border: 0,
     margin: 0,
     outline: 0,
   },
 
-  '& input:focused': {
-
-  },
+  '& input:focused': {},
 });
 
 interface TagProps extends ReturnType<AutocompleteGetTagProps> {
@@ -73,46 +71,46 @@ const Tag = (props: TagProps) => {
   const { label, src, onDelete, ...other } = props;
   return (
     <div {...other}>
-      <span><Avatar src={src} sx={{ width: 16, height: 16, mr: .5 }} /></span>
+      <span>
+        <Avatar src={src} sx={{ width: 16, height: 16, mr: 0.5 }} />
+      </span>
       <span style={{ fontWeight: 450 }}>{label}</span>
       <CloseIcon onClick={onDelete} />
     </div>
   );
-}
+};
 
-const StyledTag = styled(Tag)<TagProps>(
-  ({ theme }) => ({
-    display: "flex",
-    alignItems: "center",
-    height: "24px",
-    margin: "2px 2.7px",
-    lineHeight: "22px",
-    backgroundColor: `${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'transparent'}`,
-    border: `1px solid ${theme.palette.mode === 'dark' ? '#303030' : '#d9d9d9'}`,
-    borderRadius: "8px",
-    boxSizing: "content-box",
-    padding: "0 2px 0 4px",
-    outline: 0,
-    overflow: "visible",
+const StyledTag = styled(Tag)<TagProps>(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  height: '24px',
+  margin: '2px 2.7px',
+  lineHeight: '22px',
+  backgroundColor: `${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'transparent'}`,
+  border: `1px solid ${theme.palette.mode === 'dark' ? '#303030' : '#d9d9d9'}`,
+  borderRadius: '8px',
+  boxSizing: 'content-box',
+  padding: '0 2px 0 4px',
+  outline: 0,
+  overflow: 'visible',
 
-    '&:focus': {
-      borderColor: `${theme.palette.mode === 'dark' ? '#177ddc' : '#40a9ff'}`,
-      backgroundColor: `${theme.palette.mode === 'dark' ? '#003b57' : '#e6f7ff'}`,
-    },
+  '&:focus': {
+    borderColor: `${theme.palette.mode === 'dark' ? '#177ddc' : '#40a9ff'}`,
+    backgroundColor: `${theme.palette.mode === 'dark' ? '#003b57' : '#e6f7ff'}`,
+  },
 
-    '& span': {
-      overflow: "hidden",
-      whiteSpace: "nowrap",
-      textOverflow: "ellipsis",
-    },
+  '& span': {
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+  },
 
-    '& svg': {
-      fontSize: "12px",
-      cursor: "pointer",
-      padding: "4px",
-    },
-  })
-);
+  '& svg': {
+    fontSize: '12px',
+    cursor: 'pointer',
+    padding: '4px',
+  },
+}));
 
 const Listbox = styled('ul')(
   ({ theme }) => `
@@ -158,7 +156,7 @@ const Listbox = styled('ul')(
       color: currentColor;
     }
   }
-`,
+`
 );
 
 interface addUsersProps {
@@ -167,11 +165,11 @@ interface addUsersProps {
 
 // List of all Schemeup Users with UserInfo only data as autocomplete listbox options
 const schemeupUsers = [
-  { name: "Daniel Wu", email: "daniel@untitledui.com" },
-  { name: "Candace Wallie", email: "candace@untitledui.com" },
-  { name: "Drew Cano", email: "drew@untitledui.com" },
-  { name: "Jacques Paul", email: "jacques@untitledui.com" },
-  { name: "Demi Wikinson", email: "demi@untitledui.com" },
+  { name: 'Daniel Wu', email: 'daniel@untitledui.com' },
+  { name: 'Candace Wallie', email: 'candace@untitledui.com' },
+  { name: 'Drew Cano', email: 'drew@untitledui.com' },
+  { name: 'Jacques Paul', email: 'jacques@untitledui.com' },
+  { name: 'Demi Wikinson', email: 'demi@untitledui.com' },
 ];
 
 const AddUsers = ({ schemaId }: addUsersProps) => {
@@ -200,7 +198,7 @@ const AddUsers = ({ schemaId }: addUsersProps) => {
     options: schemeupUsers,
     onChange: (e, value) => {
       const newInput = value[value.length - 1];
-      if (typeof newInput === "string") {
+      if (typeof newInput === 'string') {
         value[value.length - 1] = { name: newInput, email: newInput };
       }
       updateSharedUsers(value as typeof schemeupUsers);
@@ -209,12 +207,10 @@ const AddUsers = ({ schemaId }: addUsersProps) => {
   });
 
   const addUsersToSchema = () => {
-    const updatedSharedUsers = sharedUsers.map(user => ({ ...user, role: Role.Viewer }));
+    const updatedSharedUsers = sharedUsers.map((user) => ({ ...user, role: Role.Viewer }));
     dispatch(addSchemaUsers({ schemaId, users: [...updatedSharedUsers] }));
     value.splice(0, value.length);
-    // updateSharedUsers([]);
-    // console.log(updatedSharedUsers);
-  }
+  };
 
   useEffect(() => {
     // Scroll to the input element when there are many tags
@@ -227,22 +223,24 @@ const AddUsers = ({ schemaId }: addUsersProps) => {
     <Root>
       <div {...getRootProps()}>
         <Label {...getInputLabelProps()}>Add Users</Label>
-        <div style={{ display: "flex", gap: 0 }}>
-          <InputWrapper ref={inputWrapperRef} className={focused ? 'focused' : ''} >
+        <div style={{ display: 'flex', gap: 0 }}>
+          <InputWrapper ref={inputWrapperRef} className={focused ? 'focused' : ''}>
             {value.map((option, index) => (
               <StyledTag
-                label={typeof option === "string" ? option : option.name}
-                src={typeof option === "string" ? '' : 'https://mkorostoff.github.io/hundred-thousand-faces/img/f/4.jpg'}
+                label={typeof option === 'string' ? option : option.name}
+                src={
+                  typeof option === 'string' ? '' : 'https://mkorostoff.github.io/hundred-thousand-faces/img/f/4.jpg'
+                }
                 {...getTagProps({ index })}
               />
             ))}
-            <input {...getInputProps()} autoFocus />
+            <input {...getInputProps()} autoFocus placeholder="Enter user emails" type="email" />
           </InputWrapper>
           <Button
             type="primary"
             label="Add"
             height={43}
-            style={{ borderRadius: "0 10px 10px 0" }}
+            style={{ borderRadius: '0 10px 10px 0' }}
             onClick={addUsersToSchema}
           />
         </div>
@@ -259,6 +257,6 @@ const AddUsers = ({ schemaId }: addUsersProps) => {
       ) : null}
     </Root>
   );
-}
+};
 
 export default AddUsers;

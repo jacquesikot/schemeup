@@ -8,7 +8,8 @@ import AddUsers from './AddUsers';
 import Button from '../../global/Button';
 import CopyIcon from '../../../images/icons/modals/CopyIcon';
 import CheckboxIcon from '../../../images/icons/modals/CheckboxIcon';
-import { useAppSelector } from '../../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { updateSchema } from '../../../redux/slice/schemas';
 
 // Can be managed with state for all users who have access to schema
 const DUMMY_SHARED_USERS = [
@@ -20,7 +21,7 @@ const DUMMY_SHARED_USERS = [
   {
     name: 'Demi Wikinson',
     email: 'demi@untitledui.com',
-    image: ''
+    image: '',
   },
   {
     name: 'Drew Cano',
@@ -31,9 +32,16 @@ const DUMMY_SHARED_USERS = [
 
 const ShareSchemaModal = ({ open, handleClose, schemaId, containerStyle }: SingleModalProps) => {
   const [checked, setChecked] = useState<boolean>(false);
-  const schemas = useAppSelector(state => state.schemas.schemas);
-  const activeSchema = schemas.filter(schema => schema.id === schemaId)[0];
-  console.log(activeSchema);
+  const schemas = useAppSelector((state) => state.schemas.schemas);
+  const activeSchema = schemas.filter((schema) => schema.id === schemaId)[0];
+
+  const handleShareUpdate = () => {
+    // dispatch(updateSchema({
+    //   ...activeSchema,
+    //   users:
+    // }))
+    return true;
+  };
 
   return (
     <BaseModal open={open} handleClose={handleClose} containerStyle={containerStyle}>
@@ -45,6 +53,9 @@ const ShareSchemaModal = ({ open, handleClose, schemaId, containerStyle }: Singl
             width: 40,
             height: 40,
             textAlign: 'center',
+            justifyContent: 'center',
+            alignItems: 'center',
+            display: 'flex',
             padding: '6px 0',
           }}
         >
@@ -68,14 +79,22 @@ const ShareSchemaModal = ({ open, handleClose, schemaId, containerStyle }: Singl
       <AddUsers schemaId={schemaId} />
 
       {/* List of all shared users */}
-      {activeSchema?.users?.length ? 
-        (<List sx={{ my: 1, maxHeight: "250px", overflowY: "scroll" }}>
+      {activeSchema?.users?.length ? (
+        <List sx={{ my: 1, maxHeight: '250px', overflowY: 'scroll' }}>
           {activeSchema?.users?.map((user) => (
-            <SharedUser key={user.email} name={user.name} email={user.email} role={user.role} schemaId={schemaId} image="" />
+            <SharedUser
+              key={user.email}
+              name={user.name}
+              email={user.email}
+              role={user.role}
+              schemaId={schemaId}
+              image=""
+            />
           ))}
-        </List>) :
-        (<Typography sx={{textAlign: "center", py: 4, color: "#aaa"}}>No users added yet</Typography>)}
-        
+        </List>
+      ) : (
+        <Typography sx={{ textAlign: 'center', py: 4, color: '#aaa' }}>No users added yet</Typography>
+      )}
 
       {/* Secondary Actions */}
       <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mt={1.5}>
@@ -85,7 +104,7 @@ const ShareSchemaModal = ({ open, handleClose, schemaId, containerStyle }: Singl
             onChange={() => {
               setChecked((prevState) => !prevState);
             }}
-            label={<Typography variant='subtitle1'>Enable Public</Typography>}
+            label={<Typography variant="subtitle1">Enable Public</Typography>}
             control={<CheckboxIcon />}
           />
         </FormControl>
@@ -107,7 +126,7 @@ const ShareSchemaModal = ({ open, handleClose, schemaId, containerStyle }: Singl
       {/* Buttons: Primary Actions */}
       <Box mt={3} display={'flex'} justifyContent={'space-evenly'} gap={2}>
         <Button type="secondary" onClick={handleClose} label="Cancel" width={'48%'} height={44} />
-        <Button type="primary" label="Done" width={'48%'} height={44} />
+        <Button type="primary" label="Done" width={'48%'} height={44} onClick={() => handleShareUpdate()} />
       </Box>
     </BaseModal>
   );
