@@ -16,8 +16,6 @@ async function parsePgDump(req: VercelRequest, res: VercelResponse) {
 
   const data = parsePgDumpParser(sql);
 
-  console.log(data);
-
   res.status(200).json({
     message: 'Postgres Schema parsed successfully',
     data,

@@ -130,6 +130,10 @@ const schemasSlice = createSlice({
         },
       });
     },
+    setNewChanges: (state, action: PayloadAction<{ schemaId: string; hasUnsavedChanges: boolean }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      state.schemas[index].hasUnsavedChanges = action.payload.hasUnsavedChanges;
+    },
     updateSchema: (state, action: PayloadAction<Schema>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.id);
       state.schemas[index] = action.payload;
@@ -217,6 +221,7 @@ export const {
   addSchemaUsers,
   removeSchemaUsers,
   updateSchemaUser,
+  setNewChanges,
 } = schemasSlice.actions;
 
 export default schemasSlice.reducer;

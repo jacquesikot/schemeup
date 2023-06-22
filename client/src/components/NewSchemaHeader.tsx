@@ -10,7 +10,7 @@ import Share from '../images/icons/canvas-controls/Share';
 import Settings from '../images/icons/canvas-controls/Settings';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import EditableText from './global/EditableText';
-import { Schema, updateSchema } from '../redux/slice/schemas';
+import { Schema, setNewChanges, updateSchema } from '../redux/slice/schemas';
 import ImportIcon from '../images/icons/canvas-controls/ImportIcon';
 import Button from './global/Button';
 import SchemaButtonUpload from '../images/icons/schema/SchemaButtonUpload';
@@ -47,7 +47,6 @@ export default function NewSchemaHeader({
 
   const createOrUpdateSchemaMutation = useMutation((schema: Schema) => createOrUpdateUserSchemaApi(user!.uid, schema), {
     onSuccess: (data) => {
-      console.log('data', data);
       dispatch(
         updateSchema({
           id: data.id,
@@ -91,6 +90,7 @@ export default function NewSchemaHeader({
           onSave={(e) => {
             const updatedSchema = { ...schema, title: e };
             dispatch(updateSchema(updatedSchema));
+            dispatch(setNewChanges({ schemaId: schema.id, hasUnsavedChanges: true }));
           }}
         />
         <Box

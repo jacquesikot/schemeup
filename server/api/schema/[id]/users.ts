@@ -5,6 +5,7 @@ import useAuth from '../../../middlewares/auth';
 import useCors from '../../../middlewares/cors';
 import connectToDatabase from '../../../db';
 import { UserSchema } from '../../../models/UserSchema';
+import { User } from '../../../models/User';
 
 async function updateSchemaUsers(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
@@ -23,10 +24,21 @@ async function updateSchemaUsers(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    const updatedUsersPromises = req.body.users.map((user) => {
+      return User.findOne({ email: user.email }).then((userData) => {
+        return {
+          ...user,
+          name: userData.fullName || null,
+        };
+      });
+    });
+
+    const updatedUsers = await Promise.all(updatedUsersPromises);
+
     const updatedSchema = await UserSchema.updateOne(
       { _id: id },
       {
-        users: req.body.users,
+        users: updatedUsers,
         isPublic: req.body.isPublic || false,
       }
     );
