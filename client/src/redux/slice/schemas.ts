@@ -5,6 +5,7 @@ import {
   PostgresOnDeleteOption,
   PostgresOnUpdateOption,
 } from '../../types/tableTypes';
+import generateForeignKeyName from '../../utils/generateFkName';
 
 export interface Table {
   id: string;
@@ -23,6 +24,7 @@ export interface Table {
     autoUpdateTime?: boolean;
   }[];
   foreignKeys: {
+    name: string;
     column: string;
     referenceTable: string;
     referenceColumn: string;
@@ -112,6 +114,7 @@ const schemasSlice = createSlice({
             ],
             foreignKeys: [
               {
+                name: generateForeignKeyName('user', 'user_id', 'user', 'id'),
                 column: 'user_id',
                 referenceTable: 'user',
                 referenceColumn: 'id',

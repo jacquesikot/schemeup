@@ -1,6 +1,6 @@
-import { postgresColumnTypes } from './columnTypes';
+import { parse } from 'path';
 
-const parsePgDump = async (sql: string) => {
+const parsePgDumpParser = (sql: string) => {
   interface Column {
     name: string;
     type: string;
@@ -41,6 +41,8 @@ const parsePgDump = async (sql: string) => {
   // Remove multi-line comments
   sqlDump = sqlDump.replace(/\/\*[\s\S]*?\*\//gm, '');
 
+  sqlDump = sqlDump.replace(/"/g, '');
+
   // Remove line breaks, leading/trailing white spaces, and convert to lowercase
   let cleanedStatements = sqlDump.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
 
@@ -67,8 +69,9 @@ const parsePgDump = async (sql: string) => {
     const startIndex = createStatement.indexOf('(') + 1;
     const endIndex = createStatement.lastIndexOf(')');
     let columnDefs = createStatement.substring(startIndex, endIndex).trim();
+    const iterableColumnDefs = Array.from(columnDefs);
 
-    for (const columnDef of columnDefs) {
+    for (const columnDef of iterableColumnDefs) {
       const columnNameValue = columnDef.split(' ')[0];
       if (columnNameValue.toLowerCase() === 'primary') {
         // remove the column def from columnDefs
@@ -154,27 +157,24 @@ const parsePgDump = async (sql: string) => {
     return columnDefinitions;
   }
 
-  function findColumnTypeMatch(inputString: string) {
-    let longestMatch = '';
-
-    for (let i = 0; i < postgresColumnTypes.length; i++) {
-      const regex = new RegExp(postgresColumnTypes[i] + '\\b[^\\s]*', 'i');
-      const match = inputString.match(regex);
-
-      if (match && (!longestMatch || match[0].length > longestMatch.length)) {
-        longestMatch = match[0];
-      }
-    }
-
-    return longestMatch;
-  }
-
   function parseColumnDefinition(columnDefinitions: string[]): Column[] {
     return columnDefinitions.map((columnDef) => {
-      const columnDefParts = columnDef.split(' ');
+      let name: string = '';
+      let type: string = '';
 
-      let name = columnDefParts[0].replace(/"/g, '');
-      const type = findColumnTypeMatch(columnDef);
+      // If columnDef contains a quoted name, handle it separately.
+      if (columnDef.startsWith('"')) {
+        const match = columnDef.match(/^"([^"]*)"\s+(.*)/);
+        if (match) {
+          name = match[1];
+          type = match[2].split(' ')[0];
+        }
+      } else {
+        const columnDefParts = columnDef.split(' ');
+        name = columnDefParts[0];
+        type = columnDefParts[1];
+      }
+
       const nullable = !columnDef.includes('not null');
       const primaryKey = columnDef.includes('primary key');
       const unique = columnDef.includes('unique');
@@ -205,59 +205,59 @@ const parsePgDump = async (sql: string) => {
     return alterTableStatements;
   }
 
-  function parseForignKeyFromAlterStatement(statements: string[]) {
-    let result: {
-      tableName: string;
-      foreignKeys: ForeignKey[];
-    }[] = [];
+  // function parseForignKeyFromAlterStatement(statements: string[]) {
+  //   let result: {
+  //     tableName: string;
+  //     foreignKeys: ForeignKey[];
+  //   }[] = [];
 
-    statements.forEach((statement) => {
-      // Clean the statement
-      let cleanedStatement = statement.toLowerCase().replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-      // Check if the statement is a foreign key constraint
-      if (cleanedStatement.includes('add constraint') && cleanedStatement.includes('foreign key')) {
-        let tableNameMatch = cleanedStatement.match(/alter table only (.*?) add constraint/);
-        let fkNameMatch = cleanedStatement.match(/add constraint (.*?) foreign key/);
-        let columnNameMatch = cleanedStatement.match(/foreign key \((.*?)\) references/);
-        let referenceTableMatch = cleanedStatement.match(/references (.*?)\(/);
-        let referenceColumnMatch = cleanedStatement.match(/references .*?\((.*?)\)/);
-        let onUpdateMatch = cleanedStatement.match(/on update (cascade|set null|set default|no action)/);
-        let onDeleteMatch = cleanedStatement.match(/on delete (cascade|set null|set default|no action)/);
+  //   statements.forEach((statement) => {
+  //     // Clean the statement
+  //     let cleanedStatement = statement.toLowerCase().replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+  //     // Check if the statement is a foreign key constraint
+  //     if (cleanedStatement.includes('add constraint') && cleanedStatement.includes('foreign key')) {
+  //       let tableNameMatch = cleanedStatement.match(/alter table only (.*?) add constraint/);
+  //       let fkNameMatch = cleanedStatement.match(/add constraint (.*?) foreign key/);
+  //       let columnNameMatch = cleanedStatement.match(/foreign key \((.*?)\) references/);
+  //       let referenceTableMatch = cleanedStatement.match(/references (.*?)\(/);
+  //       let referenceColumnMatch = cleanedStatement.match(/references .*?\((.*?)\)/);
+  //       let onUpdateMatch = cleanedStatement.match(/on update (cascade|set null|set default|no action)/);
+  //       let onDeleteMatch = cleanedStatement.match(/on delete (cascade|set null|set default|no action)/);
 
-        if (tableNameMatch && fkNameMatch && columnNameMatch && referenceTableMatch && referenceColumnMatch) {
-          let tableName = tableNameMatch[1];
-          let fkName = fkNameMatch[1];
-          let columnName = columnNameMatch[1];
-          let referenceTable = referenceTableMatch[1];
-          let referenceColumn = referenceColumnMatch[1];
-          let onUpdate = onUpdateMatch ? onUpdateMatch[1] : 'NO ACTION';
-          let onDelete = onDeleteMatch ? onDeleteMatch[1] : 'NO ACTION';
+  //       if (tableNameMatch && fkNameMatch && columnNameMatch && referenceTableMatch && referenceColumnMatch) {
+  //         let tableName = tableNameMatch[1];
+  //         let fkName = fkNameMatch[1];
+  //         let columnName = columnNameMatch[1];
+  //         let referenceTable = referenceTableMatch[1];
+  //         let referenceColumn = referenceColumnMatch[1];
+  //         let onUpdate = onUpdateMatch ? onUpdateMatch[1] : 'NO ACTION';
+  //         let onDelete = onDeleteMatch ? onDeleteMatch[1] : 'NO ACTION';
 
-          // Check if the table is already in the result
-          let table = result.find((t) => t.tableName === tableName);
-          if (!table) {
-            table = {
-              tableName: tableName,
-              foreignKeys: [],
-            };
-            result.push(table);
-          }
+  //         // Check if the table is already in the result
+  //         let table = result.find((t) => t.tableName === tableName);
+  //         if (!table) {
+  //           table = {
+  //             tableName: tableName,
+  //             foreignKeys: [],
+  //           };
+  //           result.push(table);
+  //         }
 
-          // Add the foreign key to the table
-          table.foreignKeys.push({
-            name: fkName,
-            column: columnName,
-            referenceTable: referenceTable,
-            referenceColumn: referenceColumn,
-            onUpdate: onUpdate,
-            onDelete: onDelete,
-          });
-        }
-      }
-    });
+  //         // Add the foreign key to the table
+  //         table.foreignKeys.push({
+  //           name: fkName,
+  //           column: columnName,
+  //           referenceTable: referenceTable,
+  //           referenceColumn: referenceColumn,
+  //           onUpdate: onUpdate,
+  //           onDelete: onDelete,
+  //         });
+  //       }
+  //     }
+  //   });
 
-    return result;
-  }
+  //   return result;
+  // }
 
   function parseForeignKeyFromCreateStatement(statements: string[]) {
     let foreignKeyInfo: {
@@ -265,7 +265,7 @@ const parsePgDump = async (sql: string) => {
       foreignKeys: ForeignKey[];
     }[] = [];
 
-    createStatements.forEach((statement) => {
+    statements.forEach((statement) => {
       // Clean up the statement
       statement = statement.toLowerCase();
       statement = statement.replace(/\s+/g, ' ');
@@ -352,7 +352,9 @@ const parsePgDump = async (sql: string) => {
     const parsedStatements: Table[] = [];
 
     for (const statement of createStatements) {
-      const tableNameRegex = /CREATE TABLE\s+((\w+\.\w+)|(\w+\."\w+"))/i;
+      //   const tableNameRegex = /CREATE TABLE\s+((\w+\.\w+)|(\w+\."\w+"))/i;
+      const tableNameRegex = /CREATE\s+TABLE\s+((("[^"]+")|(\w+))(\.("[^"]+")|\.(\w+))?)/i;
+
       const tableNameMatch = statement.match(tableNameRegex);
       const tableName = tableNameMatch ? tableNameMatch[1] : '';
 
@@ -361,17 +363,17 @@ const parsePgDump = async (sql: string) => {
       const parsedColumn = parseColumnDefinition(columnDefinitions);
       const alterStatements = getAlterStatements(sql);
 
-      const parsedForeignKeysFromAlterStatememts = parseForignKeyFromAlterStatement(alterStatements);
+      // const parsedForeignKeysFromAlterStatememts = parseForignKeyFromAlterStatement(alterStatements);
       const parsedForeignKeysFromCreateStatement = parseForeignKeyFromCreateStatement(createStatements);
 
-      const allForeignKeys = parsedForeignKeysFromAlterStatememts.concat(parsedForeignKeysFromCreateStatement);
+      // const allForeignKeys = parsedForeignKeysFromAlterStatememts.concat(parsedForeignKeysFromCreateStatement);
 
       const parsedIndexStatements = parseIndexFromSql(sql);
 
       parsedStatements.push({
         name: tableName,
         columns: parsedColumn,
-        foreignKeys: allForeignKeys.find((fk) => fk.tableName === tableName)?.foreignKeys || [],
+        foreignKeys: [],
         indexes: parsedIndexStatements.find((index) => index.tableName === tableName)?.indexes || [],
       });
     }
@@ -380,15 +382,59 @@ const parsePgDump = async (sql: string) => {
     return parsedStatements;
   }
 
-  const createStatements = getCreateStatements(statements);
-  const response = handleParse(createStatements);
+  function parseFk(sql: string, res: Table[]): any[] {
+    // Clean up the statements
+    const cleanedStatements = sql
+      .toLowerCase()
+      .replace(/(\r\n|\n|\r)/gm, ' ') // remove newlines
+      .replace(/"/g, ''); // remove quotes
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      data: response,
-    }),
-  };
+    // Regex to match the ALTER TABLE statements
+    // const regex = /alter table\s+(\w+)\s+add constraint \w+ foreign key\((\w+)\) references (\w+)\((\w+)\)/g;
+    const regex = /alter table\s+(\w+)\s+add constraint (\w+) foreign key\((\w+)\) references (\w+)\((\w+)\)/g;
+
+    const foreignKeys: any = [];
+    let match;
+
+    // Loop over the matches
+    while ((match = regex.exec(cleanedStatements)) !== null) {
+      foreignKeys.push({
+        table: match[1],
+        constraintName: match[2],
+        column: match[3],
+        referenceTable: match[4],
+        referenceColumn: match[5],
+        onUpdate: 'NO ACTION', // Defaulting to 'NO ACTION' as it's not specified in the ALTER TABLE statements
+        onDelete: 'NO ACTION', // Defaulting to 'NO ACTION' as it's not specified in the ALTER TABLE statements
+      });
+    }
+
+    // Loop over foreignKeys and add them to res array where the table name matches
+
+    let newData: any = [...res];
+
+    foreignKeys.forEach((fk) => {
+      res.forEach((table, index) => {
+        if (table.name === fk.table) {
+          newData[index].foreignKeys.push({
+            column: fk.column,
+            referenceTable: fk.referenceTable,
+            referenceColumn: fk.referenceColumn,
+            onUpdate: fk.onUpdate,
+            onDelete: fk.onDelete,
+            name: fk.constraintName,
+          });
+        }
+      });
+    });
+
+    return newData;
+  }
+
+  const createStatements = getCreateStatements(statements);
+  const parsedData = handleParse(createStatements);
+
+  return parseFk(sql, parsedData);
 };
 
-export default parsePgDump;
+export default parsePgDumpParser;

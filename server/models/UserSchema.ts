@@ -107,6 +107,7 @@ const UserSchemaSchema = new MongooseSchema({
   description: String,
   tables: [TableSchema],
   users: [SchemaUserSchema],
+  isPublic: { type: Boolean, default: false },
 });
 
 UserSchemaSchema.statics.build = (attr: IUserSchema) => {

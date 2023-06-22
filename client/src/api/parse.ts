@@ -1,9 +1,17 @@
 import client from './client';
 
-export const parsePgDump = async (file: string) => {
-  return await client.post('/schema/parse-pg-dump', file, {
+interface ParsePgDumpDto {
+  file: string;
+  userId: string;
+}
+
+export const parsePgDump = async ({ file, userId }: ParsePgDumpDto) => {
+  const res = await client.post('/schema/parse/postgres', file, {
     headers: {
       'Content-Type': 'text/plain',
+      'x-auth-id': userId,
     },
   });
+
+  return res.data.data;
 };
