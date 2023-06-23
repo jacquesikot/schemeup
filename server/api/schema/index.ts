@@ -1,4 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import { VercelResponse } from '@vercel/node';
 
 import connectToDatabase from '../../db';
 import createSchema from './createSchema';

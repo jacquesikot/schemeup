@@ -26,14 +26,16 @@ interface UpdateSchemaUsersDto {
   schemaId: string;
   isPublic: boolean;
   users: { email: string; role: 'admin' | 'viewer' | 'editor' }[];
+  schema: Schema;
 }
 
-export const updateSchemaUsersApi = async ({ authId, schemaId, users, isPublic }: UpdateSchemaUsersDto) => {
+export const updateSchemaUsersApi = async ({ authId, schemaId, users, isPublic, schema }: UpdateSchemaUsersDto) => {
   const res = await client.post(
     `/schema/${schemaId}/users`,
     {
       users,
       isPublic,
+      schema,
     },
     {
       headers: {
@@ -41,6 +43,16 @@ export const updateSchemaUsersApi = async ({ authId, schemaId, users, isPublic }
       },
     }
   );
+
+  return res.data.data;
+};
+
+export const deleteSchemaApi = async (authId: string, schemaId: string) => {
+  const res = await client.delete(`/schema/${schemaId}/delete`, {
+    headers: {
+      'x-auth-id': authId,
+    },
+  });
 
   return res.data.data;
 };

@@ -80,7 +80,7 @@ const Button = ({
         bgcolor: returnButtonColors().bg,
         border: `${type === 'primary' ? '0' : '1.5'}px solid #D0D5DD`,
         color: returnButtonColors().text,
-        fontWeight: 600,
+        fontWeight: 500,
         fontSize: 15,
         letterSpacing: '0.02em',
         textTransform: 'none',

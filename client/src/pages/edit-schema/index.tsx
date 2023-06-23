@@ -12,7 +12,6 @@ import CanvasDrawer from '../../components/canvas/CanvasDrawer';
 import SchemaProperties from '../../components/canvas/SchemaProperties';
 import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import generateForeignKeyName from '../../utils/generateFkName';
 import generateTableLayout from '../../utils/generateTableLayout';
 import { Schema, Table as TableProps, deleteTable, newTable, setActiveTable } from '../../redux/slice/schemas';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
@@ -279,7 +278,7 @@ const EditSchema = () => {
         containerStyle={{
           backgroundColor: '#FFFFFF',
           width: 450,
-          borderRadius: 8,
+          borderRadius: '12px',
           padding: '14px',
         }}
       />
@@ -296,7 +295,7 @@ const EditSchema = () => {
         containerStyle={{
           width: '400px',
           backgroundColor: '#FFFFFF',
-          borderRadius: '8px',
+          borderRadius: '12px',
           padding: '20px',
         }}
       />
@@ -311,7 +310,7 @@ const EditSchema = () => {
         containerStyle={{
           width: '450px',
           backgroundColor: '#FFFFFF',
-          borderRadius: '8px',
+          borderRadius: '12px',
         }}
       />
     </Box>

@@ -13,6 +13,8 @@ import MenuPopper from './MenuPopper';
 import routes from '../../routes';
 import { newSchema } from '../../redux/slice/schemas';
 import useAppTab from '../../hooks/useAppTab';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../firebase.config';
 
 interface TopBarProps {
   items: Tab[];
@@ -29,6 +31,7 @@ export default function Topbar({ items }: TopBarProps) {
   const { pathname } = useLocation();
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const dispatch = useAppDispatch();
+  const [user] = useAuthState(auth);
 
   const [open, setOpen] = useState(false);
   const [boxSize, setBoxSize] = useState(70);
@@ -127,7 +130,7 @@ export default function Topbar({ items }: TopBarProps) {
                 onClick={(e) => {
                   const id = uuidv4();
                   const newSchemaName = generateSchemaName();
-                  dispatch(newSchema({ id, title: newSchemaName, tables: [] }));
+                  dispatch(newSchema({ id, title: newSchemaName, tables: [], userId: user?.uid as string }));
                   newAppTab(`${routes.EDIT_SCHEMA}/${id}`);
                   handleClose(e);
                 }}
