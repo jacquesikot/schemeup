@@ -1,9 +1,9 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import { VercelResponse } from '@vercel/node';
 
 import connectToDatabase from '../../db';
 import createSchema from './createSchema';
 import getUserSchemas from './getUserSchemas';
-import { UserSchema, validateUserSchema } from '../../models/UserSchema';
+import { validateUserSchema } from '../../models/UserSchema';
 import useMiddlewares from '../../middlewares/useMiddlewares';
 import useCors from '../../middlewares/cors';
 import useAuth from '../../middlewares/auth';
@@ -44,10 +44,6 @@ async function handler(req: any, res: VercelResponse) {
       message: 'Schema fetched successfully',
       data: schemas,
     });
-  }
-
-  if (req.method === 'DELETE') {
-    await UserSchema.deleteOne({ id: req.query.id });
   }
 
   return res.status(405).json({ message: 'Method not allowed' });

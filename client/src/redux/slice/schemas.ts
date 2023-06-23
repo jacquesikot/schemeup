@@ -50,6 +50,7 @@ export interface SchemaUser {
 export interface Schema {
   id: string;
   title: string;
+  userId: string;
   description?: string;
   tables?: Table[];
   activeTable?: string;
@@ -75,6 +76,7 @@ const schemasSlice = createSlice({
       state.schemas.push({
         id: action.payload.id,
         title: action.payload.title,
+        userId: action.payload.userId,
         hasUnsavedChanges: true,
         description: 'A user and post default schema for reference. Feel free to delete this',
         tables: [

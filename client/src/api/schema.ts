@@ -46,3 +46,13 @@ export const updateSchemaUsersApi = async ({ authId, schemaId, users, isPublic, 
 
   return res.data.data;
 };
+
+export const deleteSchemaApi = async (authId: string, schemaId: string) => {
+  const res = await client.delete(`/schema/${schemaId}/delete`, {
+    headers: {
+      'x-auth-id': authId,
+    },
+  });
+
+  return res.data.data;
+};

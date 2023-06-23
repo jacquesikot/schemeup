@@ -50,6 +50,7 @@ export default function NewSchemaHeader({
       dispatch(
         updateSchema({
           id: data.id,
+          userId: data.userId,
           title: data.title,
           tables: data.tables,
           description: data.description,

@@ -41,8 +41,8 @@ export const purple = withAlphas({
 });
 
 export const success = withAlphas({
-  lightest: '#F6FEF9',
-  light: '#6CE9A6',
+  light: '#ECFDF3',
+  // light: '#6CE9A6',
   main: '#12B76A',
   dark: '#05603A',
   darkest: '#054F31',

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import SchemaCardItem from '../../components/schema/SchemaCardItem';
@@ -16,7 +16,7 @@ import routes from '../../routes';
 import { hideCodeEditor, triggerSnack } from '../../redux/slice/app';
 import DeleteSchemaModal from '../../components/modals/DeleteSchemaModal';
 import EmptyState from '../../components/global/EmptyState';
-import { getUserSchemasApi } from '../../api/schema';
+import { deleteSchemaApi, getUserSchemasApi } from '../../api/schema';
 import queryKeys from '../../utils/keys/query';
 import { auth } from '../../firebase.config';
 import useAppTab from '../../hooks/useAppTab';
@@ -40,6 +40,7 @@ const Dashboard = () => {
     {
       enabled: !!user?.uid,
       onSuccess: (res) => {
+        console.log(res);
         // create a new Map
         const schemaMap = new Map();
 
@@ -84,6 +85,17 @@ const Dashboard = () => {
       },
     }
   );
+
+  const deleteSchemaMutation = useMutation(() => deleteSchemaApi(user!.uid, activeSchema.id), {
+    onSuccess: () => {
+      dispatch(deleteSchema(activeSchema.id));
+      setOpenDeleteModal(false);
+      dispatch(triggerSnack({ message: 'Schema deleted', severity: 'success', hideDuration: 3000 }));
+    },
+    onError: (err) => {
+      triggerSnack({ message: 'Error deleting schema', severity: 'error', hideDuration: 3000 });
+    },
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -142,6 +154,7 @@ const Dashboard = () => {
           description: s.description,
           noOfTables: s.tables?.length || 0,
           hasUnsavedChanges: s.hasUnsavedChanges,
+          userId: s.userId,
         };
       })
     : [];
@@ -174,6 +187,7 @@ const Dashboard = () => {
     dispatch(
       newSchema({
         id: id,
+        userId: user!.uid as string,
         title: newSchemaName,
         tables: [],
       })
@@ -279,6 +293,7 @@ const Dashboard = () => {
                 <Box display="flex" justifyContent="center" alignItems="center" maxWidth="343px" height="174px" p={1}>
                   <SchemaCardItem
                     id={item.id}
+                    isShared={user?.uid !== item.userId}
                     hasUnsavedChanges={item.hasUnsavedChanges}
                     title={item.title}
                     description={item.description}
@@ -310,9 +325,10 @@ const Dashboard = () => {
       )}
 
       <DeleteSchemaModal
+        deleteLoading={deleteSchemaMutation.isLoading}
         open={openDeleteModal}
         handleClose={() => setOpenDeleteModal(false)}
-        handleSchemaDelete={() => dispatch(deleteSchema(activeSchema.id))}
+        handleSchemaDelete={() => deleteSchemaMutation.mutate()}
         schemaId={activeSchema?.id}
         containerStyle={{
           width: '400px',
