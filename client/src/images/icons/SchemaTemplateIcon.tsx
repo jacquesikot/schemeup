@@ -3,19 +3,18 @@ import { SVGProps } from "react";
 const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={20}
-    height={20}
-    stroke="red"
+    width={18}
+    height={18}
     fill="none"
     {...props}
   >
     <path
-      stroke="#076839"
+      stroke="#6941C6"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={1.667}
-      d="M10 13.333V10m0-3.333h.008M18.333 10a8.333 8.333 0 1 1-16.666 0 8.333 8.333 0 0 1 16.666 0Z"
+      d="M9 12.245v-3.2m0-3.2h.008M17 9.045a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
     />
   </svg>
 );
-export { SvgComponent as SuggestionInfoIcon };
+export { SvgComponent as SchemaTemplateIcon };
