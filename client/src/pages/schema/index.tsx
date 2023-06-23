@@ -40,7 +40,6 @@ const Dashboard = () => {
     {
       enabled: !!user?.uid,
       onSuccess: (res) => {
-        console.log(res);
         // create a new Map
         const schemaMap = new Map();
 
@@ -51,9 +50,20 @@ const Dashboard = () => {
 
         // iterate over the fetched schemas
         res.forEach((schema: Schema) => {
+          const existingSchema = schemaMap.get(schema.id);
           // only set in map if not already set
-          if (!schemaMap.has(schema.id) || !schemaMap.get(schema.id).hasUnsavedChanges) {
+          if (!existingSchema) {
             schemaMap.set(schema.id, schema);
+          } else {
+            // If both schemas have updatedAt, we keep the most recent one.
+            if (schema.updatedAt && existingSchema.updatedAt) {
+              if (new Date(schema.updatedAt) > new Date(existingSchema.updatedAt)) {
+                schemaMap.set(schema.id, schema);
+              }
+            } else {
+              // If one of them doesn't have updatedAt, we use the one from the response.
+              schemaMap.set(schema.id, schema);
+            }
           }
         });
 
@@ -93,7 +103,7 @@ const Dashboard = () => {
       dispatch(triggerSnack({ message: 'Schema deleted', severity: 'success', hideDuration: 3000 }));
     },
     onError: (err) => {
-      triggerSnack({ message: 'Error deleting schema', severity: 'error', hideDuration: 3000 });
+      dispatch(triggerSnack({ message: 'Error deleting schema', severity: 'error', hideDuration: 3000 }));
     },
   });
 

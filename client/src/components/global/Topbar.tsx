@@ -78,9 +78,8 @@ export default function Topbar({ items }: TopBarProps) {
       ref={topBarRef}
       display={'flex'}
       alignItems={'center'}
-      height={44}
+      height={34}
       maxWidth={'100%'}
-      bgcolor={'red'}
       borderBottom={1}
       borderColor={colors.grey[200]}
       sx={{

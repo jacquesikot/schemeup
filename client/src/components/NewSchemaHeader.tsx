@@ -10,7 +10,7 @@ import Share from '../images/icons/canvas-controls/Share';
 import Settings from '../images/icons/canvas-controls/Settings';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import EditableText from './global/EditableText';
-import { Schema, setNewChanges, updateSchema } from '../redux/slice/schemas';
+import { Role, Schema, setNewChanges, updateSchema } from '../redux/slice/schemas';
 import ImportIcon from '../images/icons/canvas-controls/ImportIcon';
 import Button from './global/Button';
 import SchemaButtonUpload from '../images/icons/schema/SchemaButtonUpload';
@@ -27,6 +27,7 @@ interface NewSchemaHeaderProps {
   handleShare: () => void;
   handleImport: () => void;
   showPreview: () => void;
+  role: Role;
 }
 
 export default function NewSchemaHeader({
@@ -36,6 +37,7 @@ export default function NewSchemaHeader({
   handleShare,
   handleImport,
   showPreview,
+  role,
 }: NewSchemaHeaderProps) {
   const theme = useTheme();
   const colors = theme.palette;
@@ -54,6 +56,7 @@ export default function NewSchemaHeader({
           title: data.title,
           tables: data.tables,
           description: data.description,
+          users: data.users,
           hasUnsavedChanges: false,
           activeTable: '',
           meta: {
@@ -84,6 +87,7 @@ export default function NewSchemaHeader({
       {/* SCHEMA TITLE */}
       <Box display={'flex'} alignItems={'center'}>
         <EditableText
+          disableEdit={role === 'viewer'}
           fontSize={18}
           fontColor={colors.grey[900]}
           fontWeight={500}
@@ -111,64 +115,83 @@ export default function NewSchemaHeader({
       </Box>
 
       {/* CANVAS CONTROLS */}
-      <Box display={'flex'} width={350} justifyContent={'space-between'}>
-        {/* <Tooltip title="Undo">
-          <IconButton>
-            <Undo />
-          </IconButton>
-        </Tooltip>
+      {role !== 'viewer' ? (
+        <Box display={'flex'} width={350} justifyContent={'space-between'}>
+          {/* <Tooltip title="Undo">
+        <IconButton>
+          <Undo />
+        </IconButton>
+      </Tooltip>
 
-        <Tooltip title="Forward">
-          <IconButton>
-            <Forward />
-          </IconButton>
-        </Tooltip> */}
+      <Tooltip title="Forward">
+        <IconButton>
+          <Forward />
+        </IconButton>
+      </Tooltip> */}
 
-        {/* <Tooltip title="Mouse">
-          <IconButton>
-            <Pointer />
-          </IconButton>
-        </Tooltip> */}
+          {/* <Tooltip title="Mouse">
+        <IconButton>
+          <Pointer />
+        </IconButton>
+      </Tooltip> */}
 
-        <Tooltip title="New Table">
-          <IconButton onClick={handleNewTable}>
-            <Table />
-          </IconButton>
-        </Tooltip>
+          <Tooltip title="New Table">
+            <IconButton onClick={handleNewTable}>
+              <Table />
+            </IconButton>
+          </Tooltip>
 
-        {/* <Tooltip title="New Relation">
-          <IconButton>
-            <Link />
-          </IconButton>
-        </Tooltip> */}
+          {/* <Tooltip title="New Relation">
+        <IconButton>
+          <Link />
+        </IconButton>
+      </Tooltip> */}
 
-        <Tooltip title="Comment">
-          <IconButton>
-            <Comment />
-          </IconButton>
-        </Tooltip>
+          <Tooltip title="Comment">
+            <IconButton>
+              <Comment />
+            </IconButton>
+          </Tooltip>
 
-        <Tooltip title="Preview">
-          <IconButton onClick={showPreview}>
-            <VisibilityIcon />
-          </IconButton>
-        </Tooltip>
+          <Tooltip title="Preview">
+            <IconButton onClick={showPreview}>
+              <VisibilityIcon />
+            </IconButton>
+          </Tooltip>
 
-        <Tooltip title="Share Schema">
-          <IconButton onClick={handleShare}>
-            <Share />
-          </IconButton>
-        </Tooltip>
+          {role === 'admin' && (
+            <Tooltip title="Share Schema">
+              <IconButton onClick={handleShare}>
+                <Share />
+              </IconButton>
+            </Tooltip>
+          )}
 
-        <Tooltip title="Import Schema">
-          <IconButton onClick={handleImport}>
-            <ImportIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
+          <Tooltip title="Import Schema">
+            <IconButton onClick={handleImport}>
+              <ImportIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ) : (
+        <Box
+          height={30}
+          display={'flex'}
+          borderRadius={1}
+          justifyContent={'center'}
+          alignItems={'center'}
+          paddingLeft={1}
+          paddingRight={1}
+          bgcolor={colors.success.light}
+        >
+          <Typography fontSize={12} fontWeight={500} color={colors.success.main}>
+            View Only Access
+          </Typography>
+        </Box>
+      )}
 
       {/* SHARE/EXPORT CONTROLS */}
-      <Box display={'flex'} width={150} justifyContent={'space-between'}>
+      <Box display={'flex'} width={role !== 'viewer' ? 150 : 100} justifyContent={'space-between'}>
         <Button
           disabled={!schema.hasUnsavedChanges}
           type="primary"
@@ -179,11 +202,13 @@ export default function NewSchemaHeader({
           icon={<SchemaButtonUpload color={!schema.hasUnsavedChanges ? colors.grey[300] : colors.grey[100]} />}
         />
 
-        <Tooltip title="Settings">
-          <IconButton onClick={() => toggleSettingsDrawer(!drawerState)}>
-            <Settings color={rightPanelOpen ? colors.primary.main : colors.grey[700]} />
-          </IconButton>
-        </Tooltip>
+        {role !== 'viewer' && (
+          <Tooltip title="Settings">
+            <IconButton onClick={() => toggleSettingsDrawer(!drawerState)}>
+              <Settings color={rightPanelOpen ? colors.primary.main : colors.grey[700]} />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     </Box>
   );

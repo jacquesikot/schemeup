@@ -6,6 +6,8 @@ import MenuPopper from '../../global/MenuPopper';
 import { Role, SchemaUser, removeSchemaUsers, updateSchemaUser } from '../../../redux/slice/schemas';
 import { useAppDispatch } from '../../../redux/hooks';
 import Button from '../../global/Button';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../../firebase.config';
 
 interface UserProps extends SchemaUser {
   schemaId: string;
@@ -13,6 +15,7 @@ interface UserProps extends SchemaUser {
 }
 
 const SharedUser = ({ name, email, role, image, schemaId }: UserProps) => {
+  const [user] = useAuthState(auth);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
   const theme = useTheme();
   const colors = theme.palette;
@@ -25,23 +28,26 @@ const SharedUser = ({ name, email, role, image, schemaId }: UserProps) => {
   };
 
   function getInitials(str: string) {
-    // Split the string into words
-    const words = str.split(' ');
+    if (str.length > 0) {
+      // Split the string into words
+      const words = str.split(' ');
 
-    // If there are two or more words, get the first character from the first two words
-    if (words.length >= 2) {
-      return (words[0][0] + words[1][0]).toUpperCase();
-    }
+      // If there are two or more words, get the first character from the first two words
+      if (words.length >= 2) {
+        return (words[0][0] + words[1][0]).toUpperCase();
+      }
 
-    // If there's only one word, get the first character from that word
-    else if (words.length === 1) {
-      return words[0][0].toUpperCase();
-    }
+      // If there's only one word, get the first character from that word
+      else if (words.length === 1) {
+        return words[0][0].toUpperCase();
+      }
 
-    // If the string is empty or doesn't contain any words, return an empty string
-    else {
-      return '';
+      // If the string is empty or doesn't contain any words, return an empty string
+      else {
+        return '';
+      }
     }
+    return '';
   }
 
   // Toggle Menu Popper for Edit/View
@@ -101,36 +107,39 @@ const SharedUser = ({ name, email, role, image, schemaId }: UserProps) => {
           </MuiButton>
 
           {/* Menu */}
-          <MenuPopper
-            open={openMenu}
-            setOpen={() => {}}
-            anchorRef={anchorRef}
-            handleClose={handleMenuClose.bind(null, accessControl)}
-            containerStyle={{ border: '1px solid #EAECF0', width: '115px', borderRadius: '6px' }}
-            menuItems={
-              <>
-                <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Viewer)}>
-                  <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
-                    Viewer
-                  </Typography>
-                </MenuItem>
-                <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Editor)}>
-                  <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
-                    Editor
-                  </Typography>
-                </MenuItem>
-                <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Admin)}>
-                  <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
-                    Admin
-                  </Typography>
-                </MenuItem>
-              </>
-            }
-          />
+          {user?.email !== email && (
+            <MenuPopper
+              open={openMenu}
+              setOpen={() => {}}
+              anchorRef={anchorRef}
+              handleClose={handleMenuClose.bind(null, accessControl)}
+              containerStyle={{ border: '1px solid #EAECF0', width: '115px', borderRadius: '6px' }}
+              menuItems={
+                <>
+                  <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Viewer)}>
+                    <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
+                      Viewer
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Editor)}>
+                    <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
+                      Editor
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Admin)}>
+                    <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
+                      Admin
+                    </Typography>
+                  </MenuItem>
+                </>
+              }
+            />
+          )}
         </Grid>
         <Grid item xs={2.5}>
           <Button
             disableRipple={false}
+            disabled={user?.email === email}
             label="Remove"
             type="error"
             onClick={removeUserFromList}

@@ -27,10 +27,18 @@ async function updateSchemaUsers(req: any, res: VercelResponse) {
 
       const updatedUsersPromises = req.body.users.map((user) => {
         return User.findOne({ email: user.email }).then((userData) => {
-          return {
-            ...user,
-            name: userData.fullName || null,
-          };
+          if (userData) {
+            return {
+              ...user,
+              name: userData.fullName || null,
+            };
+          } else {
+            return {
+              name: 'Anonymous',
+              email: user.email,
+              role: user.role,
+            };
+          }
         });
       });
 
@@ -46,7 +54,7 @@ async function updateSchemaUsers(req: any, res: VercelResponse) {
             description: req.body.schema.description,
             title: req.body.schema.title,
             id: req.body.schema.id,
-            userId: req.authId,
+            userId: req.body.schema.userId || req.authId,
           },
         },
         { upsert: true }

@@ -145,7 +145,7 @@ const SchemaCardItem = ({
                     Export
                   </Typography>
                 </MenuItem>
-                {returnUserRole() === Role.Admin && (
+                {user!.uid === activeSchema?.userId && (
                   <MenuItem
                     style={menuItemStyle}
                     onClick={(e) => {

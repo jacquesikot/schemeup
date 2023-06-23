@@ -58,6 +58,7 @@ export interface Schema {
   meta?: any;
   hasUnsavedChanges?: boolean;
   isPublic?: boolean;
+  updatedAt?: string;
 }
 
 interface SchemaState {
@@ -141,6 +142,7 @@ const schemasSlice = createSlice({
     updateSchema: (state, action: PayloadAction<Schema>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.id);
       state.schemas[index] = action.payload;
+      state.schemas[index].updatedAt = new Date().toISOString();
     },
     deleteSchema: (state, action: PayloadAction<string>) => {
       state.schemas = state.schemas.filter((schema) => schema.id !== action.payload);
@@ -149,11 +151,13 @@ const schemasSlice = createSlice({
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables?.push(action.payload.table);
       state.schemas[index].hasUnsavedChanges = true;
+      state.schemas[index].updatedAt = new Date().toISOString();
     },
     deleteTable: (state, action: PayloadAction<{ schemaId: string; tableId: string }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables = state.schemas[index].tables?.filter((table) => table.id !== action.payload.tableId);
       state.schemas[index].hasUnsavedChanges = true;
+      state.schemas[index].updatedAt = new Date().toISOString();
     },
     editTable: (state, action: PayloadAction<{ schemaId: string; table: Table }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
@@ -161,6 +165,7 @@ const schemasSlice = createSlice({
       if (tableIndex !== undefined && tableIndex !== -1) {
         state.schemas[index].tables![tableIndex] = action.payload.table;
         state.schemas[index].hasUnsavedChanges = true;
+        state.schemas[index].updatedAt = new Date().toISOString();
       }
     },
     addSchemaUsers: (state, action: PayloadAction<{ schemaId: string; users: SchemaUser[] }>) => {
@@ -171,6 +176,7 @@ const schemasSlice = createSlice({
         state.schemas[index].users = [...action.payload.users];
       }
       state.schemas[index].hasUnsavedChanges = true;
+      state.schemas[index].updatedAt = new Date().toISOString();
     },
     removeSchemaUsers: (state, action: PayloadAction<{ schemaId: string; users: SchemaUser[] }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
@@ -178,6 +184,7 @@ const schemasSlice = createSlice({
         (user) => !action.payload.users.find((u) => u.email === user.email)
       );
       state.schemas[index].hasUnsavedChanges = true;
+      state.schemas[index].updatedAt = new Date().toISOString();
     },
     updateSchemaUser: (state, action: PayloadAction<{ schemaId: string; user: SchemaUser }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
@@ -185,12 +192,14 @@ const schemasSlice = createSlice({
       if (userIndex !== undefined && userIndex !== -1) {
         state.schemas[index].users![userIndex] = action.payload.user;
         state.schemas[index].hasUnsavedChanges = true;
+        state.schemas[index].updatedAt = new Date().toISOString();
       }
     },
     importTables: (state, action: PayloadAction<{ schemaId: string; tables: Table[] }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       state.schemas[index].tables = action.payload.tables;
       state.schemas[index].hasUnsavedChanges = true;
+      state.schemas[index].updatedAt = new Date().toISOString();
     },
     setActiveTable: (state, action: PayloadAction<{ schemaId: string; tableId: string }>) => {
       if (action.payload.tableId.length < 1) {
