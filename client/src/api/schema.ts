@@ -26,14 +26,16 @@ interface UpdateSchemaUsersDto {
   schemaId: string;
   isPublic: boolean;
   users: { email: string; role: 'admin' | 'viewer' | 'editor' }[];
+  schema: Schema;
 }
 
-export const updateSchemaUsersApi = async ({ authId, schemaId, users, isPublic }: UpdateSchemaUsersDto) => {
+export const updateSchemaUsersApi = async ({ authId, schemaId, users, isPublic, schema }: UpdateSchemaUsersDto) => {
   const res = await client.post(
     `/schema/${schemaId}/users`,
     {
       users,
       isPublic,
+      schema,
     },
     {
       headers: {

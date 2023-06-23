@@ -58,6 +58,7 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
             fullName: values.name,
             email: values.email,
             authId: userCredential.user.uid,
+            photoUrl: userCredential.user.photoURL || undefined,
           });
           dispatch(triggerSnack({ message: 'Sign up successful!', severity: 'success', hideDuration: 3000 }));
         })

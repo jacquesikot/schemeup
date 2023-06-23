@@ -90,9 +90,9 @@ const Sidebar = () => {
   const [user] = useAuthState(auth);
 
   const logOutHandler = async () => {
-    await signOut(auth);
     dispatch(setSchemas([]));
     dispatch(resetTabs());
+    await signOut(auth);
     dispatch(triggerSnack({ message: 'Logged out successfully', severity: 'success', hideDuration: 3000 }));
   };
 

@@ -45,6 +45,7 @@ const AuthenticateUser = () => {
           fullName: result.user.displayName as string,
           email: result.user.email as string,
           authId: result.user.uid,
+          photoUrl: result.user.photoURL || undefined,
         });
         dispatch(triggerSnack({ message: 'Google Auth Success!', severity: 'success', hideDuration: 3000 }));
       })

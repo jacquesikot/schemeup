@@ -44,6 +44,7 @@ export interface SchemaUser {
   name: string;
   email: string;
   role: Role;
+  photo?: string;
 }
 
 export interface Schema {
@@ -55,6 +56,7 @@ export interface Schema {
   users?: SchemaUser[];
   meta?: any;
   hasUnsavedChanges?: boolean;
+  isPublic?: boolean;
 }
 
 interface SchemaState {
