@@ -12,7 +12,6 @@ import CanvasDrawer from '../../components/canvas/CanvasDrawer';
 import SchemaProperties from '../../components/canvas/SchemaProperties';
 import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import generateForeignKeyName from '../../utils/generateFkName';
 import generateTableLayout from '../../utils/generateTableLayout';
 import { Schema, Table as TableProps, deleteTable, newTable, setActiveTable } from '../../redux/slice/schemas';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
@@ -84,15 +83,14 @@ const EditSchema = () => {
     tablesWithForeignKeys?.flatMap((table) => {
       return table.foreignKeys.map((foreignKey, index) => {
         const refTable = foreignKey.referenceTable;
-        const refColumn = foreignKey.referenceColumn;
-        const colName = foreignKey.column;
+        const refName = foreignKey.name;
         return {
           id: table.name + 'to' + refTable,
           source: table.name,
           target: refTable,
           animated: false,
           type: 'step',
-          label: generateForeignKeyName(table.name, colName, refTable, refColumn),
+          label: refName,
         };
       });
     });
@@ -280,7 +278,7 @@ const EditSchema = () => {
         containerStyle={{
           backgroundColor: '#FFFFFF',
           width: 450,
-          borderRadius: 8,
+          borderRadius: '12px',
           padding: '14px',
         }}
       />
@@ -293,11 +291,11 @@ const EditSchema = () => {
         handleTableDelete={() =>
           dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }))
         }
-        itemId={schema.id}
+        schemaId={schema.id}
         containerStyle={{
           width: '400px',
           backgroundColor: '#FFFFFF',
-          borderRadius: '8px',
+          borderRadius: '12px',
           padding: '20px',
         }}
       />
@@ -308,10 +306,11 @@ const EditSchema = () => {
         handleClose={() => {
           toggleShowShareModal(false);
         }}
+        schemaId={schema.id}
         containerStyle={{
-          width: '400px',
+          width: '450px',
           backgroundColor: '#FFFFFF',
-          borderRadius: '8px',
+          borderRadius: '12px',
         }}
       />
     </Box>

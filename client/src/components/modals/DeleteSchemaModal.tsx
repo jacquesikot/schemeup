@@ -1,20 +1,22 @@
 import { Box, Typography, IconButton } from '@mui/material';
 
-import BaseModal, { BaseModalProps } from './BaseModal';
+import BaseModal, { SingleModalProps } from './BaseModal';
 import { DeleteModalIcon } from '../../images/icons/DeleteModalIcon';
 import { CancelIcon } from '../../images/icons/CancelIcon';
 import Button from '../global/Button';
 
-interface DeleteSchemaModalProps extends BaseModalProps {
+interface DeleteSchemaModalProps extends SingleModalProps {
   handleSchemaDelete: () => void;
+  deleteLoading: boolean;
 }
 
 const DeleteSchemaModal = ({
   open,
   handleClose,
   containerStyle,
-  itemId,
+  schemaId,
   handleSchemaDelete,
+  deleteLoading,
 }: DeleteSchemaModalProps) => {
   return (
     <BaseModal open={open} handleClose={handleClose} containerStyle={containerStyle}>
@@ -36,10 +38,11 @@ const DeleteSchemaModal = ({
       <Box mt={3} display={'flex'} justifyContent={'space-between'}>
         <Button type="secondary" onClick={handleClose} label="Cancel" width={'45%'} height={44} />
         <Button
+          isLoading={deleteLoading}
+          isLoadingText="Deleting..."
           type="error"
           onClick={(e) => {
             handleSchemaDelete();
-            handleClose(e);
           }}
           label="Delete"
           width={'45%'}

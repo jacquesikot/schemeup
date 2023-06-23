@@ -1,29 +1,55 @@
-import { useState, useRef } from 'react';
-import { Avatar, Button, Grid, ListItem, MenuItem, Typography } from "@mui/material";
-import MenuPopper from "../../global/MenuPopper";
-import { appColors } from '../BaseModal';
+import { useState, useRef, useEffect } from 'react';
+import { Avatar, Button as MuiButton, Grid, ListItem, MenuItem, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
-type ACType = 'Edit' | 'View';
+import MenuPopper from '../../global/MenuPopper';
+import { Role, SchemaUser, removeSchemaUsers, updateSchemaUser } from '../../../redux/slice/schemas';
+import { useAppDispatch } from '../../../redux/hooks';
+import Button from '../../global/Button';
 
-interface UserProps {
-  name: string;
-  email: string;
-  image: string;
+interface UserProps extends SchemaUser {
+  schemaId: string;
+  image?: string;
 }
 
-const SharedUser = ({ name, email, image }: UserProps) => {
+const SharedUser = ({ name, email, role, image, schemaId }: UserProps) => {
   const [openMenu, setOpenMenu] = useState<boolean>(false);
-  const [accessControl, setAccessControl] = useState<ACType>("Edit");
+  const theme = useTheme();
+  const colors = theme.palette;
+  const [accessControl, setAccessControl] = useState<Role>(role);
   const anchorRef = useRef<HTMLButtonElement>(null);
-  const user = name.split(" ");
-  const userInitials = user[0][0] + user[1][0];
+  const dispatch = useAppDispatch();
+  const menuItemStyle = {
+    display: 'flex',
+    alignItems: 'center',
+  };
+
+  function getInitials(str: string) {
+    // Split the string into words
+    const words = str.split(' ');
+
+    // If there are two or more words, get the first character from the first two words
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+
+    // If there's only one word, get the first character from that word
+    else if (words.length === 1) {
+      return words[0][0].toUpperCase();
+    }
+
+    // If the string is empty or doesn't contain any words, return an empty string
+    else {
+      return '';
+    }
+  }
 
   // Toggle Menu Popper for Edit/View
   const handleToggle = () => {
     setOpenMenu((prevValue) => !prevValue);
   };
   // Once the Popper menu is open, always update the permission type on close or click of an option
-  const handleMenuClose = (permission: ACType, event: Event | React.SyntheticEvent) => {
+  const handleMenuClose = (permission: Role, event: Event | React.SyntheticEvent) => {
     if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
       return;
     }
@@ -31,72 +57,97 @@ const SharedUser = ({ name, email, image }: UserProps) => {
     setOpenMenu(false);
   };
 
-  const menuItemStyle = {
-    display: 'flex',
-    alignItems: 'center',
+  const removeUserFromList = () => {
+    dispatch(removeSchemaUsers({ schemaId, users: [{ name, email, role }] }));
   };
+
+  useEffect(() => {
+    dispatch(updateSchemaUser({ schemaId, user: { name, email, role: accessControl } }));
+  }, [accessControl, dispatch, email, name, schemaId]);
 
   return (
     <ListItem disableGutters>
-      <Grid container spacing={0.8} direction={"row"} justifyContent={"space-evenly"} alignItems={"center"}>
-        <Grid item>
-          <Avatar alt={name} src={image}>{userInitials}</Avatar>
+      <Grid container spacing={0.8} direction={'row'} alignItems={'center'}>
+        <Grid item xs={1.6}>
+          <Avatar alt={name} src={image}>
+            {getInitials(name)}
+          </Avatar>
         </Grid>
-        <Grid item>
-          <Typography variant="subtitle1" fontWeight={600} fontSize={15} lineHeight={1.2}>{name}</Typography>
-          <Typography variant="subtitle2" sx={{fontWeight:400}}>{email}</Typography>
+        <Grid item xs={5.4}>
+          <Typography fontStyle={'14px'} color={colors.grey[700]} fontWeight={600} fontSize={15} lineHeight={1.2}>
+            {name}
+          </Typography>
+          <Typography color={colors.grey[600]} fontWeight={400} fontSize={'14px'}>
+            {email}
+          </Typography>
         </Grid>
-        <Grid item>
-          <Button
+        <Grid item xs={2.5}>
+          <MuiButton
             ref={anchorRef}
             id="composition-button"
             aria-controls={openMenu ? 'composition-menu' : undefined}
             aria-expanded={openMenu ? 'true' : undefined}
             aria-haspopup="true"
             onClick={handleToggle}
-            sx={{ color: "GrayText", textTransform: "capitalize", fontSize: 14, "&:hover": { backgroundColor: "transparent", fontWeight: 600 } }}
+            sx={{
+              color: 'GrayText',
+              textTransform: 'capitalize',
+              fontSize: 14,
+              '&:hover': { backgroundColor: 'transparent', fontWeight: 600 },
+            }}
             disableRipple
           >
             {accessControl}
-          </Button>
+          </MuiButton>
 
           {/* Menu */}
           <MenuPopper
             open={openMenu}
-            setOpen={() => { }}
+            setOpen={() => {}}
             anchorRef={anchorRef}
             handleClose={handleMenuClose.bind(null, accessControl)}
             containerStyle={{ border: '1px solid #EAECF0', width: '115px', borderRadius: '6px' }}
             menuItems={
               <>
-                <MenuItem
-                  disableRipple
-                  style={menuItemStyle}
-                  onClick={handleMenuClose.bind(null, 'View')}
-                >
+                <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Viewer)}>
                   <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
-                    View
+                    Viewer
                   </Typography>
                 </MenuItem>
-                <MenuItem
-                  disableRipple
-                  style={menuItemStyle}
-                  onClick={handleMenuClose.bind(null, 'Edit')}
-                >
+                <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Editor)}>
                   <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
-                    Edit
+                    Editor
+                  </Typography>
+                </MenuItem>
+                <MenuItem disableRipple style={menuItemStyle} onClick={handleMenuClose.bind(null, Role.Admin)}>
+                  <Typography color={'#344054'} fontSize={14} fontWeight={500} ml={1}>
+                    Admin
                   </Typography>
                 </MenuItem>
               </>
             }
           />
         </Grid>
-        <Grid item>
-          <Button sx={{ color: appColors.error, textTransform: "capitalize", fontSize: 14, fontWeight: 600, "&:hover": { backgroundColor: "transparent", fontWeight: 700 } }}>Remove</Button>
+        <Grid item xs={2.5}>
+          <Button
+            disableRipple={false}
+            label="Remove"
+            type="error"
+            onClick={removeUserFromList}
+            style={{
+              textTransform: 'capitalize',
+              fontSize: 14,
+              fontWeight: 600,
+              padding: 2,
+              background: 'none',
+              color: '#D92D20',
+              border: 'none',
+            }}
+          />
         </Grid>
       </Grid>
     </ListItem>
   );
-}
+};
 
 export default SharedUser;

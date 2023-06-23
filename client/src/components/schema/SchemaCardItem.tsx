@@ -10,6 +10,10 @@ import SchemaButtonUpload from '../../images/icons/schema/SchemaButtonUpload';
 import TrashIconPlain from '../../images/icons/TrashIconPlain';
 import routes from '../../routes';
 import useAppTab from '../../hooks/useAppTab';
+import { useAppSelector } from '../../redux/hooks';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../firebase.config';
+import { Role } from '../../redux/slice/schemas';
 
 interface SchemaCardItemProps {
   id: string;
@@ -18,6 +22,7 @@ interface SchemaCardItemProps {
   noOfTables: string;
   hasUnsavedChanges?: boolean;
   handleDelete: () => void;
+  isShared: boolean;
 }
 
 const SchemaCardItem = ({
@@ -27,12 +32,16 @@ const SchemaCardItem = ({
   noOfTables,
   handleDelete,
   hasUnsavedChanges,
+  isShared,
 }: SchemaCardItemProps) => {
   const theme = useTheme();
   const colors = theme.palette;
   const { newAppTab } = useAppTab();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
+  const schemas = useAppSelector((state) => state.schemas.schemas);
+  const activeSchema = schemas.find((schema) => schema.id === id);
+  const [user] = useAuthState(auth);
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -49,6 +58,16 @@ const SchemaCardItem = ({
   const menuItemStyle = {
     display: 'flex',
     alignItems: 'center',
+  };
+
+  const returnUserRole = () => {
+    if (user?.uid === activeSchema?.userId) {
+      return Role.Admin;
+    }
+
+    const userData = activeSchema && activeSchema.users && activeSchema?.users.find((u) => u.email === user!.email);
+
+    return userData?.role || Role.Viewer;
   };
   return (
     <Box
@@ -117,7 +136,7 @@ const SchemaCardItem = ({
                 >
                   <EditIcon />
                   <Typography color={'#344054'} fontSize={14} fontWeight={600} ml={1}>
-                    Edit
+                    {returnUserRole() === Role.Admin || returnUserRole() === Role.Editor ? 'Edit' : 'View'}
                   </Typography>
                 </MenuItem>
                 <MenuItem style={menuItemStyle} onClick={handleClose}>
@@ -126,18 +145,20 @@ const SchemaCardItem = ({
                     Export
                   </Typography>
                 </MenuItem>
-                <MenuItem
-                  style={menuItemStyle}
-                  onClick={(e) => {
-                    handleDelete();
-                    handleClose(e);
-                  }}
-                >
-                  <TrashIconPlain />
-                  <Typography color={'#F04438'} fontSize={14} fontWeight={500} ml={1}>
-                    Delete
-                  </Typography>
-                </MenuItem>
+                {returnUserRole() === Role.Admin && (
+                  <MenuItem
+                    style={menuItemStyle}
+                    onClick={(e) => {
+                      handleDelete();
+                      handleClose(e);
+                    }}
+                  >
+                    <TrashIconPlain />
+                    <Typography color={'#F04438'} fontSize={14} fontWeight={500} ml={1}>
+                      Delete
+                    </Typography>
+                  </MenuItem>
+                )}
               </>
             }
           />
@@ -145,11 +166,30 @@ const SchemaCardItem = ({
       </Box>
 
       <Box pl={'14px'} pr={'14px'} pb={'14px'} pt={'5px'}>
-        <Box display={'flex'} alignItems={'flex-end'}>
-          <Typography fontSize={30} fontWeight={600} color={'#344054'} mr={0.5}>
-            {noOfTables}
-          </Typography>
-          <Typography mb={1}>tables</Typography>
+        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+          <Box display={'flex'} alignItems={'flex-end'}>
+            <Typography fontSize={30} fontWeight={600} color={'#344054'} mr={0.5}>
+              {noOfTables}
+            </Typography>
+            <Typography mb={1}>tables</Typography>
+          </Box>
+
+          {isShared && (
+            <Box
+              height={18}
+              display={'flex'}
+              borderRadius={1}
+              justifyContent={'center'}
+              alignItems={'center'}
+              paddingLeft={1}
+              paddingRight={1}
+              bgcolor={colors.success.light}
+            >
+              <Typography fontSize={10} fontWeight={500} color={colors.success.main}>
+                Shared
+              </Typography>
+            </Box>
+          )}
         </Box>
 
         <Box>

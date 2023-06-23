@@ -20,7 +20,6 @@ import BootstrapInput from '../global/BootstrapInput';
 import GoogleIcon from '../../images/icons/GoogleIcon';
 import { PageProps } from '../../pages/auth';
 import { auth } from '../../firebase.config';
-import PulseLoader from 'react-spinners/PulseLoader';
 import * as yup from 'yup';
 import { useAppDispatch } from '../../redux/hooks';
 import { triggerSnack } from '../../redux/slice/app';
@@ -59,6 +58,7 @@ const SignUp = ({ flowSwitch, googleAuthHandler }: PageProps) => {
             fullName: values.name,
             email: values.email,
             authId: userCredential.user.uid,
+            photoUrl: userCredential.user.photoURL || undefined,
           });
           dispatch(triggerSnack({ message: 'Sign up successful!', severity: 'success', hideDuration: 3000 }));
         })

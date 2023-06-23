@@ -10,8 +10,11 @@ export interface BaseModalProps {
   open: boolean;
   handleClose: (event: Event | React.SyntheticEvent) => void;
   containerStyle?: React.CSSProperties;
-  itemId?: string;
   children?: React.ReactNode;
+}
+
+export interface SingleModalProps extends BaseModalProps {
+  schemaId: string;
 }
 
 const BaseModal = ({ open, handleClose, containerStyle, children }: BaseModalProps) => {
@@ -27,7 +30,7 @@ const BaseModal = ({ open, handleClose, containerStyle, children }: BaseModalPro
         alignItems: 'center',
       }}
     >
-      <Box sx={{ ...containerStyle, paddingX: 3, paddingY: 2.5, borderRadius: 1 }}>{children}</Box>
+      <Box sx={{ ...containerStyle, paddingX: 3, paddingY: 2.5 }}>{children}</Box>
     </Modal>
   );
 };

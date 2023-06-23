@@ -2,43 +2,33 @@ import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Box, Typography, IconButton } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
+import { useMutation } from 'react-query';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
-import BaseModal, { BaseModalProps } from '../BaseModal';
+import BaseModal, { SingleModalProps } from '../BaseModal';
 import { CancelIcon } from '../../../images/icons/CancelIcon';
 import Button from '../../global/Button';
 import { ImportSchemaIcon } from '../../../images/icons/canvas-controls/ImportSchemaIcon';
-import parsePgDump from '../../../utils/parsers/parsePgDump';
 import { importTables } from '../../../redux/slice/schemas';
 import { useAppDispatch } from '../../../redux/hooks';
 import { triggerSnack } from '../../../redux/slice/app';
 import ImportSchemaModalForm from './ImportSchemaModalForm';
+import { parsePgDump } from '../../../api/parse';
+import { auth } from '../../../firebase.config';
 
-interface ImportModalProps extends BaseModalProps {
-  schemaId: string;
-}
-
-const ImportSchemaModal = ({ open, handleClose, containerStyle, schemaId }: ImportModalProps) => {
-  const [sql, setSql] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+const ImportSchemaModal = ({ open, handleClose, containerStyle, schemaId }: SingleModalProps) => {
+  const [user] = useAuthState(auth);
+  const [sql, setSql] = useState<any>();
+  const [modalEvent, setModalEvent] = useState<string>('');
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const colors = theme.palette;
-
-  // get sql string from either file or text input in ImportSchemaModalForm
-  const getSqlString = (data: string) => {
-    setSql(data);
-  };
-
-  const handleImport = async () => {
-    try {
-      setIsLoading(true);
-      const schemaData = await parsePgDump(sql);
-      console.log(sql);
-      const schema = JSON.parse(schemaData.body);
+  const parsePgDumpMutation = useMutation((sql: string) => parsePgDump({ file: sql, userId: user?.uid as string }), {
+    onSuccess: (data) => {
       dispatch(
         importTables({
           schemaId,
-          tables: schema.data.map((d: any) => {
+          tables: data.map((d: any) => {
             return {
               id: uuidv4(),
               name: d.name,
@@ -47,18 +37,39 @@ const ImportSchemaModal = ({ open, handleClose, containerStyle, schemaId }: Impo
                   ...c,
                 };
               }),
-              foreignKeys: [],
+              foreignKeys: [
+                ...d.foreignKeys.map((f: any) => {
+                  return {
+                    name: f.name,
+                    column: f.column,
+                    referenceTable: f.referenceTable,
+                    referenceColumn: f.referenceColumn,
+                    onUpdate: f.onUpdate,
+                    onDelete: f.onDelete,
+                  };
+                }),
+              ],
               indexes: [],
             };
           }),
         })
       );
-      setIsLoading(false);
+      setSql('');
       dispatch(triggerSnack({ message: 'DB Schema Imported Successfully', severity: 'success', hideDuration: 2000 }));
-    } catch (error) {
-      setIsLoading(false);
+      handleClose(modalEvent as any);
+    },
+    onError: (error) => {
       dispatch(triggerSnack({ message: 'Error Importing DB Schema', severity: 'error', hideDuration: 2000 }));
-    }
+    },
+  });
+
+  // get sql string from either file or text input in ImportSchemaModalForm
+  const getSqlString = (data: string) => {
+    setSql(data);
+  };
+
+  const handleImport = async (e: any) => {
+    parsePgDumpMutation.mutate(sql);
   };
 
   return (
@@ -85,12 +96,12 @@ const ImportSchemaModal = ({ open, handleClose, containerStyle, schemaId }: Impo
         <Button
           type="primary"
           onClick={(e) => {
-            handleImport();
-            handleClose(e);
+            setModalEvent(e);
+            handleImport(e);
           }}
           label="Import Schema"
           height={44}
-          isLoading={isLoading}
+          isLoading={parsePgDumpMutation.isLoading}
           isLoadingText="Importing..."
         />
       </Box>

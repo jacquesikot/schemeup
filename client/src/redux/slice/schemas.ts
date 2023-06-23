@@ -5,6 +5,7 @@ import {
   PostgresOnDeleteOption,
   PostgresOnUpdateOption,
 } from '../../types/tableTypes';
+import generateForeignKeyName from '../../utils/generateFkName';
 
 export interface Table {
   id: string;
@@ -23,6 +24,7 @@ export interface Table {
     autoUpdateTime?: boolean;
   }[];
   foreignKeys: {
+    name: string;
     column: string;
     referenceTable: string;
     referenceColumn: string;
@@ -32,27 +34,30 @@ export interface Table {
   indexes: { column: string; unique: boolean; sorting: PostgresIndexSorting }[];
 }
 
-enum Role {
+export enum Role {
   Admin = 'admin',
   Editor = 'editor',
   Viewer = 'viewer',
 }
 
-interface SchemaUser {
+export interface SchemaUser {
   name: string;
   email: string;
   role: Role;
+  photo?: string;
 }
 
 export interface Schema {
   id: string;
   title: string;
+  userId: string;
   description?: string;
   tables?: Table[];
   activeTable?: string;
   users?: SchemaUser[];
   meta?: any;
   hasUnsavedChanges?: boolean;
+  isPublic?: boolean;
 }
 
 interface SchemaState {
@@ -71,6 +76,7 @@ const schemasSlice = createSlice({
       state.schemas.push({
         id: action.payload.id,
         title: action.payload.title,
+        userId: action.payload.userId,
         hasUnsavedChanges: true,
         description: 'A user and post default schema for reference. Feel free to delete this',
         tables: [
@@ -112,6 +118,7 @@ const schemasSlice = createSlice({
             ],
             foreignKeys: [
               {
+                name: generateForeignKeyName('user', 'user_id', 'user', 'id'),
                 column: 'user_id',
                 referenceTable: 'user',
                 referenceColumn: 'id',
@@ -126,6 +133,10 @@ const schemasSlice = createSlice({
           showColumns: true,
         },
       });
+    },
+    setNewChanges: (state, action: PayloadAction<{ schemaId: string; hasUnsavedChanges: boolean }>) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      state.schemas[index].hasUnsavedChanges = action.payload.hasUnsavedChanges;
     },
     updateSchema: (state, action: PayloadAction<Schema>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.id);
@@ -154,7 +165,11 @@ const schemasSlice = createSlice({
     },
     addSchemaUsers: (state, action: PayloadAction<{ schemaId: string; users: SchemaUser[] }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
-      state.schemas[index].users = [...state.schemas[index].users!, ...action.payload.users];
+      if (state.schemas[index].users) {
+        state.schemas[index].users = [...state.schemas[index].users!, ...action.payload.users];
+      } else {
+        state.schemas[index].users = [...action.payload.users];
+      }
       state.schemas[index].hasUnsavedChanges = true;
     },
     removeSchemaUsers: (state, action: PayloadAction<{ schemaId: string; users: SchemaUser[] }>) => {
@@ -210,6 +225,7 @@ export const {
   addSchemaUsers,
   removeSchemaUsers,
   updateSchemaUser,
+  setNewChanges,
 } = schemasSlice.actions;
 
 export default schemasSlice.reducer;
