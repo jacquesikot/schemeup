@@ -27,15 +27,12 @@ async function updateSchemaUsers(req: any, res: VercelResponse) {
 
       const updatedUsersPromises = req.body.users.map((user) => {
         return User.findOne({ email: user.email }).then((userData) => {
-          console.log(userData);
           return {
             ...user,
             name: userData.fullName || null,
           };
         });
       });
-
-      console.log(req.body);
 
       const updatedUsers = await Promise.all(updatedUsersPromises);
 
@@ -65,7 +62,6 @@ async function updateSchemaUsers(req: any, res: VercelResponse) {
       message: 'Invalid method',
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       message: 'Internal server error',
     });

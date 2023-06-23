@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Box, FormControl, FormControlLabel, Icon, IconButton, List, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useDispatch } from 'react-redux';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useMutation } from 'react-query';
 
 import BaseModal, { SingleModalProps } from '../BaseModal';
 import { CancelIcon } from '../../../images/icons/CancelIcon';
@@ -13,30 +13,10 @@ import Button from '../../global/Button';
 import CopyIcon from '../../../images/icons/modals/CopyIcon';
 import CheckboxIcon from '../../../images/icons/modals/CheckboxIcon';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { SchemaUser, setNewChanges, updateSchema } from '../../../redux/slice/schemas';
+import { setNewChanges, updateSchema } from '../../../redux/slice/schemas';
 import { updateSchemaUsersApi } from '../../../api/schema';
-import { useMutation } from 'react-query';
 import { auth } from '../../../firebase.config';
 import { triggerSnack } from '../../../redux/slice/app';
-
-// Can be managed with state for all users who have access to schema
-const DUMMY_SHARED_USERS = [
-  {
-    name: 'Candice Wu',
-    email: 'cane@untitledui.com',
-    image: 'https://mkorostoff.github.io/hundred-thousand-faces/img/f/4.jpg',
-  },
-  {
-    name: 'Demi Wikinson',
-    email: 'demi@untitledui.com',
-    image: '',
-  },
-  {
-    name: 'Drew Cano',
-    email: 'drew@untitledui.com',
-    image: 'https://mkorostoff.github.io/hundred-thousand-faces/img/m/18.jpg',
-  },
-];
 
 const ShareSchemaModal = ({ open, handleClose, schemaId, containerStyle }: SingleModalProps) => {
   const [user] = useAuthState(auth);
@@ -69,6 +49,7 @@ const ShareSchemaModal = ({ open, handleClose, schemaId, containerStyle }: Singl
         dispatch(
           triggerSnack({ severity: 'success', message: 'Schema users updated successfully', hideDuration: 2000 })
         );
+        dispatch(setNewChanges({ schemaId, hasUnsavedChanges: false }));
         handleClose(closeEvent as any);
       },
       onError: (error) => {

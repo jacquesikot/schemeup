@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import useAutocomplete, { AutocompleteGetTagProps } from '@mui/material/useAutocomplete';
 import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
 import { Avatar, Typography } from '@mui/material';
@@ -17,7 +16,6 @@ import { getAllUsersApi } from '../../../api/user';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../../firebase.config';
 import { UserPillDelete } from '../../../images/icons/UserPillDelete';
-import { triggerSnack } from '../../../redux/slice/app';
 
 // Custom Mui AutoComplete Label, Input Wrapper, Tags + Input Element
 const Root = styled('div')({
