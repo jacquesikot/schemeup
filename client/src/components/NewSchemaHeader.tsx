@@ -1,7 +1,6 @@
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
-import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
 
 // import Pointer from '../images/icons/canvas-controls/Pointer';
 import Comment from '../images/icons/canvas-controls/Comment';
@@ -19,6 +18,9 @@ import { createOrUpdateUserSchemaApi } from '../api/schema';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase.config';
 import { triggerSnack } from '../redux/slice/app';
+import { VisibilityIcon } from '../images/icons/canvas-controls/VisibilityIcon';
+import { DownloadIcon } from '../images/icons/canvas-controls/DownloadIcon';
+import { RelationIcon } from '../images/icons/canvas-controls/RelationIcon';
 
 interface NewSchemaHeaderProps {
   toggleSettingsDrawer: (open: boolean) => void;
@@ -127,7 +129,7 @@ export default function NewSchemaHeader({
 
       {/* CANVAS CONTROLS */}
       {role !== 'viewer' ? (
-        <Box display={'flex'} width={370} justifyContent={'space-between'}>
+        <Box display={'flex'} width={450} justifyContent={'space-between'}>
           {/* <Tooltip title="Undo">
         <IconButton>
           <Undo />
@@ -161,11 +163,11 @@ export default function NewSchemaHeader({
         </IconButton>
       </Tooltip> */}
 
-          <Tooltip title="Comment">
+          <Tooltip title="New Relationship">
             <IconButton sx={iconButtonStyle}>
-              <Comment />
+              <RelationIcon />
               <Typography mt={1} fontSize={11}>
-                Comment
+                Relation
               </Typography>
             </IconButton>
           </Tooltip>
@@ -195,6 +197,15 @@ export default function NewSchemaHeader({
               <ImportIcon />
               <Typography mt={1} fontSize={11}>
                 Import
+              </Typography>
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Download Schema">
+            <IconButton sx={iconButtonStyle} onClick={() => true}>
+              <DownloadIcon />
+              <Typography mt={1} fontSize={11}>
+                Download
               </Typography>
             </IconButton>
           </Tooltip>

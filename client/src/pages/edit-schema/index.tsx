@@ -68,7 +68,6 @@ const EditSchema = () => {
   const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
   const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
-  const tableLayout = generateTableLayout(schema.tables || []);
   const tablesWithForeignKeys = schema?.tables?.filter((table) => table.foreignKeys.length > 0);
 
   const activeTableId = useAppSelector(
@@ -84,6 +83,8 @@ const EditSchema = () => {
   const [showRelations, setShowRelations] = useState<boolean>(true);
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
+
+  console.log(schema.tables?.map((t) => t.foreignKeys));
 
   const initialEdges: any =
     schema &&
@@ -105,13 +106,15 @@ const EditSchema = () => {
     });
   const nodeSchemaTables = schema.tables as any;
 
+  const tableLayout = generateTableLayout(schema.tables || [], initialEdges || []);
+
   const initialNodes: Node<Schema>[] = nodeSchemaTables.map((table: TableProps) => {
     return {
       id: table.name,
       type: 'table',
       position: {
-        x: tableLayout.filter((t) => t.id === table.id)[0].x,
-        y: tableLayout.filter((t) => t.id === table.id)[0].y,
+        x: tableLayout.filter((t) => t.id === table.name)[0].x,
+        y: tableLayout.filter((t) => t.id === table.name)[0].y,
       },
       data: {
         id: table.id,
