@@ -25,7 +25,7 @@ const AiSuggestCard = ({
       sx={{
         border: "1px solid #4caf50",
         borderRadius: 1,
-        bgcolor: "#ECFDF2",
+        borderColor: "#EAECF0",
         p: 2,
         mb: "18px",
       }}

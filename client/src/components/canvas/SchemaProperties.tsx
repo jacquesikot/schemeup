@@ -16,7 +16,8 @@ import Switch from "../Switch";
 import Button from "../global/Button";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { updateSchema } from "../../redux/slice/schemas";
-import AiSuggestCard from "./AiSuggestCard";
+// import AiSuggestCard from "./AiSuggestCard";
+import SchemaTemplateCard from "../SchemaTemplateCard";
 import TableV2 from "./TableV2";
 import { triggerSnack } from "../../redux/slice/app";
 
@@ -307,7 +308,7 @@ const SchemaProperties = ({
                 flexDirection={"column"}
                 alignItems={"center"}
               >
-                <AiSuggestCard
+                {/* <AiSuggestCard
                   question=" Add a created and updated field to the “user” table"
                   solutions={[
                     {
@@ -325,7 +326,9 @@ const SchemaProperties = ({
                   ]}
                   severity="high"
                   onPressInfo={() => console.log("info")}
-                />
+                /> */}
+                {/* temporarily displaying the SchemaTemplate Card */}
+                <SchemaTemplateCard />
               </Box>
             </Grid>
           </Grid>
