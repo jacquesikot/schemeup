@@ -84,8 +84,6 @@ const EditSchema = () => {
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
-  console.log(schema.tables?.map((t) => t.foreignKeys));
-
   const initialEdges: any =
     schema &&
     schema.tables &&

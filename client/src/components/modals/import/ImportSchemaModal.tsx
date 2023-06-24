@@ -40,7 +40,7 @@ const ImportSchemaModal = ({ open, handleClose, containerStyle, schemaId }: Sing
               foreignKeys: [
                 ...d.foreignKeys.map((f: any) => {
                   return {
-                    name: f.name,
+                    name: f.constraintName,
                     column: f.column,
                     referenceTable: f.referenceTable,
                     referenceColumn: f.referenceColumn,
