@@ -100,15 +100,18 @@ const SchemaUserSchema = new MongooseSchema({
   role: { type: String, required: true }, // Map your Role to a suitable value
 });
 
-const UserSchemaSchema = new MongooseSchema({
-  id: { type: String, required: true },
-  userId: { type: String, required: true },
-  title: { type: String, required: true },
-  description: String,
-  tables: [TableSchema],
-  users: [SchemaUserSchema],
-  isPublic: { type: Boolean, default: false },
-});
+const UserSchemaSchema = new MongooseSchema(
+  {
+    id: { type: String, required: true },
+    userId: { type: String, required: true },
+    title: { type: String, required: true },
+    description: String,
+    tables: [TableSchema],
+    users: [SchemaUserSchema],
+    isPublic: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
 
 UserSchemaSchema.statics.build = (attr: IUserSchema) => {
   return new UserSchema(attr);

@@ -13,7 +13,7 @@ import SchemaProperties from '../../components/canvas/SchemaProperties';
 import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import generateTableLayout from '../../utils/generateTableLayout';
-import { Schema, Table as TableProps, deleteTable, newTable, setActiveTable } from '../../redux/slice/schemas';
+import { Role, Schema, Table as TableProps, deleteTable, newTable, setActiveTable } from '../../redux/slice/schemas';
 import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
 // import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
@@ -25,6 +25,8 @@ import DeleteTableModal from '../../components/modals/DeleteTableModal';
 import EmptyState from '../../components/global/EmptyState';
 import Button from '../../components/global/Button';
 import { removeTab } from '../../redux/slice/apptabs';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../firebase.config';
 
 const EditSchema = () => {
   const params = useParams();
@@ -32,6 +34,13 @@ const EditSchema = () => {
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const navigate = useNavigate();
+  const [user] = useAuthState(auth);
+  const userRole =
+    schema.userId === user?.uid
+      ? Role.Admin
+      : schema && schema.users
+      ? schema.users.filter((u) => u.email === user?.email)[0].role
+      : Role.Viewer;
 
   if (!schema) {
     return (
@@ -194,6 +203,7 @@ const EditSchema = () => {
   return (
     <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 150, position: 'relative' }}>
       <NewSchemaHeader
+        role={userRole}
         toggleSettingsDrawer={() => dispatch(toggleRightPanel())}
         drawerState={drawerOpen}
         handleNewTable={() => {
@@ -244,26 +254,33 @@ const EditSchema = () => {
           nodeTypes={nodeTypes}
           edges={showRelations ? canvas.edges : []}
           onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeClick={(_event, node) => {
-            dispatch(setActiveTable({ schemaId: schema.id, tableId: node.data.id }));
-            dispatch(openRightPanel());
-          }}
+          onEdgesChange={userRole !== 'viewer' ? onEdgesChange : () => {}}
+          onConnect={userRole !== 'viewer' ? onConnect : () => {}}
+          onNodeClick={
+            userRole !== 'viewer'
+              ? (_event, node) => {
+                  dispatch(setActiveTable({ schemaId: schema.id, tableId: node.data.id }));
+                  dispatch(openRightPanel());
+                }
+              : () => {}
+          }
           onClick={(e) => {
-            console.log('target', e.currentTarget.nodeName);
             if (activeTableId) {
               dispatch(setActiveTable({ schemaId: schema.id, tableId: '' }));
             } else {
               e.preventDefault();
             }
           }}
-          onNodesDelete={(nodes) => {
-            setOpenDeleteModal(true);
-          }}
+          onNodesDelete={
+            userRole !== 'viewer'
+              ? (nodes) => {
+                  setOpenDeleteModal(true);
+                }
+              : () => {}
+          }
           fitView
           panOnScroll
-          selectionOnDrag
+          // selectionOnDrag
         >
           <Background />
           <Controls />

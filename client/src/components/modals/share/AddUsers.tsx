@@ -209,14 +209,15 @@ const AddUsers = ({ schemaId }: addUsersProps) => {
     });
 
   const addUsersToSchema = () => {
+    console.log(selectedUsers);
     dispatch(
       addSchemaUsers({
         schemaId,
         users: selectedUsers.map((user) => {
           return {
-            email: user.email,
+            email: user.email ? user.email : user,
             role: Role.Viewer,
-            name: user.name || '',
+            name: user.name ? user.name : 'Anonymous',
           };
         }),
       })

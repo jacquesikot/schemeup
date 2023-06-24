@@ -10,6 +10,7 @@ interface EditableTextProps {
   fontWeight?: number;
   fontSize?: number;
   fontColor?: string;
+  disableEdit?: boolean;
 }
 
 const StyledTextField = styled(TextField)({
@@ -43,6 +44,7 @@ const EditableText = ({
   fontSize = 14,
   fontWeight = 500,
   fontColor = '#000',
+  disableEdit = false,
 }: EditableTextProps) => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [textValue, setTextValue] = useState<string>(value);
@@ -75,7 +77,7 @@ const EditableText = ({
   } else {
     return (
       <ButtonBase
-        onClick={() => setEditMode(true)}
+        onClick={disableEdit ? undefined : () => setEditMode(true)}
         disableTouchRipple
         sx={{
           cursor: 'pointer',

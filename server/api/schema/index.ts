@@ -16,6 +16,7 @@ async function handler(req: any, res: VercelResponse) {
       id: req.body.id,
       description: req.body.description,
       userId: req.authId,
+      users: req.body.users,
       title: req.body.title,
       tables: req.body.tables,
     });
@@ -27,7 +28,8 @@ async function handler(req: any, res: VercelResponse) {
     const schema = await createSchema({
       id: req.body.id,
       description: req.body.description,
-      userId: req.authId,
+      userId: req.body.userId ? req.body.userId : req.authId,
+      users: req.body.users,
       title: req.body.title,
       tables: req.body.tables,
     });
