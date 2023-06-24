@@ -58,7 +58,7 @@ const CanvasTableColumn = ({ name, type, nullable, foreignKey, primaryKey }: Can
         )}
       </Box>
 
-      <Box display={'flex'} flex={1} alignItems={'center'} justifyContent={'center'}>
+      <Box display={'flex'} flex={1} alignItems={'center'} justifyContent={'space-between'} pr={2}>
         {primaryKey && (
           <Box
             bgcolor={'#F17400'}

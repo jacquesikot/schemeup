@@ -25,6 +25,7 @@ import { UniqueIndexIcon } from '../../images/icons/UniqueIndexIcon';
 import { IndexPinIcon } from '../../images/icons/IndexPinIcon';
 import { SmallTickIcon } from '../../images/icons/SmallTickIcon';
 import { useAppSelector } from '../../redux/hooks';
+import removeTypeModifier from '../../utils/removeTypeModifier';
 
 export interface TableRowProps {
   name: string;
@@ -109,10 +110,7 @@ function TableRowV2(row: TableRowProps) {
   };
 
   const isValidType = (type: PostgresColumnType) => {
-    return typesArray.some((validType) => {
-      const regex = new RegExp(`^${validType}(\\(\\d+\\))?$`, 'i');
-      return regex.test(type);
-    });
+    return typesArray.some((validType) => validType === type);
   };
 
   return (
@@ -145,7 +143,7 @@ function TableRowV2(row: TableRowProps) {
         </Box>
 
         {/* Column Name */}
-        <Box width={'20%'} mr={1}>
+        <Box width={'30%'} mr={1}>
           <Tooltip title={nameEditMode ? '' : rowData.name}>
             {nameEditMode ? (
               <Autocomplete
@@ -192,9 +190,9 @@ function TableRowV2(row: TableRowProps) {
 
         {/* Column Type */}
         <Box
-          width={'35%'}
+          width={'30%'}
           borderRadius={'6px'}
-          border={isValidType(rowData.type) ? 'none' : `1px solid ${colors.error.main}`}
+          border={isValidType(removeTypeModifier(rowData.type)) ? 'none' : `1px solid ${colors.error.main}`}
         >
           <Tooltip title={typeEditMode ? '' : rowData.type}>
             {typeEditMode ? (

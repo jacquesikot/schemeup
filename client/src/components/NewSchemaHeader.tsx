@@ -71,6 +71,17 @@ export default function NewSchemaHeader({
     },
   });
 
+  const iconButtonStyle = {
+    width: '70px',
+    height: '60px',
+    borderRadius: '8px',
+    bgcolor: colors.grey[50],
+    flexDirection: 'column',
+    '&:hover': {
+      bgcolor: colors.grey[100],
+    },
+  };
+
   return (
     <Box
       bgcolor={'white'}
@@ -116,7 +127,7 @@ export default function NewSchemaHeader({
 
       {/* CANVAS CONTROLS */}
       {role !== 'viewer' ? (
-        <Box display={'flex'} width={350} justifyContent={'space-between'}>
+        <Box display={'flex'} width={370} justifyContent={'space-between'}>
           {/* <Tooltip title="Undo">
         <IconButton>
           <Undo />
@@ -136,8 +147,11 @@ export default function NewSchemaHeader({
       </Tooltip> */}
 
           <Tooltip title="New Table">
-            <IconButton onClick={handleNewTable}>
+            <IconButton onClick={handleNewTable} sx={iconButtonStyle}>
               <Table />
+              <Typography mt={1} fontSize={11}>
+                Table
+              </Typography>
             </IconButton>
           </Tooltip>
 
@@ -148,28 +162,40 @@ export default function NewSchemaHeader({
       </Tooltip> */}
 
           <Tooltip title="Comment">
-            <IconButton>
+            <IconButton sx={iconButtonStyle}>
               <Comment />
+              <Typography mt={1} fontSize={11}>
+                Comment
+              </Typography>
             </IconButton>
           </Tooltip>
 
           <Tooltip title="Preview">
-            <IconButton onClick={showPreview}>
+            <IconButton sx={iconButtonStyle} onClick={showPreview}>
               <VisibilityIcon />
+              <Typography mt={1} fontSize={11}>
+                Preview
+              </Typography>
             </IconButton>
           </Tooltip>
 
           {role === 'admin' && (
             <Tooltip title="Share Schema">
-              <IconButton onClick={handleShare}>
+              <IconButton sx={iconButtonStyle} onClick={handleShare}>
                 <Share />
+                <Typography mt={1} fontSize={11}>
+                  Share
+                </Typography>
               </IconButton>
             </Tooltip>
           )}
 
           <Tooltip title="Import Schema">
-            <IconButton onClick={handleImport}>
+            <IconButton sx={iconButtonStyle} onClick={handleImport}>
               <ImportIcon />
+              <Typography mt={1} fontSize={11}>
+                Import
+              </Typography>
             </IconButton>
           </Tooltip>
         </Box>

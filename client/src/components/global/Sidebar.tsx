@@ -115,7 +115,7 @@ const Sidebar = () => {
         },
         '& .pro-menu-item.active': {
           color: `${theme.palette.grey[800]} !important`,
-          bgcolor: `${theme.palette.grey[100]} !important`,
+          bgcolor: `${theme.palette.grey[50]} !important`,
         },
       }}
     >

@@ -4,7 +4,7 @@ const DEV = 'https://schemeup-server.vercel.app/api';
 const LOCAL = 'http://localhost:8080/api';
 
 const client = axios.create({
-  baseURL: DEV,
+  baseURL: LOCAL,
 });
 
 export default client;

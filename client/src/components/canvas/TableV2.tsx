@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, IconButton } from '@mui/material';
+import { Box, ButtonBase, IconButton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { TickIcon } from '../../images/icons/TickIcon';
@@ -10,6 +10,8 @@ import TableRowV2, { TableRowProps } from './TableRowV2';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { Table as TableProps, editTable } from '../../redux/slice/schemas';
+import Button from '../global/Button';
+import { SaveIcon } from '../../images/icons/SaveIcon';
 
 function TableV2({ data }: any) {
   const theme = useTheme();
@@ -81,15 +83,23 @@ function TableV2({ data }: any) {
         </Box>
 
         <Box display={'flex'} alignItems={'center'}>
-          <IconButton
+          {/* <IconButton
             onClick={() => {
               data.handleTableDelete();
             }}
             style={{ marginRight: 15, marginLeft: 10 }}
           >
             <CancelIcon />
-          </IconButton>
-          <IconButton
+          </IconButton> */}
+          <ButtonBase
+            sx={{
+              borderRadius: '8px',
+            }}
+            // sx={{
+            //   cursor: 'pointer',
+            // }}
+            // display={'flex'}
+            // alignItems={'center'}
             onClick={() => {
               const table: TableProps = {
                 ...(schema?.tables?.filter((t) => t.id === data.id)[0] as any),
@@ -162,8 +172,85 @@ function TableV2({ data }: any) {
               dispatch(editTable({ schemaId: schema.id, table }));
             }}
           >
-            <TickIcon />
-          </IconButton>
+            {/* <IconButton
+              onClick={() => {
+                const table: TableProps = {
+                  ...(schema?.tables?.filter((t) => t.id === data.id)[0] as any),
+                  name: tableName,
+                  columns: [
+                    ...tableRows.map((row) => {
+                      return {
+                        name: row.name,
+                        type: row.type,
+                        default: row.defaultValue,
+                        nullable: row.nullable,
+                        unique: row.unique,
+                        index: row.index,
+                        autoInc: row.autoInc,
+                        primaryKey: row.primaryKey,
+                        comment: '',
+                      };
+                    }),
+                  ],
+                  foreignKeys: [
+                    ...tableRows
+                      .map((row) => {
+                        if (row.foreignKey) {
+                          return {
+                            column: row.name,
+                            referenceTable: row.referenceTable,
+                            referenceColumn: row.referenceColumn,
+                            onUpdate: row.onUpdate,
+                            onDelete: row.onDelete,
+                          };
+                        } else {
+                          return null;
+                        }
+                      })
+                      .filter((key) => key != null),
+                  ],
+                  indexes: [
+                    ...tableRows
+                      .map((row) => {
+                        if (row.index) {
+                          return {
+                            column: row.name,
+                            unique: row.unique,
+                            sorting: 'ASC',
+                          };
+                        } else {
+                          return null;
+                        }
+                      })
+                      .filter((key) => key != null),
+                    ...tableRows
+                      .map((row) => {
+                        if (row.unique) {
+                          return {
+                            column: row.name,
+                            unique: true,
+                            sorting: 'ASC',
+                          };
+                        } else {
+                          return null;
+                        }
+                      })
+                      .filter((key) => key != null),
+                  ],
+                  meta: {
+                    type: 'table',
+                  },
+                };
+
+                dispatch(editTable({ schemaId: schema.id, table }));
+              }}
+            >
+              <SaveIcon />
+            </IconButton> */}
+            <Typography p={1} mt={'1px'} fontSize={12} color={colors.grey[800]}>
+              Update
+            </Typography>
+          </ButtonBase>
         </Box>
       </Box>
 
