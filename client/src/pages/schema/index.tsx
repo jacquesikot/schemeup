@@ -165,6 +165,7 @@ const Dashboard = () => {
           noOfTables: s.tables?.length || 0,
           hasUnsavedChanges: s.hasUnsavedChanges,
           userId: s.userId,
+          users: s.users,
         };
       })
     : [];
@@ -303,7 +304,7 @@ const Dashboard = () => {
                 <Box display="flex" justifyContent="center" alignItems="center" maxWidth="343px" height="174px" p={1}>
                   <SchemaCardItem
                     id={item.id}
-                    isShared={user?.uid !== item.userId}
+                    isShared={user?.uid !== item.userId || item.users?.length > 0}
                     hasUnsavedChanges={item.hasUnsavedChanges}
                     title={item.title}
                     description={item.description}

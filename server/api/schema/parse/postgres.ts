@@ -3,7 +3,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import useMiddlewares from '../../../middlewares/useMiddlewares';
 import useAuth from '../../../middlewares/auth';
 import useCors from '../../../middlewares/cors';
-import parsePgDumpParser from '../../../lib/parsers/pgDumpParser';
+import parsePgDumpParser from '../../../lib/parsers/pgDumpParserO';
 
 async function parsePgDump(req: VercelRequest, res: VercelResponse) {
   const sql = req.body;
