@@ -49,7 +49,7 @@ const BottomBar = () => {
   useEffect(() => {
     // find better solution here
     if (schema && location.pathname.includes(routes.EDIT_SCHEMA)) {
-      console.log(generateSchemaTablesSql(schema.tables as any));
+      // console.log(generateSchemaTablesSql(schema.tables as any));
       setSchemaSql(generateSchemaTablesSql(schema.tables as any));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
