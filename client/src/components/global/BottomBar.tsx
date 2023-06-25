@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, IconButton, Typography } from '@mui/material';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { a11yLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -23,15 +23,12 @@ const BottomBar = () => {
   const codeEditorOpen = useAppSelector((state) => state.app.codeEditorOpen);
   const rightPanelOpen = useAppSelector((state) => state.app.rightPanelOpen);
 
-  // useEffect(() => {
-  //   console.log(codeEditorOpen);
-  // }, []);
   const urlParts = location.pathname.split('/');
   const id = urlParts[urlParts.length - 1];
 
-  // const schemaArr = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === id));
+  const schemaArr = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === id));
 
-  // const schema = schemaArr && schemaArr.length > 0 ? schemaArr[0] : { tables: [] };
+  const schema = schemaArr && schemaArr.length > 0 ? schemaArr[0] : { tables: [] };
 
   // console.log(schema);
 
@@ -49,12 +46,14 @@ const BottomBar = () => {
   const sqlAccessRoutes =
     location.pathname.includes(routes.EDIT_SCHEMA) || location.pathname.includes(routes.SHARE_SCHEMA);
 
-  // useEffect(() => {
-  //   if (schema) {
-  //     setSchemaSql(generateSchemaTablesSql(schema.tables as any));
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [schema.tables]);
+  useEffect(() => {
+    // find better solution here
+    if (schema && location.pathname.includes(routes.EDIT_SCHEMA)) {
+      console.log(generateSchemaTablesSql(schema.tables as any));
+      setSchemaSql(generateSchemaTablesSql(schema.tables as any));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schema.tables]);
 
   const returnBoxWidth = () => {
     if (rightPanelOpen && sideBarOpen) {
@@ -123,9 +122,10 @@ const BottomBar = () => {
           </Box>
 
           <SyntaxHighlighter
-            showLineNumbers
+            // showLineNumbers
             wrapLongLines
             language="sql"
+            format
             style={a11yLight}
             customStyle={{
               width: '100%',
