@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 import ReactFlow, { MiniMap, Controls, addEdge, applyNodeChanges, applyEdgeChanges, Background, Node } from 'reactflow';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 import NewSchemaHeader from '../../components/NewSchemaHeader';
 import CanvasDrawer from '../../components/canvas/CanvasDrawer';
@@ -25,7 +26,6 @@ import DeleteTableModal from '../../components/modals/DeleteTableModal';
 import EmptyState from '../../components/global/EmptyState';
 import Button from '../../components/global/Button';
 import { removeTab } from '../../redux/slice/apptabs';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase.config';
 
 const EditSchema = () => {
@@ -102,6 +102,7 @@ const EditSchema = () => {
         };
       });
     });
+
   const nodeSchemaTables = schema.tables as any;
 
   const tableLayout = generateTableLayout(schema.tables || [], initialEdges || []);
@@ -281,7 +282,6 @@ const EditSchema = () => {
           }
           fitView
           panOnScroll
-          // selectionOnDrag
         >
           <Background />
           <Controls />

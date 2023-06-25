@@ -30,7 +30,7 @@ export const TABLE_WIDTH = 450;
 const CanvasTableColumn = ({ name, type, nullable, foreignKey, primaryKey }: CanvasTableColumnProps) => {
   return (
     <Box display={'flex'} height={40} paddingLeft={'10px'} borderTop={1} borderColor={'#EAECF0'} alignItems={'center'}>
-      <Typography fontFamily={'IBM Plex Mono'} fontSize={14} color={'#344054'} width={'35%'} mr={1}>
+      <Typography fontFamily={'IBM Plex Mono'} fontSize={14} color={'#344054'} width={'35%'} mr={1} overflow={'hidden'}>
         {name}
       </Typography>
 
