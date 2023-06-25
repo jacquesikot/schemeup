@@ -7,8 +7,8 @@ import ReactFlow, {
   MiniMap,
   Controls,
   addEdge,
-  applyNodeChanges,
-  applyEdgeChanges,
+  // applyNodeChanges,
+  // applyEdgeChanges,
   Background,
   Node,
   useNodesState,
@@ -23,11 +23,19 @@ import SchemaProperties from '../../components/canvas/SchemaProperties';
 import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import generateTableLayout from '../../utils/generateTableLayout';
-import { Role, Schema, Table as TableProps, deleteTable, newTable, setActiveTable } from '../../redux/slice/schemas';
-import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
+import {
+  Role,
+  Schema,
+  Table as TableProps,
+  deleteForeignKey,
+  deleteTable,
+  newTable,
+  setActiveTable,
+} from '../../redux/slice/schemas';
+// import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
 // import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
-import { openRightPanel, toggleRightPanel } from '../../redux/slice/app';
+import { openRightPanel, toggleRightPanel, triggerSnack } from '../../redux/slice/app';
 import ImportModal from '../../components/modals/import/ImportSchemaModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 import routes from '../../routes';
@@ -37,6 +45,7 @@ import Button from '../../components/global/Button';
 import { removeTab } from '../../redux/slice/apptabs';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase.config';
+import DeleteEdgeModal from '../../components/modals/DeleteEdgeModal';
 
 const EditSchema = () => {
   const params = useParams();
@@ -44,6 +53,7 @@ const EditSchema = () => {
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const navigate = useNavigate();
+  console.log(schema);
   const [user] = useAuthState(auth);
   const userRole =
     schema.userId === user?.uid
@@ -75,9 +85,9 @@ const EditSchema = () => {
     );
   }
 
-  const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
+  // const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
-  const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
+  // const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
   const tablesWithForeignKeys = schema?.tables?.filter((table) => table.foreignKeys.length > 0);
 
   const activeTableId = useAppSelector(
@@ -89,10 +99,12 @@ const EditSchema = () => {
   const containerRef = useRef<any>(null);
 
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [openDeleteEdgeModal, setOpenDeleteEdgeModal] = useState<boolean>(false);
   const [showShareModal, toggleShowShareModal] = useState<boolean>(false);
   const [showRelations, setShowRelations] = useState<boolean>(true);
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
+  const [activeEdge, setActiveEdge] = useState<any>(null);
 
   const initialEdges: any =
     schema &&
@@ -101,14 +113,13 @@ const EditSchema = () => {
     tablesWithForeignKeys?.flatMap((table) => {
       return table.foreignKeys.map((foreignKey, index) => {
         const refTable = foreignKey.referenceTable;
-        const refName = foreignKey.name;
         return {
           id: table.name + 'to' + refTable,
           source: table.name,
           target: refTable,
           animated: false,
           type: 'step',
-          label: refName,
+          label: foreignKey.name,
         };
       });
     });
@@ -220,7 +231,9 @@ const EditSchema = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), []);
+  const onConnect = useCallback((params: any) => {
+    dispatch(triggerSnack({ message: 'Feature coming soon!', severity: 'warning', hideDuration: 3000 }));
+  }, []);
 
   return (
     <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 150, position: 'relative' }}>
@@ -300,6 +313,12 @@ const EditSchema = () => {
                 }
               : () => {}
           }
+          onEdgesDelete={(edges) => {
+            if (userRole !== 'viewer') {
+              setActiveEdge(edges[0]);
+              setOpenDeleteEdgeModal(true);
+            }
+          }}
           fitView
           panOnScroll
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
@@ -330,6 +349,29 @@ const EditSchema = () => {
         }}
         handleTableDelete={() =>
           dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }))
+        }
+        schemaId={schema.id}
+        containerStyle={{
+          width: '400px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          padding: '20px',
+        }}
+      />
+
+      <DeleteEdgeModal
+        open={openDeleteEdgeModal}
+        handleClose={() => {
+          setOpenDeleteEdgeModal(false);
+        }}
+        handleEdgeDelete={() =>
+          dispatch(
+            deleteForeignKey({
+              schemaId: schema.id,
+              tableName: activeEdge.source as string,
+              foreignKeyName: activeEdge.label as string,
+            })
+          )
         }
         schemaId={schema.id}
         containerStyle={{

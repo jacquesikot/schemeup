@@ -286,8 +286,25 @@ function TableV2({ data }: any) {
         borderColor={colors.divider}
         height={40}
         alignItems={'center'}
-        justifyContent={'flex-end'}
+        justifyContent={'flex-start'}
         paddingRight={'10px'}
+        onClick={() =>
+          setTableRows([
+            ...tableRows,
+            {
+              name: 'new_column',
+              type: 'text',
+              defaultValue: '',
+              nullable: false,
+              index: false,
+              unique: false,
+              primaryKey: false,
+              autoInc: false,
+              foreignKey: false,
+              autoUpdateTime: false,
+            },
+          ])
+        }
       >
         <IconButton
           onClick={() =>
