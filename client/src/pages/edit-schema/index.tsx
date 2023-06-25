@@ -3,10 +3,19 @@
 import 'reactflow/dist/style.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box } from '@mui/material';
-import ReactFlow, { MiniMap, Controls, addEdge, applyNodeChanges, applyEdgeChanges, Background, Node } from 'reactflow';
+import ReactFlow, {
+  MiniMap,
+  Controls,
+  addEdge,
+  applyNodeChanges,
+  applyEdgeChanges,
+  Background,
+  Node,
+  useNodesState,
+  useEdgesState,
+} from 'reactflow';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { useAuthState } from 'react-firebase-hooks/auth';
 
 import NewSchemaHeader from '../../components/NewSchemaHeader';
 import CanvasDrawer from '../../components/canvas/CanvasDrawer';
@@ -26,6 +35,7 @@ import DeleteTableModal from '../../components/modals/DeleteTableModal';
 import EmptyState from '../../components/global/EmptyState';
 import Button from '../../components/global/Button';
 import { removeTab } from '../../redux/slice/apptabs';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase.config';
 
 const EditSchema = () => {
@@ -102,10 +112,11 @@ const EditSchema = () => {
         };
       });
     });
-
   const nodeSchemaTables = schema.tables as any;
 
-  const tableLayout = generateTableLayout(schema.tables || [], initialEdges || []);
+  const tableLayout = useMemo(() => {
+    return generateTableLayout(schema.tables || [], initialEdges || []);
+  }, [schema.tables]);
 
   const initialNodes: Node<Schema>[] = nodeSchemaTables.map((table: TableProps) => {
     return {
@@ -141,35 +152,40 @@ const EditSchema = () => {
     };
   });
 
-  const onNodesChange = useCallback(
-    (changes: any) => {
-      const appliedChanges = applyNodeChanges(changes, canvas.nodes);
-      dispatch(handleNodeChange({ schemaId: schema.id, node: appliedChanges }));
-    },
-    [dispatch, canvas.nodes]
-  );
+  // const onNodesChange = useCallback(
+  //   (changes: any) => {
+  //     const appliedChanges = applyNodeChanges(changes, canvas.nodes);
+  //     dispatch(handleNodeChange({ schemaId: schema.id, node: appliedChanges }));
+  //   },
+  //   [dispatch, canvas.nodes]
+  // );
 
-  const onEdgesChange = useCallback(
-    (changes: any) => {
-      const appliedChanges = applyEdgeChanges(changes, canvas.edges);
-      dispatch(handleEdgeChange({ schemaId: schema.id, edge: appliedChanges }));
-      return appliedChanges;
-    },
-    [dispatch, canvas.edges]
-  );
+  // const onEdgesChange = useCallback(
+  //   (changes: any) => {
+  //     const appliedChanges = applyEdgeChanges(changes, canvas.edges);
+  //     dispatch(handleEdgeChange({ schemaId: schema.id, edge: appliedChanges }));
+  //     return appliedChanges;
+  //   },
+  //   [dispatch, canvas.edges]
+  // );
 
-  const onConnect = useCallback(
-    (params: any) => {
-      const edges = addEdge(params, canvas.edges);
-      dispatch(handleEdgeChange({ schemaId: schema.id, edge: edges }));
-      return edges;
-    },
-    [dispatch, canvas.edges]
-  );
+  // const onConnect = useCallback(
+  //   (params: any) => {
+  //     const edges = addEdge(params, canvas.edges);
+  //     dispatch(handleEdgeChange({ schemaId: schema.id, edge: edges }));
+  //     return edges;
+  //   },
+  //   [dispatch, canvas.edges]
+  // );
+
+  // useEffect(() => {
+  //   dispatch(setNodeState({ node: initialNodes || [], edge: initialEdges || [], schemaId: schema.id }));
+  // }, [dispatch, schema.tables, openDeleteModal]);
 
   useEffect(() => {
-    dispatch(setNodeState({ node: initialNodes || [], edge: initialEdges || [], schemaId: schema.id }));
-  }, [dispatch, schema.tables, openDeleteModal]);
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [params.id, schema.tables, openDeleteModal]);
 
   // useEffect(() => {
   //   const run = async () => {
@@ -201,6 +217,10 @@ const EditSchema = () => {
     const url = `${routes.SHARE_SCHEMA}/${schema.id}`;
     window.open(url, '_blank', 'noreferrer');
   };
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), []);
 
   return (
     <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 150, position: 'relative' }}>
@@ -252,15 +272,15 @@ const EditSchema = () => {
 
       <Box style={{ width: '100%', height: '100%', position: 'absolute' }}>
         <ReactFlow
-          nodes={canvas.nodes}
+          nodes={nodes}
           nodeTypes={nodeTypes}
-          edges={showRelations ? canvas.edges : []}
+          edges={showRelations ? edges : []}
           onNodesChange={onNodesChange}
           onEdgesChange={userRole !== 'viewer' ? onEdgesChange : () => {}}
           onConnect={userRole !== 'viewer' ? onConnect : () => {}}
           onNodeClick={
             userRole !== 'viewer'
-              ? (_event, node) => {
+              ? (e, node) => {
                   dispatch(setActiveTable({ schemaId: schema.id, tableId: node.data.id }));
                   dispatch(openRightPanel());
                 }
@@ -282,6 +302,8 @@ const EditSchema = () => {
           }
           fitView
           panOnScroll
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+          // selectionOnDrag
         >
           <Background />
           <Controls />

@@ -36,14 +36,14 @@ const generateTableLayout = (tables: Table[], edges: any[]): TableCoordinates[] 
     .force('x', d3.forceX().strength(0.1))
     .force('y', d3.forceY().strength(0.1))
 
-    // .force(
-    //   'link',
-    //   d3
-    //     .forceLink(edges.map((edge) => ({ ...edge, source: edge.source, target: edge.target })))
-    //     .id((d: any) => d.id)
-    //     .distance(300)
-    //     .strength(1)
-    // )
+    .force(
+      'link',
+      d3
+        .forceLink(edges.map((edge) => ({ ...edge, source: edge.source, target: edge.target })))
+        .id((d: any) => d.id)
+        .distance(300)
+        .strength(1)
+    )
     .stop();
 
   // run the simulation for a set number of iterations

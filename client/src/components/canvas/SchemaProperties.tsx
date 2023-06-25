@@ -12,6 +12,7 @@ import { updateSchema } from '../../redux/slice/schemas';
 import SchemaTemplateCard from '../SchemaTemplateCard';
 import TableV2 from './TableV2';
 import { triggerSnack } from '../../redux/slice/app';
+import { active } from 'd3';
 
 interface SchemaPropertiesProps {
   toggleOpen: (open: boolean) => void;
@@ -75,6 +76,8 @@ const SchemaProperties = ({
       setActiveSuggestions(suggestions);
     }
   }, [suggestions, activeTableName]);
+
+  // console.log(activeTable && activeTable.name);
 
   return (
     <Box pl={2} pr={2} width={'100%'} pt={2}>
