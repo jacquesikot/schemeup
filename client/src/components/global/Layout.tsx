@@ -43,6 +43,7 @@ const Layout = () => {
               <Route path={routes.MOCK_DATA} element={<MockData />} />
               <Route path={routes.DATASOURCES} element={<Datasources />} />
               <Route path={routes.EDIT_SCHEMA + '/:id'} element={<EditSchema />} />
+              <Route path={routes.SHARE_SCHEMA + '/:id'} element={<ShareSchema />} />
             </Routes>
           </main>
         </div>

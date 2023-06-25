@@ -13,6 +13,7 @@
     "@types/mongoose": "^5.11.97",
     "@vercel/node": "^2.15.1",
     "mongoose": "^7.3.0",
+    "natural": "^6.5.0",
     "next-api-route-middleware": "^1.0.2"
   },
   "devDependencies": {

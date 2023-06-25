@@ -1,3 +1,6 @@
+import natural from 'natural';
+import PostgresColumnTypes from '../../utils/postgresColumnTypes';
+
 const parsePgDumpParser = (sql: string) => {
   interface Column {
     name: string;
@@ -6,6 +9,7 @@ const parsePgDumpParser = (sql: string) => {
     primaryKey: boolean;
     unique: boolean;
     comment?: string;
+    index?: boolean;
   }
 
   interface ForeignKey {
@@ -109,6 +113,22 @@ const parsePgDumpParser = (sql: string) => {
     });
 
     return tableNames.filter((name) => name !== '');
+  }
+
+  function findClosestPostgresType(inputString) {
+    let maxSimilarity = 0;
+    let closestType = '';
+
+    PostgresColumnTypes.forEach((type) => {
+      let similarity = natural.JaroWinklerDistance(inputString, type, {});
+
+      if (similarity > maxSimilarity) {
+        maxSimilarity = similarity;
+        closestType = type;
+      }
+    });
+
+    return closestType;
   }
 
   function parseCreateTableColumns(createTableStatement: string): TableDefinition | null {
@@ -240,9 +260,10 @@ const parsePgDumpParser = (sql: string) => {
 
       return {
         name,
-        type,
+        type: findClosestPostgresType(type),
         nullable,
         primaryKey,
+        index: false,
         unique,
         comment,
         default: defaultValue,
@@ -332,6 +353,95 @@ const parsePgDumpParser = (sql: string) => {
     return primaryKeys;
   }
 
+  function parseUniqueIndexesFromAlter(alterStatements: string[]) {
+    const uniqueIndexRegex1 = /alter table\s+"?(.*?)"?\s+add unique\s*\(\s*"(.*?)"?\s*\)/gi;
+    const uniqueIndexRegex2 = /alter table\s+"?(.*?)"?\s+add constraint\s+"?(.*?)"?\s+unique\s*\(\s*"(.*?)"?\s*\)/gi;
+
+    const uniqueIndexes: any = [];
+
+    for (let statement of alterStatements) {
+      let match;
+      while ((match = uniqueIndexRegex1.exec(statement)) !== null) {
+        const tableName = match[1];
+        const columnName = match[2];
+        const index: Index = {
+          column: columnName,
+          unique: true,
+          sorting: 'ASC', // Defaulting to 'ASC' as it's not specified in the ALTER TABLE statements
+          primaryKey: false, // Defaulting to 'false' as it's not specified in the ALTER TABLE statements
+        };
+
+        let tableIndex = uniqueIndexes.find((x) => x.table === tableName);
+        if (tableIndex) {
+          tableIndex.indexes.push(index);
+        } else {
+          uniqueIndexes.push({
+            table: tableName,
+            indexes: [index],
+          });
+        }
+      }
+
+      while ((match = uniqueIndexRegex2.exec(statement)) !== null) {
+        const tableName = match[1];
+        const columnName = match[3];
+        const index: Index = {
+          column: columnName,
+          unique: true,
+          sorting: 'ASC', // Defaulting to 'ASC' as it's not specified in the ALTER TABLE statements
+          primaryKey: false, // Defaulting to 'false' as it's not specified in the ALTER TABLE statements
+        };
+
+        let tableIndex = uniqueIndexes.find((x) => x.table === tableName);
+        if (tableIndex) {
+          tableIndex.indexes.push(index);
+        } else {
+          uniqueIndexes.push({
+            table: tableName,
+            indexes: [index],
+          });
+        }
+      }
+    }
+
+    return uniqueIndexes;
+  }
+
+  function parseCreateIndexStatements(createIndexStatements: string[]) {
+    let responses: any[] = [];
+
+    createIndexStatements.forEach((statement: string) => {
+      // regex to parse the statement
+      const regex = /create index \"(.*)\" on \"(.*)\"\(\"(.*)\"\)/i;
+      const match = statement.match(regex);
+
+      if (!match) {
+        throw new Error(`Invalid statement: ${statement}`);
+      }
+
+      // get the indexName, tableName, and columnName from the regex match
+      const indexName = match[1];
+      const tableName = match[2];
+      const columnName = match[3];
+
+      let index: Index = {
+        column: columnName,
+        unique: false, // This would have to be parsed from the statement if available
+        sorting: 'ASC', // This would have to be parsed from the statement if available
+        primaryKey: false, // This would have to be parsed from the statement if available
+      };
+
+      let response = {
+        table: tableName,
+        indexes: [index],
+      };
+
+      responses.push(response);
+    });
+
+    return responses;
+  }
+
   const cleanedStatements = cleanSqlDump(sql);
   const createTableStatements = extractCreateTableStatements(cleanedStatements);
   const alterTableStatements = extractAlterTableStatements(cleanedStatements);
@@ -348,6 +458,12 @@ const parsePgDumpParser = (sql: string) => {
   // Parse primary keys from alter table statements
   const parsedPrimaryKeysFromAlter = parsePrimaryKeysFromAlter(alterTableStatements);
   const parsedPrimaryKeysFromCreate = parsePrimaryKeysFromCreate(createTableStatements);
+
+  //Parse unique indexes from alter table statements
+  const parsedUniqueIndexesFromAlter = parseUniqueIndexesFromAlter(alterTableStatements);
+
+  // Parse create index statements
+  const parsedIndexes = parseCreateIndexStatements(createIndexStatements);
 
   // Create schema structure using table names
   extractTableNames(createTableStatements).map((tableName) => {
@@ -408,6 +524,58 @@ const parsePgDumpParser = (sql: string) => {
 
         if (columnIndex !== -1) {
           schemaTable.columns[columnIndex].primaryKey = true;
+        }
+      }
+    }
+  });
+
+  // Add unique indexes from alter to schema
+  parsedUniqueIndexesFromAlter.forEach((index) => {
+    const schemaTable = schema.find((s) => s.name === index.table);
+    if (schemaTable) {
+      if (schemaTable.columns) {
+        // find column index in table by name
+        const columnIndex = schemaTable.columns.findIndex((column) => {
+          return index.indexes.find((index) => index.column === column.name);
+        });
+
+        if (columnIndex !== -1) {
+          schemaTable.columns[columnIndex].unique = true;
+
+          // ensure the indexes array exists
+          schemaTable.indexes = schemaTable.indexes || [];
+          schemaTable.indexes.push({
+            column: schemaTable.columns[columnIndex].name,
+            unique: true,
+            sorting: 'ASC', // default sorting
+            primaryKey: false, // this is not a primary key
+          });
+        }
+      }
+    }
+  });
+
+  // Add indexes to schema
+  parsedIndexes.forEach((index) => {
+    const schemaTable = schema.find((s) => s.name === index.table);
+    if (schemaTable) {
+      if (schemaTable.columns) {
+        // find column index in table by name
+        const columnIndex = schemaTable.columns.findIndex((column) => {
+          return index.indexes.find((index) => index.column === column.name);
+        });
+
+        if (columnIndex !== -1) {
+          schemaTable.columns[columnIndex].index = true;
+
+          // ensure the indexes array exists
+          schemaTable.indexes = schemaTable.indexes || [];
+          schemaTable.indexes.push({
+            column: schemaTable.columns[columnIndex].name,
+            unique: false, // this is not unique
+            sorting: 'ASC', // default sorting
+            primaryKey: false, // this is not a primary key
+          });
         }
       }
     }

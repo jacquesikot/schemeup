@@ -21,8 +21,8 @@ async function deleteSchema(req: any, res: VercelResponse) {
       const schema = await UserSchema.findOne({ id: id });
 
       if (!schema) {
-        return res.status(400).json({
-          message: 'Schema not found',
+        return res.status(200).json({
+          message: 'Schema not found in db',
         });
       }
 
