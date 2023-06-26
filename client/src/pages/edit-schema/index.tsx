@@ -3,17 +3,7 @@
 import 'reactflow/dist/style.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box } from '@mui/material';
-import ReactFlow, {
-  MiniMap,
-  Controls,
-  addEdge,
-  // applyNodeChanges,
-  // applyEdgeChanges,
-  Background,
-  Node,
-  useNodesState,
-  useEdgesState,
-} from 'reactflow';
+import ReactFlow, { MiniMap, Controls, Background, Node, useNodesState, useEdgesState } from 'reactflow';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -32,9 +22,7 @@ import {
   newTable,
   setActiveTable,
 } from '../../redux/slice/schemas';
-// import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
 import generateSchemaName from '../../utils/generateSchemaName';
-// import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
 import { openRightPanel, toggleRightPanel, triggerSnack } from '../../redux/slice/app';
 import ImportModal from '../../components/modals/import/ImportSchemaModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
@@ -46,6 +34,10 @@ import { removeTab } from '../../redux/slice/apptabs';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase.config';
 import DeleteEdgeModal from '../../components/modals/DeleteEdgeModal';
+import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
+import { getSchemaSuggestionsApi } from '../../api/ai';
+import { useQuery } from 'react-query';
+import queryKeys from '../../utils/keys/query';
 
 const EditSchema = () => {
   const params = useParams();
@@ -53,7 +45,6 @@ const EditSchema = () => {
   const schema = useAppSelector((state) => state.schemas.schemas.filter((s) => s.id === params.id))[0];
   const tabs = useAppSelector((state) => state.appTabs.tabs);
   const navigate = useNavigate();
-  console.log(schema);
   const [user] = useAuthState(auth);
   const userRole =
     schema.userId === user?.uid
@@ -102,7 +93,7 @@ const EditSchema = () => {
   const [openDeleteEdgeModal, setOpenDeleteEdgeModal] = useState<boolean>(false);
   const [showShareModal, toggleShowShareModal] = useState<boolean>(false);
   const [showRelations, setShowRelations] = useState<boolean>(true);
-  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<any>([]);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
   const [activeEdge, setActiveEdge] = useState<any>(null);
 
@@ -163,66 +154,34 @@ const EditSchema = () => {
     };
   });
 
-  // const onNodesChange = useCallback(
-  //   (changes: any) => {
-  //     const appliedChanges = applyNodeChanges(changes, canvas.nodes);
-  //     dispatch(handleNodeChange({ schemaId: schema.id, node: appliedChanges }));
-  //   },
-  //   [dispatch, canvas.nodes]
-  // );
-
-  // const onEdgesChange = useCallback(
-  //   (changes: any) => {
-  //     const appliedChanges = applyEdgeChanges(changes, canvas.edges);
-  //     dispatch(handleEdgeChange({ schemaId: schema.id, edge: appliedChanges }));
-  //     return appliedChanges;
-  //   },
-  //   [dispatch, canvas.edges]
-  // );
-
-  // const onConnect = useCallback(
-  //   (params: any) => {
-  //     const edges = addEdge(params, canvas.edges);
-  //     dispatch(handleEdgeChange({ schemaId: schema.id, edge: edges }));
-  //     return edges;
-  //   },
-  //   [dispatch, canvas.edges]
-  // );
-
-  // useEffect(() => {
-  //   dispatch(setNodeState({ node: initialNodes || [], edge: initialEdges || [], schemaId: schema.id }));
-  // }, [dispatch, schema.tables, openDeleteModal]);
-
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
   }, [params.id, schema.tables, openDeleteModal]);
 
-  // useEffect(() => {
-  //   const run = async () => {
-  //     try {
-  //       const schemaSql = generateSchemaTablesSql(schema.tables || []);
-  //       const res = await getSchemaSuggestions(schemaSql);
-  //       if (res) {
-  //         const data = res.replace(/^'|'$/g, '');
-  //         if (data) {
-  //           const dataRes = JSON.parse(data);
-  //           if (dataRes) {
-  //             const finalSuggestions = dataRes.suggestions.map((d: any) => {
-  //               return {
-  //                 title: d.severity,
-  //                 body: d.suggestion,
-  //               };
-  //             });
-  //             setAiSuggestions(finalSuggestions);
-  //           }
-  //         }
-  //       }
-  //     } catch (error) {}
-  //   };
-
-  //   run();
-  // }, [schema.tables, schema.description, schema.title]);
+  const { isLoading: fetchSchemaSuggestionsLoading } = useQuery(
+    [queryKeys.SCHEMA_SUGGESTIONS, schema.id],
+    () => {
+      const schemaSql = generateSchemaTablesSql(schema.tables || []);
+      return getSchemaSuggestionsApi({ sql: schemaSql, userId: user?.uid as string });
+    },
+    {
+      enabled: !!user?.uid,
+      onSuccess: (res: any) => {
+        setAiSuggestions(res.suggestions);
+        console.log('res', res.suggestions);
+      },
+      onError: (err: any) => {
+        dispatch(
+          triggerSnack({
+            message: 'Error fetching AI suggestions',
+            severity: 'error',
+            hideDuration: 3000,
+          })
+        );
+      },
+    }
+  );
 
   const showPreview = () => {
     const url = `${routes.SHARE_SCHEMA}/${schema.id}`;
@@ -275,6 +234,7 @@ const EditSchema = () => {
 
       <CanvasDrawer open={drawerOpen}>
         <SchemaProperties
+          suggestionLoading={fetchSchemaSuggestionsLoading}
           suggestions={aiSuggestions}
           toggleOpen={() => dispatch(toggleRightPanel())}
           showRelations={showRelations}

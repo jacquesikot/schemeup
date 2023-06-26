@@ -14,7 +14,7 @@ async function suggestion(req: VercelRequest, res: VercelResponse) {
   const prompt = `  
     Schema: ${JSON.stringify(req.body)}
     Given the postgre sql schema above, suggest improvements based on the following criteria:
-    - Normalization: Check if the database is normalized, typically to the 3rd normal form. Normalization helps avoid redundant data, inconsistencies, and anomalies. It's crucial for maintaining data integrity and consistency.
+    - Normalization: Check if the database is normalized, typically to the 3rd normal form.
     - Keys and Constraints: Foreign keys, primary keys, and constraints should be appropriately implemented. They maintain data integrity and relationships between tables. Check if primary keys have been assigned to each table and whether they are appropriate (unique and not null). Make sure foreign keys are used to establish relations between tables and if they have been indexed.
     - Indexing: Indexes improve query performance. Make sure that columns that are frequently used in WHERE clauses, JOIN conditions, or sorting operations are indexed. But remember, while indexes speed up queries, they can slow down write operations (INSERT, UPDATE, DELETE) because the index also needs to be updated.
     - Use of appropriate Data Types: The choice of data types can greatly influence the performance, storage requirements, and accuracy of the database. Make sure that the correct data types have been used (i.e., integer, text, date, etc.), and they are appropriate for the data they're meant to store.
@@ -26,6 +26,7 @@ async function suggestion(req: VercelRequest, res: VercelResponse) {
     The response should be an array of objects with the following interface:
     
     interface Suggestion {
+      problem: string;
       suggestion: string;
       severity: 'high' | 'medium' | 'low';
     }
@@ -34,10 +35,10 @@ async function suggestion(req: VercelRequest, res: VercelResponse) {
       suggestions: Suggestion[],
     }
   
-    The response should be complete and provide a comprehensive fix that can be applied to the schema provided.
+    The response should be complete and provide a comprehensive fix that can be applied to the sql schema above directly.
     The response should not be vague and should contain exact details with relation to the schema provided.
     The resonse should be broken down to so that each suggestion contains one solution for one table, i.e each suggestion should be for one table only and fix one problem only.
-    Please format your response as a valid JSON object matching the Response interface provided above.
+    The response format should be a valid JSON object matching the Response interface provided above that can be parsed with javascript JSON.parse() function.
     Response:
     
     `;
@@ -51,7 +52,7 @@ async function suggestion(req: VercelRequest, res: VercelResponse) {
 
   res.status(200).json({
     message: 'Schema suggestions',
-    data: response.data?.choices[0].text?.trim(),
+    data: JSON.parse(response.data.choices[0].text || ''),
   });
 }
 
