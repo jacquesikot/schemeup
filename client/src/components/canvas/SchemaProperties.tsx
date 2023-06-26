@@ -2,23 +2,24 @@ import { useEffect, useState } from 'react';
 import { Typography, Box, IconButton, TextField, styled, Checkbox, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
+import { Player } from '@lottiefiles/react-lottie-player';
 
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
 import Switch from '../Switch';
 import Button from '../global/Button';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { updateSchema } from '../../redux/slice/schemas';
-// import AiSuggestCard from "./AiSuggestCard";
+import AiSuggestCard from './AiSuggestCard';
 import SchemaTemplateCard from '../SchemaTemplateCard';
 import TableV2 from './TableV2';
 import { triggerSnack } from '../../redux/slice/app';
-import { active } from 'd3';
 
 interface SchemaPropertiesProps {
   toggleOpen: (open: boolean) => void;
   showRelations: boolean;
   toggleRelations: (showRelations: boolean) => void;
-  suggestions: { title: string; body: string }[];
+  suggestions: { problem: string; suggestion: string; severity: 'high' | 'medium' | 'low' }[];
+  suggestionLoading: boolean;
   handleTableDelete: () => void;
 }
 
@@ -53,6 +54,7 @@ const SchemaProperties = ({
   toggleRelations,
   suggestions,
   handleTableDelete,
+  suggestionLoading,
 }: SchemaPropertiesProps) => {
   const theme = useTheme();
   const colors = theme.palette;
@@ -71,13 +73,13 @@ const SchemaProperties = ({
 
   useEffect(() => {
     if (activeTableName) {
-      setActiveSuggestions(suggestions.filter((s) => s.body.toLowerCase().includes(activeTableName.toLowerCase())));
+      setActiveSuggestions(
+        suggestions.filter((s) => s.suggestion.toLowerCase().includes(activeTableName.toLowerCase()))
+      );
     } else {
       setActiveSuggestions(suggestions);
     }
   }, [suggestions, activeTableName]);
-
-  // console.log(activeTable && activeTable.name);
 
   return (
     <Box pl={2} pr={2} width={'100%'} pt={2}>
@@ -218,54 +220,54 @@ const SchemaProperties = ({
       ) : (
         <>
           <Typography mt={2}>{schema.activeTable ? `Filtering for ${activeTableName}` : 'Entire Schema'}</Typography>
-          <Grid
-            container
-            maxHeight={'71vh'}
-            pt={2}
-            pb={2}
-            sx={{
-              overflowY: 'auto' /* To allow main grid scroll vertically but not entire screen */,
-              scrollbarWidth: 'none' /* Firefox */,
-              '-ms-overflow-style': 'none' /* IE 10+ */,
-              '&::-webkit-scrollbar': {
-                width: 0,
-                height: 0,
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'transparent',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'transparent',
-              },
-              '-webkit-overflow-scrolling': 'touch' /* For hide on scroll */,
-            }}
-          >
-            <Grid>
-              <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
-                {/* <AiSuggestCard
-                  question=" Add a created and updated field to the “user” table"
-                  solutions={[
-                    {
-                      header: "add columns",
-                      body: "Create a two new columns, one for the updated at field, and another for the created_at field in the “user” table",
-                      onPressFixNow: () => console.log("fixed"),
-                      onPressLearnMore: () => console.log("learn"),
-                    },
-                    {
-                      header: "add columns",
-                      body: "Create a two new columns, one for the updated at field, and another for the created_at field in the “user” table",
-                      onPressFixNow: () => console.log("fixed"),
-                      onPressLearnMore: () => console.log("learn"),
-                    },
-                  ]}
-                  severity="high"
-                  onPressInfo={() => console.log("info")}
-                /> */}
-                {/* temporarily displaying the SchemaTemplate Card */}
-                <SchemaTemplateCard />
-              </Box>
-            </Grid>
-          </Grid>
+          {suggestionLoading ? (
+            <Player src={require('../../images/animation/ai-loading.json')} loop autoplay />
+          ) : (
+            <>
+              <Grid
+                container
+                maxHeight={'80%'}
+                pt={2}
+                pb={2}
+                sx={{
+                  overflowY: 'auto' /* To allow main grid scroll vertically but not entire screen */,
+                  scrollbarWidth: 'none' /* Firefox */,
+                  '-ms-overflow-style': 'none' /* IE 10+ */,
+                  '&::-webkit-scrollbar': {
+                    width: 0,
+                    height: 0,
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: 'transparent',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: 'transparent',
+                  },
+                  '-webkit-overflow-scrolling': 'touch' /* For hide on scroll */,
+                }}
+              >
+                {suggestions.map((s) => (
+                  <Grid>
+                    <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
+                      <AiSuggestCard
+                        question={s.problem}
+                        solutions={[
+                          {
+                            header: 'Suggested Solution',
+                            body: s.suggestion,
+                            onPressFixNow: () => console.log('fixed'),
+                            onPressLearnMore: () => console.log('learn'),
+                          },
+                        ]}
+                        severity={s.severity}
+                        onPressInfo={() => console.log('info')}
+                      />
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </>
+          )}
         </>
       )}
     </Box>
