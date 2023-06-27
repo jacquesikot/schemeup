@@ -10,7 +10,7 @@ import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppSelector } from '../../redux/hooks';
 import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
 import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
-import ShareSchemaHeader from '../../components/ShareSchemaHeader';
+import ShareSchemaHeader from '../../components/schema/ShareSchemaHeader';
 
 
 const ShareSchema = () => {

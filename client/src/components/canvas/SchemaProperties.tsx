@@ -5,12 +5,12 @@ import { useParams } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
 
 import SideBarToggleOpen from '../../images/icons/SideBarToggleOpen';
-import Switch from '../Switch';
+import Switch from '../global/Switch';
 import Button from '../global/Button';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { updateSchema } from '../../redux/slice/schemas';
 import AiSuggestCard from './AiSuggestCard';
-import SchemaTemplateCard from '../SchemaTemplateCard';
+import SchemaTemplateCard from '../schema/SchemaTemplateCard';
 import TableV2 from './TableV2';
 import { triggerSnack } from '../../redux/slice/app';
 
@@ -98,7 +98,7 @@ const SchemaProperties = ({
         </IconButton>
       </Box>
 
-      <Switch value={value} setValue={setValue} badgeValue={suggestions.length} />
+      <Switch value={value} setValue={setValue} badgeValue={suggestions.length} tabs={["Settings", "AI Suggestions"]} />
 
       {value === 'Settings' ? (
         schema.activeTable && activeTable ? (

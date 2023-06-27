@@ -6,9 +6,10 @@ interface SwitchProps {
   value: string;
   setValue: (value: string) => void;
   badgeValue: number;
+  tabs: string[];
 }
 
-const Switch = ({ value, setValue, badgeValue }: SwitchProps) => {
+const Switch = ({ value, setValue, badgeValue, tabs }: SwitchProps) => {
   const handleChange = (event: React.MouseEvent<HTMLElement>, newValue: string) => {
     setValue(newValue);
   };
@@ -38,6 +39,7 @@ const Switch = ({ value, setValue, badgeValue }: SwitchProps) => {
       },
     },
   }));
+
   return (
     <Box>
       <Paper
@@ -62,13 +64,13 @@ const Switch = ({ value, setValue, badgeValue }: SwitchProps) => {
           onChange={handleChange}
           exclusive
         >
-          <ToggleButton style={{ width: '50%', textTransform: 'none' }} value="Settings" aria-label="left aligned">
+          <ToggleButton style={{ width: '50%', textTransform: 'none' }} value={tabs[0]} aria-label="left aligned">
             <Typography fontWeight={600} fontSize={14}>
-              Settings
+              {tabs[0]}
             </Typography>
           </ToggleButton>
 
-          <ToggleButton style={{ width: '50%', textTransform: 'none' }} value="AI" aria-label="right aligned">
+          <ToggleButton style={{ width: '50%', textTransform: 'none' }} value={tabs[1]} aria-label="right aligned">
             {badgeValue > 0 && (
               <Box
                 style={{
@@ -90,7 +92,7 @@ const Switch = ({ value, setValue, badgeValue }: SwitchProps) => {
               </Box>
             )}
             <Typography fontWeight={600} fontSize={14}>
-              AI Suggestions
+              {tabs[1]}
             </Typography>
           </ToggleButton>
         </StyledToggleButtonGroup>
