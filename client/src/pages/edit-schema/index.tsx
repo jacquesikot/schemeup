@@ -7,7 +7,7 @@ import ReactFlow, { MiniMap, Controls, Background, Node, useNodesState, useEdges
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import NewSchemaHeader from '../../components/NewSchemaHeader';
+import NewSchemaHeader from '../../components/schema/NewSchemaHeader';
 import CanvasDrawer from '../../components/canvas/CanvasDrawer';
 import SchemaProperties from '../../components/canvas/SchemaProperties';
 import CanvasTable from '../../components/canvas/CanvasTable';

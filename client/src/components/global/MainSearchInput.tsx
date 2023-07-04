@@ -1,5 +1,5 @@
 import { InputAdornment, TextField, styled } from '@mui/material';
-import InputSearchIcon from '../images/icons/InputSeachIcon';
+import InputSearchIcon from '../../images/icons/InputSeachIcon';
 
 const StyledTextField = styled(TextField)({
   '& label.Mui-focused': {

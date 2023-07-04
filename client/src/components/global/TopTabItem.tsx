@@ -1,9 +1,9 @@
 import { Box, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import TopBarX from '../images/icons/TopBarX';
-import { useAppDispatch } from '../redux/hooks';
-import { Tab, removeTab } from '../redux/slice/apptabs';
+import TopBarX from '../../images/icons/TopBarX';
+import { useAppDispatch } from '../../redux/hooks';
+import { Tab, removeTab } from '../../redux/slice/apptabs';
 
 interface TopTabItemProps {
   active: boolean;

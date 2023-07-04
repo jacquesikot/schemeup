@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import TopTabItem from '../TopTabItem';
+import TopTabItem from './TopTabItem';
 import TopBarPlus from '../../images/icons/Plus';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { Tab } from '../../redux/slice/apptabs';
