@@ -7,6 +7,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import logo from '../../images/schemeup_logo.png';
+import logoIcon from '../../images/schemeup_logo_icon.png';
 import SideBarSchema from '../../images/icons/SideBarSchema';
 import SideBarMockData from '../../images/icons/SideBarMockData';
 import SideBarDatasources from '../../images/icons/SideBarDatasources';
@@ -127,11 +128,8 @@ const Sidebar = () => {
               <Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center" pl={4} pr={3}>
                   <Box display={'flex'} alignItems={'center'}>
-                    <img src={logo} alt="SchemupLogo" style={{ width: 30 }} />
+                    <img src={logo} alt="SchemupLogo" style={{ width: 140, height: 37 }} />
                   </Box>
-                  <Typography variant="h5" color={theme.palette.grey[900]} fontWeight="medium">
-                    SchemeUp
-                  </Typography>
                   <IconButton onClick={() => dispatch(toggleSideBar())}>
                     <SideBarToggleClose />
                   </IconButton>
@@ -141,7 +139,14 @@ const Sidebar = () => {
 
             <MenuItem
               onClick={() => dispatch(toggleSideBar())}
-              icon={!sideBarOpen ? <SideBarToggleOpen /> : undefined}
+              icon={
+                !sideBarOpen ? (
+                  <Box display={'flex'} alignItems={'center'}>
+                    <img src={logoIcon} alt="SchemupLogoIcon" style={{ width: 30 }} />
+                    <SideBarToggleOpen />
+                  </Box>
+                ) : undefined
+              }
               style={{
                 margin: '10px 0 20px 0',
                 color: theme.palette.grey[100],

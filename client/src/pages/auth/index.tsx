@@ -67,7 +67,12 @@ const AuthenticateUser = () => {
     <Grid container sx={{ height: '100%', alignItems: 'center' }}>
       <Grid item xs={12} lg={6} pt={2} pb={2}>
         <Box width="80%" maxWidth={400} mx="auto">
-          <Avatar variant="square" alt="schemeup-logo" style={{ marginBottom: 20 }} src={SchemeupLogo}>
+          <Avatar
+            variant="square"
+            alt="schemeup-logo"
+            style={{ marginBottom: 20, width: 140, height: 37 }}
+            src={SchemeupLogo}
+          >
             Schemeup Logo
           </Avatar>
 
