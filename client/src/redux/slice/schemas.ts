@@ -7,6 +7,15 @@ import {
 } from '../../types/tableTypes';
 import generateForeignKeyName from '../../utils/generateFkName';
 
+export interface ForeignKey {
+  name: string;
+  column: string;
+  referenceTable: string;
+  referenceColumn: string;
+  onUpdate: PostgresOnUpdateOption;
+  onDelete: PostgresOnDeleteOption;
+}
+
 export interface Table {
   id: string;
   name: string;
@@ -23,14 +32,7 @@ export interface Table {
     default?: string;
     autoUpdateTime?: boolean;
   }[];
-  foreignKeys: {
-    name: string;
-    column: string;
-    referenceTable: string;
-    referenceColumn: string;
-    onUpdate: PostgresOnUpdateOption;
-    onDelete: PostgresOnDeleteOption;
-  }[];
+  foreignKeys: ForeignKey[];
   indexes: { column: string; unique: boolean; sorting: PostgresIndexSorting }[];
 }
 
@@ -159,6 +161,20 @@ const schemasSlice = createSlice({
       state.schemas[index].hasUnsavedChanges = true;
       state.schemas[index].updatedAt = new Date().toISOString();
     },
+    deleteForeignKey: (
+      state,
+      action: PayloadAction<{ schemaId: string; tableName: string; foreignKeyName: string }>
+    ) => {
+      const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
+      const tableIndex = state.schemas[index].tables?.findIndex((table) => table.name === action.payload.tableName);
+      if (tableIndex !== undefined && tableIndex !== -1) {
+        state.schemas[index].tables![tableIndex].foreignKeys = state.schemas[index].tables![
+          tableIndex
+        ].foreignKeys.filter((foreignKey) => foreignKey.name !== action.payload.foreignKeyName);
+        state.schemas[index].hasUnsavedChanges = true;
+        state.schemas[index].updatedAt = new Date().toISOString();
+      }
+    },
     editTable: (state, action: PayloadAction<{ schemaId: string; table: Table }>) => {
       const index = state.schemas.findIndex((schema) => schema.id === action.payload.schemaId);
       const tableIndex = state.schemas[index].tables?.findIndex((table) => table.id === action.payload.table.id);
@@ -235,6 +251,7 @@ export const {
   removeSchemaUsers,
   updateSchemaUser,
   setNewChanges,
+  deleteForeignKey,
 } = schemasSlice.actions;
 
 export default schemasSlice.reducer;

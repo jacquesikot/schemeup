@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import EditableText from './global/EditableText';
-import Button from './global/Button';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import EditableText from '../global/EditableText';
+import Button from '../global/Button';
 
 
 export default function ShareSchemaHeader() {

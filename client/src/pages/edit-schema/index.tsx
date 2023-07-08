@@ -3,21 +3,27 @@
 import 'reactflow/dist/style.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box } from '@mui/material';
-import ReactFlow, { MiniMap, Controls, addEdge, applyNodeChanges, applyEdgeChanges, Background, Node } from 'reactflow';
+import ReactFlow, { MiniMap, Controls, Background, Node, useNodesState, useEdgesState } from 'reactflow';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import NewSchemaHeader from '../../components/NewSchemaHeader';
+import NewSchemaHeader from '../../components/schema/NewSchemaHeader';
 import CanvasDrawer from '../../components/canvas/CanvasDrawer';
 import SchemaProperties from '../../components/canvas/SchemaProperties';
 import CanvasTable from '../../components/canvas/CanvasTable';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import generateTableLayout from '../../utils/generateTableLayout';
-import { Role, Schema, Table as TableProps, deleteTable, newTable, setActiveTable } from '../../redux/slice/schemas';
-import { handleNodeChange, handleEdgeChange, setNodeState } from '../../redux/slice/canvas';
+import {
+  Role,
+  Schema,
+  Table as TableProps,
+  deleteForeignKey,
+  deleteTable,
+  newTable,
+  setActiveTable,
+} from '../../redux/slice/schemas';
 import generateSchemaName from '../../utils/generateSchemaName';
-// import getSchemaSuggestions from '../../prompts/getSchemaSuggestions';
-import { openRightPanel, toggleRightPanel } from '../../redux/slice/app';
+import { openRightPanel, toggleRightPanel, triggerSnack } from '../../redux/slice/app';
 import ImportModal from '../../components/modals/import/ImportSchemaModal';
 import ShareSchemaModal from '../../components/modals/share/ShareSchemaModal';
 import routes from '../../routes';
@@ -27,6 +33,11 @@ import Button from '../../components/global/Button';
 import { removeTab } from '../../redux/slice/apptabs';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase.config';
+import DeleteEdgeModal from '../../components/modals/DeleteEdgeModal';
+import generateSchemaTablesSql from '../../utils/generateSchemaTablesSql';
+import { getSchemaSuggestionsApi } from '../../api/ai';
+import { useQuery } from 'react-query';
+import queryKeys from '../../utils/keys/query';
 
 const EditSchema = () => {
   const params = useParams();
@@ -65,10 +76,9 @@ const EditSchema = () => {
     );
   }
 
-  const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
+  // const canvasRaw = useAppSelector((state) => state.canvas).filter((c) => c.schemaId === params.id)[0];
   const drawerOpen = useAppSelector((state) => state.app.rightPanelOpen);
-  const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
-  const tableLayout = generateTableLayout(schema.tables || []);
+  // const canvas = canvasRaw || { nodes: [], edges: [], schemaId: params.id };
   const tablesWithForeignKeys = schema?.tables?.filter((table) => table.foreignKeys.length > 0);
 
   const activeTableId = useAppSelector(
@@ -80,10 +90,12 @@ const EditSchema = () => {
   const containerRef = useRef<any>(null);
 
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [openDeleteEdgeModal, setOpenDeleteEdgeModal] = useState<boolean>(false);
   const [showShareModal, toggleShowShareModal] = useState<boolean>(false);
   const [showRelations, setShowRelations] = useState<boolean>(true);
-  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<any>([]);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
+  const [activeEdge, setActiveEdge] = useState<any>(null);
 
   const initialEdges: any =
     schema &&
@@ -92,26 +104,29 @@ const EditSchema = () => {
     tablesWithForeignKeys?.flatMap((table) => {
       return table.foreignKeys.map((foreignKey, index) => {
         const refTable = foreignKey.referenceTable;
-        const refName = foreignKey.name;
         return {
           id: table.name + 'to' + refTable,
           source: table.name,
           target: refTable,
           animated: false,
           type: 'step',
-          label: refName,
+          label: foreignKey.name,
         };
       });
     });
   const nodeSchemaTables = schema.tables as any;
+
+  const tableLayout = useMemo(() => {
+    return generateTableLayout(schema.tables || [], initialEdges || []);
+  }, [schema.tables]);
 
   const initialNodes: Node<Schema>[] = nodeSchemaTables.map((table: TableProps) => {
     return {
       id: table.name,
       type: 'table',
       position: {
-        x: tableLayout.filter((t) => t.id === table.id)[0].x,
-        y: tableLayout.filter((t) => t.id === table.id)[0].y,
+        x: tableLayout.filter((t) => t.id === table.name)[0].x,
+        y: tableLayout.filter((t) => t.id === table.name)[0].y,
       },
       data: {
         id: table.id,
@@ -139,66 +154,45 @@ const EditSchema = () => {
     };
   });
 
-  const onNodesChange = useCallback(
-    (changes: any) => {
-      const appliedChanges = applyNodeChanges(changes, canvas.nodes);
-      dispatch(handleNodeChange({ schemaId: schema.id, node: appliedChanges }));
-    },
-    [dispatch, canvas.nodes]
-  );
-
-  const onEdgesChange = useCallback(
-    (changes: any) => {
-      const appliedChanges = applyEdgeChanges(changes, canvas.edges);
-      dispatch(handleEdgeChange({ schemaId: schema.id, edge: appliedChanges }));
-      return appliedChanges;
-    },
-    [dispatch, canvas.edges]
-  );
-
-  const onConnect = useCallback(
-    (params: any) => {
-      const edges = addEdge(params, canvas.edges);
-      dispatch(handleEdgeChange({ schemaId: schema.id, edge: edges }));
-      return edges;
-    },
-    [dispatch, canvas.edges]
-  );
-
   useEffect(() => {
-    dispatch(setNodeState({ node: initialNodes || [], edge: initialEdges || [], schemaId: schema.id }));
-  }, [dispatch, schema.tables, openDeleteModal]);
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [params.id, schema.tables, openDeleteModal]);
 
-  // useEffect(() => {
-  //   const run = async () => {
-  //     try {
-  //       const schemaSql = generateSchemaTablesSql(schema.tables || []);
-  //       const res = await getSchemaSuggestions(schemaSql);
-  //       if (res) {
-  //         const data = res.replace(/^'|'$/g, '');
-  //         if (data) {
-  //           const dataRes = JSON.parse(data);
-  //           if (dataRes) {
-  //             const finalSuggestions = dataRes.suggestions.map((d: any) => {
-  //               return {
-  //                 title: d.severity,
-  //                 body: d.suggestion,
-  //               };
-  //             });
-  //             setAiSuggestions(finalSuggestions);
-  //           }
-  //         }
-  //       }
-  //     } catch (error) {}
-  //   };
-
-  //   run();
-  // }, [schema.tables, schema.description, schema.title]);
+  const { isLoading: fetchSchemaSuggestionsLoading } = useQuery(
+    [queryKeys.SCHEMA_SUGGESTIONS, schema.id],
+    () => {
+      const schemaSql = generateSchemaTablesSql(schema.tables || []);
+      return getSchemaSuggestionsApi({ sql: schemaSql, userId: user?.uid as string });
+    },
+    {
+      enabled: !!user?.uid,
+      onSuccess: (res: any) => {
+        setAiSuggestions(res.suggestions);
+        console.log('res', res.suggestions);
+      },
+      onError: (err: any) => {
+        dispatch(
+          triggerSnack({
+            message: 'Error fetching AI suggestions',
+            severity: 'error',
+            hideDuration: 3000,
+          })
+        );
+      },
+    }
+  );
 
   const showPreview = () => {
     const url = `${routes.SHARE_SCHEMA}/${schema.id}`;
     window.open(url, '_blank', 'noreferrer');
   };
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const onConnect = useCallback((params: any) => {
+    dispatch(triggerSnack({ message: 'Feature coming soon!', severity: 'warning', hideDuration: 3000 }));
+  }, []);
 
   return (
     <Box ref={containerRef} style={{ width: '100%', height: window.innerHeight - 150, position: 'relative' }}>
@@ -240,6 +234,7 @@ const EditSchema = () => {
 
       <CanvasDrawer open={drawerOpen}>
         <SchemaProperties
+          suggestionLoading={fetchSchemaSuggestionsLoading}
           suggestions={aiSuggestions}
           toggleOpen={() => dispatch(toggleRightPanel())}
           showRelations={showRelations}
@@ -250,15 +245,15 @@ const EditSchema = () => {
 
       <Box style={{ width: '100%', height: '100%', position: 'absolute' }}>
         <ReactFlow
-          nodes={canvas.nodes}
+          nodes={nodes}
           nodeTypes={nodeTypes}
-          edges={showRelations ? canvas.edges : []}
+          edges={showRelations ? edges : []}
           onNodesChange={onNodesChange}
           onEdgesChange={userRole !== 'viewer' ? onEdgesChange : () => {}}
           onConnect={userRole !== 'viewer' ? onConnect : () => {}}
           onNodeClick={
             userRole !== 'viewer'
-              ? (_event, node) => {
+              ? (e, node) => {
                   dispatch(setActiveTable({ schemaId: schema.id, tableId: node.data.id }));
                   dispatch(openRightPanel());
                 }
@@ -278,8 +273,15 @@ const EditSchema = () => {
                 }
               : () => {}
           }
+          onEdgesDelete={(edges) => {
+            if (userRole !== 'viewer') {
+              setActiveEdge(edges[0]);
+              setOpenDeleteEdgeModal(true);
+            }
+          }}
           fitView
           panOnScroll
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
           // selectionOnDrag
         >
           <Background />
@@ -307,6 +309,29 @@ const EditSchema = () => {
         }}
         handleTableDelete={() =>
           dispatch(deleteTable({ schemaId: schema.id, tableId: activeTableId ? activeTableId : '' }))
+        }
+        schemaId={schema.id}
+        containerStyle={{
+          width: '400px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          padding: '20px',
+        }}
+      />
+
+      <DeleteEdgeModal
+        open={openDeleteEdgeModal}
+        handleClose={() => {
+          setOpenDeleteEdgeModal(false);
+        }}
+        handleEdgeDelete={() =>
+          dispatch(
+            deleteForeignKey({
+              schemaId: schema.id,
+              tableName: activeEdge.source as string,
+              foreignKeyName: activeEdge.label as string,
+            })
+          )
         }
         schemaId={schema.id}
         containerStyle={{

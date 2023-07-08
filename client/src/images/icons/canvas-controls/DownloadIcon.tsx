@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-const Share = (props: SVGProps<SVGSVGElement>) => (
+const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} fill="none" {...props}>
     <path
       stroke="#4B535F"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={1.2}
-      d="m7.158 11.258 5.692 3.317m-.008-9.15L7.158 8.742M17.5 4.167a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM7.5 10a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm10 5.833a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+      d="M17.5 17.5h-15M15 9.167l-5 5m0 0-5-5m5 5V2.5"
     />
   </svg>
 );
-export default Share;
+export { SvgComponent as DownloadIcon };

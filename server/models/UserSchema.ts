@@ -24,6 +24,7 @@ interface Table {
     autoUpdateTime?: boolean;
   }[];
   foreignKeys: {
+    name: string;
     column: string;
     referenceTable: string;
     referenceColumn: string;
@@ -72,6 +73,7 @@ const ColumnSchema = new MongooseSchema({
 });
 
 const ForeignKeySchema = new MongooseSchema({
+  name: { type: String, required: true, unique: true },
   column: { type: String, required: true },
   referenceTable: { type: String, required: true },
   referenceColumn: { type: String, required: true },
