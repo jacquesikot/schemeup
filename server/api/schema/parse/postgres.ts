@@ -4,6 +4,7 @@ import useMiddlewares from '../../../middlewares/useMiddlewares';
 import useAuth from '../../../middlewares/auth';
 import useCors from '../../../middlewares/cors';
 import parsePgDumpParser from '../../../lib/parsers/pgDumpParserO';
+import { postgreAiSqlParser } from '../../../lib/parsers/aiPgDumpParser';
 
 async function parsePgDump(req: VercelRequest, res: VercelResponse) {
   const sql = req.body;
@@ -14,7 +15,7 @@ async function parsePgDump(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  const data = parsePgDumpParser(sql);
+  const data = await postgreAiSqlParser(sql);
 
   res.status(200).json({
     message: 'Postgres Schema parsed successfully',

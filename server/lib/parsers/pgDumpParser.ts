@@ -1,5 +1,3 @@
-import { parse } from 'path';
-
 const parsePgDumpParser = (sql: string) => {
   interface Column {
     name: string;
